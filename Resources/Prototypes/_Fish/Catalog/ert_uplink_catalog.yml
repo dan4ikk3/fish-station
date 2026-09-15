@@ -3,7 +3,7 @@
   productEntity: ClothingBackpackDuffelCBURNEVABundle
   icon: { sprite: _Sunrise/Interface/Misc/nt_icons.rsi, state: cburneva }
   cost:
-    Crystallite: 7
+    Crystallite: 8
   categories:
     - NTEquipment
   conditions:
