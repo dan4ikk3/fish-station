@@ -70,6 +70,7 @@ public abstract partial class SharedMechSystem : EntitySystem
         SubscribeLocalEvent<MechPilotComponent, GetMeleeWeaponEvent>(OnGetMeleeWeapon);
         SubscribeLocalEvent<MechPilotComponent, CanAttackFromContainerEvent>(OnCanAttackFromContainer);
         SubscribeLocalEvent<MechPilotComponent, AttackAttemptEvent>(OnAttackAttempt);
+        SubscribeLocalEvent<MechPilotComponent, ShotAttemptedEvent>(OnPilotShotAttempt);
 
         InitializeRelay();
     }
@@ -496,6 +497,17 @@ public abstract partial class SharedMechSystem : EntitySystem
             args.Cancel();
     }
 
+    private void OnPilotShotAttempt(EntityUid uid, MechPilotComponent component, ref ShotAttemptedEvent args) //sunrise-start
+    {
+        if (TryComp<MechEquipmentComponent>(args.Used, out var equipment) &&
+            equipment.EquipmentOwner == component.Mech)
+        {
+            return;
+        }
+
+        args.Cancel();
+    } //sunrise-end
+
     public void UpdateAppearance(EntityUid uid, MechComponent? component = null,
         AppearanceComponent? appearance = null)
     {
@@ -563,4 +575,3 @@ public sealed partial class MechExitEvent : SimpleDoAfterEvent
 public sealed partial class MechEntryEvent : SimpleDoAfterEvent
 {
 }
-
