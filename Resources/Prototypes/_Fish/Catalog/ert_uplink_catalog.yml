@@ -1,6 +1,6 @@
 - type: listing
   id: ERTUplinkCBURNEvaBundle
-  productEntity: ClothingBackpackDuffelCBURNEVABundle
+  productEntity: FishClothingBackpackDuffelCBURNEVABundle
   icon: { sprite: _Sunrise/Interface/Misc/nt_icons.rsi, state: cburneva }
   cost:
     Crystallite: 8

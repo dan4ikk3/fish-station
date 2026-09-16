@@ -212,7 +212,7 @@
 # Набор EVA рхбзз
 - type: entity
   parent: ClothingBackpackDuffelCBURN
-  id: ClothingBackpackDuffelCBURNEVABundle
+  id: FishClothingBackpackDuffelCBURNEVABundle
   name: CBURN insulated EVA suit
   description: "A heavyweight, tough and padded EVA capable biosuit used for special cleanup operations."
   components:
