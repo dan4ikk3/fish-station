@@ -50,6 +50,9 @@
   - type: Storage
     grid:
     - 0,0,4,1
+    blacklist:
+      tags:
+      - Bottle
   - type: EntityTableContainerFill
     containers:
       storagebase:
@@ -120,6 +123,9 @@
   - type: Storage
     grid:
     - 0,0,4,1
+    blacklist:
+      tags:
+      - Bottle
   - type: ItemCounter
     count:
       tags: [Cigarette]
@@ -267,4 +273,3 @@
       weight: 7
     - id: CigaretteSaline
       weight: 7
-
