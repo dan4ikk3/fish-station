@@ -50,9 +50,12 @@
   - type: Storage
     grid:
     - 0,0,4,1
-    blacklist: #Fish-Start
+    whitelist:
       tags:
-      - Bottle #Fish-End
+      - Cigarette
+      - Matchstick
+      components:
+      - IgnitionSource
   - type: EntityTableContainerFill
     containers:
       storagebase:
@@ -123,9 +126,12 @@
   - type: Storage
     grid:
     - 0,0,4,1
-    blacklist: #Fish-Start
+    whitelist:
       tags:
-      - Bottle #Fish-End
+      - Cigarette
+      - Matchstick
+      components:
+      - IgnitionSource
   - type: ItemCounter
     count:
       tags: [Cigarette]
