@@ -125,7 +125,7 @@ namespace Content.Client.RoundEnd
                 Orientation = LayoutOrientation.Vertical
             };
             //Put observers at the bottom of the list. Put antags on top.
-            var sortedPlayersInfo = playersInfo.OrderBy(p => p.Observer).ThenBy(p => !p.Antag).ToList();
+            var sortedPlayersInfo = playersInfo.OrderBy(p => p.Observer).ThenBy(p => !p.Antag).ToList(); // Fish-Edit
             var manifestRows = new List<Control>(); // Fish-Edit
 
             //Create labels for each player info.
