@@ -1,5 +1,6 @@
 using System.Linq;
 using System.Numerics;
+using Content.Client._Fish.RoundEnd; // Fish-Edit
 using Content.Client._Sunrise.StatsBoard;
 using Content.Client.Message;
 using Content.Shared._Sunrise.StatsBoard;
@@ -125,7 +126,8 @@ namespace Content.Client.RoundEnd
             };
 
             //Put observers at the bottom of the list. Put antags on top.
-            var sortedPlayersInfo = playersInfo.OrderBy(p => p.Observer).ThenBy(p => !p.Antag);
+            var sortedPlayersInfo = playersInfo.OrderBy(p => p.Observer).ThenBy(p => !p.Antag).ToList();
+            var manifestRows = new List<Control>(); // Fish-Edit
 
             //Create labels for each player info.
             foreach (var playerInfo in sortedPlayersInfo)
@@ -176,8 +178,10 @@ namespace Content.Client.RoundEnd
                 }
                 hBox.AddChild(playerInfoText);
                 playerInfoContainer.AddChild(hBox);
+                manifestRows.Add(hBox); // Fish-Edit
             }
 
+            ManifestSearchHook.Apply(playerManifestTab, manifestRows, sortedPlayersInfo); // Fish-Edit
             playerInfoContainerScrollbox.AddChild(playerInfoContainer);
             playerManifestTab.AddChild(playerInfoContainerScrollbox);
 
