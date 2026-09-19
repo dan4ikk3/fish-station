@@ -637,3 +637,19 @@
     message: пачка фиксов карт
   id: 61
   url: https://github.com/makura-games/fish-station/pull/459
+- author: dan4ikk3
+  time: '2026-09-18T12:41:39.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлен поиск по IC, OCC и должности в манифесте после конца раунда
+  id: 62
+  url: https://github.com/makura-games/fish-station/pull/462
+- author: dan4ikk3
+  time: '2026-09-18T20:53:25.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Коробка для бутылочек теперь занимает 2х2 в инвентаре. Хранилище осталось прежним.
+  - type: Fix
+    message: Теперь нельзя класть бутылочки в пачку из под сигарет
+  id: 63
+  url: https://github.com/makura-games/fish-station/pull/465
