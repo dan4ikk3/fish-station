@@ -1,0 +1,11 @@
+# Выдаётся звонящему на время one-way звонка (см. OneWayHolopadSystem), после звонка забирается.
+- type: entity
+  id: ActionOneWayHolopadEndCall
+  name: Прервать вещание
+  description: Немедленно завершает текущий звонок.
+  components:
+  - type: Action
+    icon: Interface/Actions/manifest.png # заглушка, замените иконку
+    useDelay: 1
+  - type: InstantAction
+    event: !type:OneWayHolopadEndCallActionEvent
