@@ -653,3 +653,26 @@
     message: Теперь нельзя класть бутылочки в пачку из под сигарет
   id: 63
   url: https://github.com/makura-games/fish-station/pull/465
+- author: TiFeRi
+  time: '2026-09-19T22:33:18.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Снижение стоимости подкрепления ЯО (с 30ТК до 18ТК).
+  - type: Tweak
+    message: Добавление подкрепления ЯО лон оперу.
+  id: 64
+  url: https://github.com/makura-games/fish-station/pull/464
+- author: erikundel
+  time: '2026-09-22T17:37:39.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: вернул в спавнменю вентиляторы
+  id: 65
+  url: https://github.com/makura-games/fish-station/pull/468
+- author: NekutGit
+  time: '2026-09-22T20:28:39.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Бита Хоумран больше не отбрасывает цели с включёнными магнитными ботинками
+  id: 66
+  url: https://github.com/makura-games/fish-station/pull/454
