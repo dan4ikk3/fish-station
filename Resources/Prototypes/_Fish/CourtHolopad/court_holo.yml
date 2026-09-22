@@ -1,0 +1,23 @@
+- type: entity
+  parent: HolopadBluespace
+  id: FishHolopadRemoteTransmitter
+  name: remote-view transmitter holopad
+  suffix: Remote Transmitter
+  components:
+  - type: Telephone
+    unlistedNumber: false
+  - type: RemoteHolopadTransmitter
+  - type: Label
+    currentLabel: holopad-remote-transmitter
+
+- type: entity
+  parent: HolopadBluespace
+  id: FishHolopadRemoteReceiver
+  name: remote-view receiver holopad
+  suffix: Remote Receiver
+  components:
+  - type: Telephone
+    unlistedNumber: false
+  - type: RemoteHolopadTransmitter
+  - type: Label
+    currentLabel: holopad-remote-receiver

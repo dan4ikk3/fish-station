@@ -24,7 +24,6 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using System.Linq;
 using Content.Shared.Power.EntitySystems;
-using Content.Server._Fish.Holopad; // Fish-Edit
 
 namespace Content.Server.Holopad;
 
@@ -43,7 +42,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly PvsOverrideSystem _pvs = default!;
     [Dependency] private readonly SharedPowerStateSystem _powerState = default!;
-    [Dependency] private readonly OneWayHolopadSystem _oneWayHolopad = default!; // Fish-Edit
+    [Dependency] private readonly RemoteHolopadSystem _remoteHolopad = default!; // Fish-edit
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
 
@@ -103,17 +102,13 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
         var receiver = GetEntity(args.Receiver);
 
-        if (!TryComp<TelephoneComponent>(receiver, out var receiverTelephone))
+        if (!_remoteHolopad.CanCall(source.Owner, receiver)) // FIsh edit
             return;
 
-        LinkHolopadToUser(source, args.Actor);
-
-        // Fish-Start
-        // Односторонняя сеть: звонок с передатчика идёт принудительно (без ответа), им занимается наша система
-        if (_oneWayHolopad.TryStartCall(source, receiver, args.Actor))
+        if (!TryComp<TelephoneComponent>(receiver, out var receiverTelephone)) // Fish-Edit
             return;
-        // Fish-End
 
+        LinkHolopadToUser(source, args.Actor); // Fish-Edit
         _telephoneSystem.CallTelephone((source, sourceTelephone), (receiver, receiverTelephone), args.Actor);
     }
 
@@ -514,21 +509,25 @@ public sealed class HolopadSystem : SharedHolopadSystem
         {
             var receiver = new Entity<TelephoneComponent>(receiverUid, receiverTelephone);
 
-            // Fish-Start
-            // Односторонняя сеть: передатчик видит только свои приёмники, обычные голопады — только друг друга
-            if (!_oneWayHolopad.IsListedFor(source, receiver))
-                continue;
-            // Fish-End
-
             if (receiverTelephone.UnlistedNumber)
                 continue;
 
             if (source == receiver)
                 continue;
 
+            if (!_remoteHolopad.IsListedFor(entity.Owner, receiverUid)) // FIsh edit
+                continue;
+
             if (!_telephoneSystem.IsSourceInRangeOfReceiver(source, receiver))
                 continue;
 
+            // Изоляция кастомных голопадов. fish-start
+            var sourceIsRemote = HasComp<RemoteHolopadTransmitterComponent>(entity) || HasComp<RemoteHolopadTransmitterComponent>(entity);
+            var receiverIsRemote = HasComp<RemoteHolopadTransmitterComponent>(receiverUid) || HasComp<RemoteHolopadTransmitterComponent>(receiverUid);
+
+            if (sourceIsRemote != receiverIsRemote)
+                continue;
+            //fish-end
             var name = MetaData(receiverUid).EntityName;
 
             if (TryComp<LabelComponent>(receiverUid, out var label) && !string.IsNullOrEmpty(label.CurrentLabel))
