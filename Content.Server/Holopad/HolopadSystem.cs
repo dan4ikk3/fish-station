@@ -151,6 +151,9 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHolopadEndCall(Entity<HolopadComponent> entity, ref HolopadEndCallMessage args)
     {
+        if (HasComp<RemoteHolopadReceiverComponent>(entity)) // Fish-Edit
+            return;
+
         if (!TryComp<TelephoneComponent>(entity, out var entityTelephone))
             return;
 
@@ -521,13 +524,6 @@ public sealed class HolopadSystem : SharedHolopadSystem
             if (!_telephoneSystem.IsSourceInRangeOfReceiver(source, receiver))
                 continue;
 
-            // Изоляция кастомных голопадов. fish-start
-            var sourceIsRemote = HasComp<RemoteHolopadTransmitterComponent>(entity) || HasComp<RemoteHolopadTransmitterComponent>(entity);
-            var receiverIsRemote = HasComp<RemoteHolopadTransmitterComponent>(receiverUid) || HasComp<RemoteHolopadTransmitterComponent>(receiverUid);
-
-            if (sourceIsRemote != receiverIsRemote)
-                continue;
-            //fish-end
             var name = MetaData(receiverUid).EntityName;
 
             if (TryComp<LabelComponent>(receiverUid, out var label) && !string.IsNullOrEmpty(label.CurrentLabel))

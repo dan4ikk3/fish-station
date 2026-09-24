@@ -18,6 +18,18 @@
   components:
   - type: Telephone
     unlistedNumber: false
-  - type: RemoteHolopadTransmitter
+  - type: RemoteHolopadReceiver
   - type: Label
     currentLabel: holopad-remote-receiver
+
+
+- type: entity
+  id: ActionRemoteHolopadExitView
+  name: Выйти из просмотра
+  description: Прерывает удалённый просмотр, не завершая сам звонок.
+  components:
+  - type: Action
+    icon: Interface/Actions/manifest.png # заглушка
+    useDelay: 1
+  - type: InstantAction
+    event: !type:RemoteHolopadExitViewActionEvent
