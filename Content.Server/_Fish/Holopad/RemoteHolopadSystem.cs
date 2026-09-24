@@ -51,7 +51,7 @@ public sealed class RemoteHolopadSystem : EntitySystem
         SubscribeLocalEvent<RemoteViewerFrozenComponent, ComponentShutdown>(OnFrozenShutdown);
     }
 
-    #region: Публичное API для хуков из HolopadSystem (сигнатуры не менялись)
+
 
     public bool CanCall(EntityUid source, EntityUid receiver)
     {
@@ -71,7 +71,6 @@ public sealed class RemoteHolopadSystem : EntitySystem
     /// </summary>
     public bool IsListedFor(EntityUid source, EntityUid receiver) => CanCall(source, receiver);
 
-    #endregion
 
     #region: Отедльная сеть
 
