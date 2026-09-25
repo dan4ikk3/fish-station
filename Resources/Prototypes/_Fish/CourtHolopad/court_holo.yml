@@ -21,10 +21,10 @@
     currentLabel: holopad-remote-receiver
 
 - type: entity
-  id: ActionRemoteHolopadExitView
+  id: FishActionRemoteHolopadExitView
   components:
   - type: Action
-    icon: Interface/Actions/manifest.png # заглушка
+    icon: Interface/Actions/eyeclose.png
     useDelay: 1
   - type: InstantAction
     event: !type:RemoteHolopadExitViewActionEvent

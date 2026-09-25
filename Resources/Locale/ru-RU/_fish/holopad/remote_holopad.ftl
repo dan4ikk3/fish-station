@@ -6,7 +6,7 @@ ent-FishHolopadRemoteReceiver = продвинутый голопад
     .desc = Модифицированный голопад-приёмник. Собирает данные об окружении и отправляет их на подключённый передатчик.
     .suffix = Удаленный приёмник
 
-ent-ActionRemoteHolopadExitView = Прервать просмотр
+ent-FishActionRemoteHolopadExitView = Прервать просмотр
     .desc = Отключиться от удалённого канала.
 
 holopad-remote-transmitter = Передатчик
