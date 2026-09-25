@@ -102,7 +102,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
         var receiver = GetEntity(args.Receiver);
 
-        if (!_remoteHolopad.CanCall(source.Owner, receiver)) // FIsh edit
+        if (!_remoteHolopad.CanCall(source.Owner, receiver)) // Fish-edit
             return;
 
         if (!TryComp<TelephoneComponent>(receiver, out var receiverTelephone)) // Fish-Edit
@@ -524,7 +524,7 @@ public sealed class HolopadSystem : SharedHolopadSystem
             if (source == receiver)
                 continue;
 
-            if (!_remoteHolopad.IsListedFor(entity.Owner, receiverUid)) // FIsh edit
+            if (!_remoteHolopad.IsListedFor(entity.Owner, receiverUid)) // Fish-edit
                 continue;
 
             if (!_telephoneSystem.IsSourceInRangeOfReceiver(source, receiver))
