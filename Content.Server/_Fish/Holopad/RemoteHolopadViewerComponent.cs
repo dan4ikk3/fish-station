@@ -1,11 +1,11 @@
 namespace Content.Server.Holopad;
 
 /// <summary>
-/// Запрещено выдавать вручную!
+/// Не выдавать вручную!
 /// </summary>
 [RegisterComponent]
 public sealed partial class RemoteHolopadViewerComponent : Component
 {
-    public EntityUid Receiver;
+    public EntityUid Transmitter;
     public EntityUid? ExitViewActionEntity;
 }

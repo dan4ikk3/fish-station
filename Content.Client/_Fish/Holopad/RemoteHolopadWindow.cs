@@ -7,15 +7,6 @@ namespace Content.Client.Holopad;
 public sealed partial class HolopadWindow
 {
 
-    public event Action? SendRemoteHolopadStopBroadcastMessageAction;
-
-
-    partial void InitializeRemoteControls()
-    {
-        StopBroadcastButton.OnPressed += _ => SendRemoteHolopadStopBroadcastMessageAction?.Invoke();
-        StopBroadcastButton.AddStyleClass("Caution");
-    }
-
 
     partial void UpdateRemoteAppearance(bool lockButtons)
     {
@@ -24,13 +15,22 @@ public sealed partial class HolopadWindow
 
         var isTransmitter = _entManager.HasComponent<RemoteHolopadTransmitterComponent>(owner);
 
-        StopBroadcastButton.Disabled = _currentState != TelephoneState.InCall || lockButtons;
-        RemoteBroadcastContainer.Visible = isTransmitter && _currentState == TelephoneState.InCall;
+        var isReceiver = _entManager.HasComponent<RemoteHolopadReceiverComponent>(owner);
 
-        if (_entManager.HasComponent<RemoteHolopadReceiverComponent>(owner))
+
+        if (isReceiver)
         {
             EndCallButton.Disabled = true;
             EndCallButton.Visible = false;
+        }
+
+
+        if (isTransmitter || isReceiver)
+        {
+            RequestStationAiButton.Disabled = true;
+            RequestStationAiButton.Visible = false;
+            StartBroadcastButton.Disabled = true;
+            StartBroadcastButton.Visible = false;
         }
     }
 }

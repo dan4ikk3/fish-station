@@ -9,6 +9,17 @@ namespace Content.Shared.Holopad;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class RemoteHolopadTransmitterComponent : Component
 {
+    /// <summary>
+    /// Игроки, которые сейчас смотрят через этот голопад
+    /// </summary>
+    [ViewVariables]
+    public HashSet<EntityUid> Viewers = new();
+
+    /// <summary>
+    /// Выйти из просмотра, выдаётся каждому Viewer на время просмотра.
+    /// </summary>
+    [DataField]
+    public EntProtoId ExitViewAction = "ActionRemoteHolopadExitView";
 }
 
 /// <summary>
@@ -17,15 +28,4 @@ public sealed partial class RemoteHolopadTransmitterComponent : Component
 [RegisterComponent, NetworkedComponent]
 public sealed partial class RemoteHolopadReceiverComponent : Component
 {
-    /// <summary>
-    /// Игрок, который сейчас смотрит через ресивер
-    /// </summary>
-    [ViewVariables]
-    public EntityUid? Viewer;
-
-    /// <summary>
-    /// "Выйти из просмотра", выдаётся Viewer на время просмотра
-    /// </summary>
-    [DataField]
-    public EntProtoId ExitViewAction = "ActionRemoteHolopadExitView";
 }

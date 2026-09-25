@@ -20,7 +20,6 @@ public sealed class RemoteHolopadSystem : EntitySystem
     [Dependency] private readonly SharedEyeSystem _eye = default!;
     [Dependency] private readonly ActionBlockerSystem _blocker = default!;
     [Dependency] private readonly TelephoneSystem _telephone = default!;
-    [Dependency] private readonly SharedHolopadSystem _holopad = default!;
     [Dependency] private readonly SharedActionsSystem _actions = default!;
 
     private const float UpdateInterval = 1f;
@@ -32,12 +31,11 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
         SubscribeLocalEvent<TelephoneCallAttemptEvent>(OnCallAttempt);
 
-        SubscribeLocalEvent<RemoteHolopadTransmitterComponent, RemoteHolopadStopBroadcastMessage>(OnStopBroadcast);
+        SubscribeLocalEvent<RemoteHolopadTransmitterComponent, ActivateInWorldEvent>(OnTransmitterActivate);
+        SubscribeLocalEvent<RemoteHolopadTransmitterComponent, RemoteHolopadJoinViewMessage>(OnJoinView);
         SubscribeLocalEvent<RemoteHolopadTransmitterComponent, ComponentShutdown>(OnTransmitterShutdown);
         SubscribeLocalEvent<RemoteHolopadTransmitterComponent, PowerChangedEvent>(OnTransmitterPower);
 
-        SubscribeLocalEvent<RemoteHolopadReceiverComponent, ActivateInWorldEvent>(OnReceiverActivate);
-        SubscribeLocalEvent<RemoteHolopadReceiverComponent, RemoteHolopadJoinViewMessage>(OnJoinView);
         SubscribeLocalEvent<RemoteHolopadReceiverComponent, ComponentShutdown>(OnReceiverShutdown);
         SubscribeLocalEvent<RemoteHolopadReceiverComponent, PowerChangedEvent>(OnReceiverPower);
 
@@ -51,7 +49,7 @@ public sealed class RemoteHolopadSystem : EntitySystem
         SubscribeLocalEvent<RemoteViewerFrozenComponent, ComponentShutdown>(OnFrozenShutdown);
     }
 
-
+    #region: Публичное API
 
     public bool CanCall(EntityUid source, EntityUid receiver)
     {
@@ -66,13 +64,11 @@ public sealed class RemoteHolopadSystem : EntitySystem
         return sourceIsTransmitter && receiverIsReceiver;
     }
 
-    /// <summary>
-    /// Хук для HolopadSystem.UpdateUIState
-    /// </summary>
     public bool IsListedFor(EntityUid source, EntityUid receiver) => CanCall(source, receiver);
 
+    #endregion
 
-    #region: Отедльная сеть
+    #region: Изоляция сети
 
     private void OnCallAttempt(ref TelephoneCallAttemptEvent ev)
     {
@@ -92,43 +88,41 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
     #endregion
 
-    #region: Вход в голопад
+    #region: Вход в просмотр
 
-    private void OnReceiverActivate(Entity<RemoteHolopadReceiverComponent> ent, ref ActivateInWorldEvent args)
+    private void OnTransmitterActivate(Entity<RemoteHolopadTransmitterComponent> ent, ref ActivateInWorldEvent args)
     {
         TryEnterView(ent, args.User);
     }
 
-    private void OnJoinView(Entity<RemoteHolopadReceiverComponent> ent, ref RemoteHolopadJoinViewMessage args)
+    private void OnJoinView(Entity<RemoteHolopadTransmitterComponent> ent, ref RemoteHolopadJoinViewMessage args)
     {
         TryEnterView(ent, args.Actor);
     }
 
-    private void TryEnterView(Entity<RemoteHolopadReceiverComponent> ent, EntityUid actor)
+    private void TryEnterView(Entity<RemoteHolopadTransmitterComponent> ent, EntityUid actor)
     {
         if (!TryComp<TelephoneComponent>(ent, out var telephone) || telephone.CurrentState != TelephoneState.InCall)
-            return;
-
-        if (ent.Comp.Viewer != null)
-            return;
-
-        var transmitter = telephone.LinkedTelephones.FirstOrDefault().Owner;
-        if (transmitter == default)
             return;
 
         if (HasComp<RemoteHolopadViewerComponent>(actor))
             return;
 
-        ent.Comp.Viewer = actor;
+        var receiver = telephone.LinkedTelephones.FirstOrDefault().Owner;
+        if (receiver == default)
+            return;
+
+        ent.Comp.Viewers.Add(actor);
 
         var viewer = EnsureComp<RemoteHolopadViewerComponent>(actor);
-        viewer.Receiver = ent.Owner;
+        viewer.Transmitter = ent.Owner;
         _actions.AddAction(actor, ref viewer.ExitViewActionEntity, ent.Comp.ExitViewAction);
 
         if (TryComp<EyeComponent>(actor, out var eye))
-            _eye.SetTarget(actor, transmitter, eye);
+            _eye.SetTarget(actor, receiver, eye);
 
         EnsureComp<RemoteViewerFrozenComponent>(actor);
+        _blocker.UpdateCanMove(actor);
     }
 
     #endregion
@@ -146,8 +140,8 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
     private void ExitView(Entity<RemoteHolopadViewerComponent> ent)
     {
-        if (TryComp<RemoteHolopadReceiverComponent>(ent.Comp.Receiver, out var receiver) && receiver.Viewer == ent.Owner)
-            receiver.Viewer = null;
+        if (TryComp<RemoteHolopadTransmitterComponent>(ent.Comp.Transmitter, out var transmitter))
+            transmitter.Viewers.Remove(ent.Owner);
 
         if (TryComp<EyeComponent>(ent.Owner, out var eye))
             _eye.SetTarget(ent.Owner, null, eye);
@@ -160,35 +154,15 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
     #endregion
 
-    #region: Остановка трансляции, только для передатчика
-
-    private bool CanStopBroadcast(Entity<RemoteHolopadTransmitterComponent> ent, EntityUid actor)
-    {
-        if (!TryComp<TelephoneComponent>(ent, out var telephone) || telephone.CurrentState != TelephoneState.InCall)
-            return false;
-
-        if (!TryComp<HolopadComponent>(ent, out var holopad))
-            return false;
-
-        return !_holopad.IsHolopadControlLocked((ent.Owner, holopad), actor);
-    }
-
-    private void OnStopBroadcast(Entity<RemoteHolopadTransmitterComponent> ent, ref RemoteHolopadStopBroadcastMessage args)
-    {
-        if (!CanStopBroadcast(ent, args.Actor))
-            return;
-
-        if (TryComp<TelephoneComponent>(ent, out var tel))
-            _telephone.EndTelephoneCalls((ent.Owner, tel));
-    }
-
-    #endregion
-
-    #region: Аварийный выход
+    #region: Аварийные выходы
 
     private void OnTransmitterShutdown(Entity<RemoteHolopadTransmitterComponent> ent, ref ComponentShutdown args)
     {
-        ReleaseViewersOf(ent.Owner);
+        foreach (var viewer in ent.Comp.Viewers.ToArray())
+        {
+            if (TryComp<RemoteHolopadViewerComponent>(viewer, out var viewerComp))
+                ExitView((viewer, viewerComp));
+        }
     }
 
     private void OnTransmitterPower(Entity<RemoteHolopadTransmitterComponent> ent, ref PowerChangedEvent args)
@@ -199,27 +173,14 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
     private void OnReceiverShutdown(Entity<RemoteHolopadReceiverComponent> ent, ref ComponentShutdown args)
     {
-        if (ent.Comp.Viewer is { } viewer && TryComp<RemoteHolopadViewerComponent>(viewer, out var viewerComp))
-            ExitView((viewer, viewerComp));
+        if (TryComp<TelephoneComponent>(ent, out var tel) && _telephone.IsTelephoneEngaged((ent.Owner, tel)))
+            _telephone.EndTelephoneCalls((ent.Owner, tel));
     }
 
     private void OnReceiverPower(Entity<RemoteHolopadReceiverComponent> ent, ref PowerChangedEvent args)
     {
         if (!args.Powered && TryComp<TelephoneComponent>(ent, out var tel))
             _telephone.EndTelephoneCalls((ent.Owner, tel));
-    }
-
-    private void ReleaseViewersOf(EntityUid transmitter)
-    {
-        var query = EntityQueryEnumerator<RemoteHolopadViewerComponent>();
-        while (query.MoveNext(out var uid, out var viewerComp))
-        {
-            if (!TryComp<TelephoneComponent>(viewerComp.Receiver, out var tel) ||
-                tel.LinkedTelephones.FirstOrDefault().Owner != transmitter)
-                continue;
-
-            ExitView((uid, viewerComp));
-        }
     }
 
     #endregion
@@ -262,8 +223,8 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
     private void OnViewerShutdown(Entity<RemoteHolopadViewerComponent> ent, ref ComponentShutdown args)
     {
-        if (TryComp<RemoteHolopadReceiverComponent>(ent.Comp.Receiver, out var receiver) && receiver.Viewer == ent.Owner)
-            receiver.Viewer = null;
+        if (TryComp<RemoteHolopadTransmitterComponent>(ent.Comp.Transmitter, out var transmitter))
+            transmitter.Viewers.Remove(ent.Owner);
     }
 
     #endregion
@@ -279,11 +240,10 @@ public sealed class RemoteHolopadSystem : EntitySystem
 
         _updateTimer -= UpdateInterval;
 
-        // Если звонок оборвался, выкидвает всех из звонка
         var query = EntityQueryEnumerator<RemoteHolopadViewerComponent>();
         while (query.MoveNext(out var uid, out var viewerComp))
         {
-            if (!TryComp<TelephoneComponent>(viewerComp.Receiver, out var telephone) ||
+            if (!TryComp<TelephoneComponent>(viewerComp.Transmitter, out var telephone) ||
                 telephone.CurrentState != TelephoneState.InCall)
             {
                 ExitView((uid, viewerComp));

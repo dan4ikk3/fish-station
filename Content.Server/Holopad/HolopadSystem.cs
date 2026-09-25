@@ -179,6 +179,9 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHolopadStartBroadcast(Entity<HolopadComponent> source, ref HolopadStartBroadcastMessage args)
     {
+        if (HasComp<RemoteHolopadTransmitterComponent>(source) || HasComp<RemoteHolopadReceiverComponent>(source)) // Fish-Edit
+            return;
+
         if (IsHolopadControlLocked(source, args.Actor) || IsHolopadBroadcastOnCoolDown(source))
             return;
 
@@ -212,6 +215,9 @@ public sealed class HolopadSystem : SharedHolopadSystem
 
     private void OnHolopadStationAiRequest(Entity<HolopadComponent> entity, ref HolopadStationAiRequestMessage args)
     {
+        if (HasComp<RemoteHolopadTransmitterComponent>(entity) || HasComp<RemoteHolopadReceiverComponent>(entity)) // Fish-Edit
+            return;
+
         if (IsHolopadControlLocked(entity, args.Actor))
             return;
 

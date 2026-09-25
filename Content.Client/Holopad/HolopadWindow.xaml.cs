@@ -43,7 +43,6 @@ public sealed partial class HolopadWindow : FancyWindow
     public event Action? SendHolopadActivateProjectorMessageAction;
     public event Action? SendHolopadRequestStationAiMessageAction;
 
-    partial void InitializeRemoteControls(); // Fish-edit
     partial void UpdateRemoteAppearance(bool lockButtons); // Fish-edit
 
     public HolopadWindow()
@@ -67,7 +66,6 @@ public sealed partial class HolopadWindow : FancyWindow
 
         // XML formatting
         AnswerCallButton.AddStyleClass("ButtonAccept");
-        InitializeRemoteControls(); // Fish-edit
         EndCallButton.AddStyleClass("Caution");
         StartBroadcastButton.AddStyleClass("Caution");
 
