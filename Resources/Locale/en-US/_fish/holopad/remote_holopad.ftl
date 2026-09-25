@@ -6,7 +6,7 @@ ent-FishHolopadRemoteReceiver = advanced holopad
     .desc = A modified holopad receiver. Gathers data on its surroundings and sends it to the connected transmitter.
     .suffix = Remote Receiver
 
-ent-FishActionRemoteHolopadExitView = Stop viewing
+ent-ActionRemoteHolopadExitView = Stop viewing
     .desc = Disconnect from the remote channel.
 
 holopad-remote-transmitter = Transmitter

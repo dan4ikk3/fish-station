@@ -21,7 +21,7 @@
     currentLabel: holopad-remote-receiver
 
 - type: entity
-  id: FishActionRemoteHolopadExitView
+  id: ActionRemoteHolopadExitView
   components:
   - type: Action
     icon: Interface/Actions/eyeclose.png
