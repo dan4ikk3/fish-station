@@ -84,7 +84,7 @@
 #Security implants
 
 - type: entity
-  parent: BaseSubdermalImplant
+  parent: [ BaseSubdermalImplant, DeathRattleImplant ]
   id: TrackingImplant
   name: tracking implant
   description: This implant has a tracking device attached to the suit sensor network, as well as a condition monitor for the Security radio channel.
@@ -105,6 +105,10 @@
     - type: StationLimitedNetwork
     - type: WirelessNetworkConnection
       range: 500
+    # Fish-start
+    - type: RattleOnTrigger
+      radioChannel: Security
+    # Fish-end
 
 #ERT implants Sunrise-start
 #- type: entity
