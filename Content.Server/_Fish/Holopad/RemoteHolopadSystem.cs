@@ -17,10 +17,10 @@ namespace Content.Server.Holopad;
 
 public sealed class RemoteHolopadSystem : EntitySystem
 {
-    [Dependency] private readonly SharedEyeSystem _eye = default!;
-    [Dependency] private readonly ActionBlockerSystem _blocker = default!;
-    [Dependency] private readonly TelephoneSystem _telephone = default!;
-    [Dependency] private readonly SharedActionsSystem _actions = default!;
+    [Dependency] private SharedEyeSystem _eye = default!;
+    [Dependency] private ActionBlockerSystem _blocker = default!;
+    [Dependency] private TelephoneSystem _telephone = default!;
+    [Dependency] private SharedActionsSystem _actions = default!;
 
     private const float UpdateInterval = 1f;
     private float _updateTimer;
