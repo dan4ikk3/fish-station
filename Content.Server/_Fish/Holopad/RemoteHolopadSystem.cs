@@ -15,7 +15,7 @@ using Robust.Shared.GameObjects;
 
 namespace Content.Server.Holopad;
 
-public sealed class RemoteHolopadSystem : EntitySystem
+public sealed partial class RemoteHolopadSystem : EntitySystem
 {
     [Dependency] private SharedEyeSystem _eye = default!;
     [Dependency] private ActionBlockerSystem _blocker = default!;
