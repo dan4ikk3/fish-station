@@ -19,7 +19,7 @@ public sealed partial class RemoteHolopadTransmitterComponent : Component
     /// Выйти из просмотра, выдаётся каждому Viewer на время просмотра.
     /// </summary>
     [DataField]
-    public EntProtoId ExitViewAction = "ActionRemoteHolopadExitView";
+    public EntProtoId ExitViewAction = "FishActionRemoteHolopadExitView";
 }
 
 /// <summary>
