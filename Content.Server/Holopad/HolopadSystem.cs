@@ -27,7 +27,7 @@ using Content.Shared.Power.EntitySystems;
 
 namespace Content.Server.Holopad;
 
-public sealed partial class HolopadSystem : SharedHolopadSystem
+public sealed class HolopadSystem : SharedHolopadSystem
 {
     [Dependency] private TelephoneSystem _telephoneSystem = default!;
     [Dependency] private UserInterfaceSystem _userInterfaceSystem = default!;
@@ -43,7 +43,6 @@ public sealed partial class HolopadSystem : SharedHolopadSystem
     [Dependency] private PvsOverrideSystem _pvs = default!;
     [Dependency] private SharedPowerStateSystem _powerState = default!;
     [Dependency] private RemoteHolopadSystem _remoteHolopad = default!; // Fish-edit
-
     private float _updateTimer = 1.0f;
     private const float UpdateTime = 1.0f;
 
