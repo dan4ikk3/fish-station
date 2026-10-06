@@ -70,7 +70,7 @@ public abstract partial class SharedMechSystem : EntitySystem
         SubscribeLocalEvent<MechPilotComponent, GetMeleeWeaponEvent>(OnGetMeleeWeapon);
         SubscribeLocalEvent<MechPilotComponent, CanAttackFromContainerEvent>(OnCanAttackFromContainer);
         SubscribeLocalEvent<MechPilotComponent, AttackAttemptEvent>(OnAttackAttempt);
-        SubscribeLocalEvent<MechPilotComponent, ShotAttemptedEvent>(OnPilotShotAttempt); // Fish-Edit
+        SubscribeLocalEvent<MechPilotComponent, ShotAttemptedEvent>(OnPilotShotAttempt); // Sunrise-Edit
 
         InitializeRelay();
     }
