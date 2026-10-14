@@ -1,0 +1,30 @@
+- type: job
+  id: CentCommMaid
+  name: job-name-centcom-maid
+  description: job-description-centcom-maid
+  playTimeTracker: JobCentCommMaid
+  requirements:
+  - !type:DiscordRoleRequirement
+  - !type:OverallPlaytimeRequirement
+    time: 12000
+  - !type:RoleTimeRequirement
+    role: JobComMaid
+    time: 16000
+  weight: 100
+  setPreference: true
+  startingGear: ComMaidGear
+  icon: JobIconComMaid
+  overrideConsoleVisibility: false
+  supervisors: job-supervisors-centcom
+  radioBold: true
+  alwaysUseSpawner: true
+  accessGroups:
+  - AllAccess
+  access:
+  - CentralCommand
+  special:
+  - !type:AddImplantSpecial
+    implants: [ MindShieldImplant, DeathRattleImplantCentcomm ]
+  - !type:AddComponentSpecial
+    components:
+    - type: ParadoxCloneImmune

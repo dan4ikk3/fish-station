@@ -24,4 +24,3 @@
     prototype: WehMedipen
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
-
