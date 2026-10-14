@@ -8,7 +8,7 @@
       time: 720000
     - !type:DepartmentTimeRequirement
       department: Medical
-      time: 60400 #2 hrs # Sunrise-RoleTime
+      time: 60400 #16,8 hrs # Sunrise-RoleTime
   startingGear: DoctorGear
   icon: "JobIconCentcommMedicalDoctor"
   supervisors: job-supervisors-centcom

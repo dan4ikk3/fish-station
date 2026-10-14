@@ -8,7 +8,7 @@
       time: 720000
     - !type:DepartmentTimeRequirement
       department: Civilian
-      time: 60400 #1 hrs # Sunrise-RoleTime
+      time: 60400 #16,8 hrs # Sunrise-RoleTime
   startingGear: CentcommBartenderGear
   icon: "JobIconCentcommBartender"
   overrideConsoleVisibility: false
