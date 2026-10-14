@@ -130,7 +130,7 @@
       - state: jobicon
 
 - type: entity
-  id: SpawnPointLustCentCommMaid
+  id: SpawnPointCentCommMaid
   parent: SpawnPointJobBase
   name: central command maid
   components:
