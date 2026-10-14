@@ -4,12 +4,11 @@
   description: job-description-centcom-maid
   playTimeTracker: JobCentCommMaid
   requirements:
-  - !type:DiscordRoleRequirement
   - !type:OverallPlaytimeRequirement
-    time: 12000
+    time: 720000
   - !type:RoleTimeRequirement
     role: JobComMaid
-    time: 16000
+    time: 50400
   weight: 100
   setPreference: true
   startingGear: ComMaidGear
