@@ -26,5 +26,3 @@
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, DeathRattleImplantCentcomm ]
   - !type:AddComponentSpecial
-    components:
-    - type: ParadoxCloneImmune
