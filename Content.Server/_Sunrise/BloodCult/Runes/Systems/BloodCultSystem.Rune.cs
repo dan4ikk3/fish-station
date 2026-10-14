@@ -1,3 +1,7 @@
+// Fish-start
+using Content.Shared.Mind;
+using Content.Shared.Ghost;
+// Fish-end
 using System.Linq;
 using System.Numerics;
 using Content.Server._Sunrise.BloodCult.GameRule;
@@ -493,6 +497,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             args.Result = result;
         }
 
+        /// <summary>
+        /// Sacrifices a target on a blood cult offering rune.
+        /// </summary>
         private bool Sacrifice(
             EntityUid rune,
             EntityUid target,
@@ -520,7 +527,13 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
                     _cultistTargetsConditionSystem.RefresTitle(obj, rule.CultTargets, killCultistTargetsComponent);
                 }
 
-                _gibbing.Gib(target);
+                // Fish-start
+                if (!SpawnShard(target))
+                {
+                    _gibbing.Gib(target);
+                }
+                // Fish-end
+
                 _bloodCultRuleSystem.ChangeSacrificeCount(rule, rule.SacrificeCount + 1);
 
                 return true;
@@ -1340,20 +1353,55 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             _entityManager.SpawnEntity(rune, coords);
         }
 
+        // Fish-start
+        /// <summary>
+        /// Attempts to create a soul shard from the sacrifice target, transferring the victim's mind into it.
+        /// Returns false if the target has no mind or the mind is already in another living body.
+        /// </summary>
         private bool SpawnShard(EntityUid target)
         {
-            if (!_entityManager.TryGetComponent<MindContainerComponent>(target, out var mindComponent))
-                return false;
-
             var transform = CompOrNull<TransformComponent>(target)?.Coordinates;
 
             if (transform == null)
                 return false;
 
+            EntityUid? targetMindId = null;
+            MindComponent? targetMind = null;
+
+            if (_entityManager.TryGetComponent<MindContainerComponent>(target, out var mindComponent) && mindComponent.HasMind)
+            {
+                targetMindId = mindComponent.Mind;
+                if (targetMindId.HasValue) targetMind = _entityManager.GetComponent<MindComponent>(targetMindId.Value);
+            }
+            else
+            {
+                return false;
+            }
+
+            if (targetMindId != null && targetMind != null)
+            {
+                var currentEntity = targetMind.CurrentEntity;
+
+                if (currentEntity != null && currentEntity != target && currentEntity != targetMind.VisitingEntity)
+                {
+                    if (_entityManager.HasComponent<MobStateComponent>(currentEntity) && !_entityManager.HasComponent<GhostComponent>(currentEntity))
+                    {
+                        return false;
+                    }
+                }
+            }
+            else
+            {
+                return false;
+            }
+        // Fish-end
+
             var shard = _entityManager.SpawnEntity("SoulShardGhost", transform.Value);
 
-            if (mindComponent.Mind.HasValue)
-                _mindSystem.TransferTo(mindComponent.Mind.Value, shard);
+            if (targetMindId != null && targetMind != null)
+            {
+                _mindSystem.TransferTo(targetMindId.Value, shard, mind: targetMind);
+            }
 
             _gibbing.Gib(target);
 
@@ -1419,6 +1467,9 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             return metres;
         }
 
+        /// <summary>
+        /// Validates that the entity is on a valid station grid tile where a rune can be placed.
+        /// </summary>
         public bool IsCorrectLocation(EntityUid uid, out EntityCoordinates coords)
         {
             coords = default;
@@ -1432,6 +1483,14 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
             if (!TryComp<MapGridComponent>(gridUid, out var mapGrid))
                 return false;
+
+            // Fish-start
+            if (_station.GetOwningStation(gridUid.Value) == null)
+            {
+                _popupSystem.PopupEntity(Loc.GetString("cult-rune-not-on-station"), uid, uid);
+                return false;
+            }
+            // Fish-end
 
             var position = _map.TileIndicesFor(gridUid.Value, mapGrid, transform.Coordinates);
 
@@ -1455,3 +1514,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
          */
     }
 }
+
+
+
+

@@ -3196,17 +3196,20 @@
     materialComposition:
       MoneyWarMizMaterial: 100
   - type: SelfUnremovableClothing
-  - type: StorageFill
-    contents: 
-    - id: DrinkMREFlaskWM
-    - id: PinpointerCoreWM
-    - id: CombatKnifeWM
-    - id: MedkitFilledWM
-    - id: GrenadeFlashBangWM
-    - id: TearGasGrenadeWM
-    - id: BoxGlowstickBlueWM
-    - id: MoneyWarMiz500
-    - id: BinocularsWM
+  - type: EntityTableContainerFill
+    containers:
+      storagebase: !type:AllSelector
+        children:
+        - id: PouchBackpackPockets
+        - id: DrinkMREFlaskWM
+        - id: PinpointerCoreWM
+        - id: CombatKnifeWM
+        - id: MedkitFilledWM
+        - id: GrenadeFlashBangWM
+        - id: TearGasGrenadeWM
+        - id: BoxGlowstickBlueWM
+        - id: MoneyWarMiz500
+        - id: BinocularsWM
   - type: ExplosionResistance
     damageCoefficient: 0
 
@@ -3315,17 +3318,20 @@
     materialComposition:
       MoneyWarMizMaterial: 100
   - type: SelfUnremovableClothing
-  - type: StorageFill
-    contents:
-    - id: DrinkMREFlaskWM
-    - id: PinpointerArmWM
-    - id: KukriKnifeWM
-    - id: MedkitFilledWM
-    - id: GrenadeFlashBangWM
-    - id: TearGasGrenadeWM
-    - id: BoxGlowstickRedWM
-    - id: MoneyWarMiz500
-    - id: BinocularsWM
+  - type: EntityTableContainerFill
+    containers:
+      storagebase: !type:AllSelector
+        children:
+        - id: PouchBackpackPockets
+        - id: DrinkMREFlaskWM
+        - id: PinpointerArmWM
+        - id: KukriKnifeWM
+        - id: MedkitFilledWM
+        - id: GrenadeFlashBangWM
+        - id: TearGasGrenadeWM
+        - id: BoxGlowstickRedWM
+        - id: MoneyWarMiz500
+        - id: BinocularsWM
   - type: ExplosionResistance
     damageCoefficient: 0
 

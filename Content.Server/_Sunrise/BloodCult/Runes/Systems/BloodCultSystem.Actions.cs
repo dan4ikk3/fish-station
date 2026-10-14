@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Content.Server._Sunrise.BloodCult.UI;
 using Content.Server._Sunrise.BloodCult.Runes.Comps;
 using Content.Server.Body.Components;
@@ -38,6 +38,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             SubscribeLocalEvent<BloodCultistComponent, CultEmpPulseTargetActionEvent>(OnElectromagneticPulse);
             SubscribeLocalEvent<BloodCultistComponent, CultConcealPresenceWorldActionEvent>(OnConcealPresence);
             SubscribeLocalEvent<BloodCultistComponent, CultTeleportTargetActionEvent>(OnTeleport);
+            SubscribeLocalEvent<BloodCultistComponent, CultTeleportStartDoAfterEvent>(OnTeleportStartDoAfter);
             SubscribeLocalEvent<BloodCultistComponent, CultTeleportDoAfterEvent>(OnTeleportDoAfter);
             SubscribeLocalEvent<BloodCultistComponent, CultStunTargetActionEvent>(OnStunTarget);
             SubscribeLocalEvent<BloodCultistComponent, CultShadowShacklesTargetActionEvent>(OnShadowShackles);
@@ -261,13 +262,27 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             args.Handled = true;
         }
 
+        /// <summary>
+        /// Opens the teleport rune selection EUI for the cultist.
+        /// </summary>
         private void OnTeleport(EntityUid uid, BloodCultistComponent component, CultTeleportTargetActionEvent args)
         {
-            if (!TryComp<BloodstreamComponent>(args.Performer, out _) || !TryComp<ActorComponent>(uid, out _))
+            if (!TryComp<BloodstreamComponent>(args.Performer, out _) || !TryComp<ActorComponent>(uid, out var actor))
                 return;
 
+            var eui = new TeleportSpellEui(args.Performer, args.Target);
+            _euiManager.OpenEui(eui, actor.PlayerSession);
+            eui.StateDirty();
+            args.Handled = true;
+        }
+
+        /// <summary>
+        /// Starts a 2-second DoAfter for the personal cult teleport after the player selects a target rune.
+        /// </summary>
+        private void OnTeleportStartDoAfter(EntityUid uid, BloodCultistComponent comp, CultTeleportStartDoAfterEvent args)
+        {
             var ev = new CultTeleportDoAfterEvent();
-            var doAfter = new DoAfterArgs(_entityManager, args.Performer, TimeSpan.FromSeconds(2), ev, uid)
+            var doAfter = new DoAfterArgs(_entityManager, uid, TimeSpan.FromSeconds(2), ev, uid)
             {
                 BreakOnMove = true,
                 BreakOnDamage = true,
@@ -278,11 +293,16 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
             if (!_doAfterSystem.TryStartDoAfter(doAfter))
                 return;
 
-            // Сохраняем цель телепорта до завершения каста.
-            EnsureComp<CultTeleportCastComponent>(uid).Target = args.Target;
-            args.Handled = true;
+            // Fish-start
+            var castComp = EnsureComp<CultTeleportCastComponent>(uid);
+            castComp.Target = args.Target;
+            castComp.Rune = args.Rune;
+            // Fish-end
         }
 
+        /// <summary>
+        /// Completes the personal cult teleport after the DoAfter finishes: spawns effects, plays sounds, and moves the target.
+        /// </summary>
         private void OnTeleportDoAfter(EntityUid uid, BloodCultistComponent component, CultTeleportDoAfterEvent args)
         {
             if (args.Cancelled || args.Handled)
@@ -295,25 +315,35 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
             args.Handled = true;
 
-            if (!TryComp<CultTeleportCastComponent>(uid, out var cast) ||
-                !TryComp<ActorComponent>(uid, out var actor))
+            if (!TryComp<CultTeleportCastComponent>(uid, out var cast))
             {
                 RemComp<CultTeleportCastComponent>(uid);
                 return;
             }
 
             var target = cast.Target;
+            var rune = cast.Rune;
             RemComp<CultTeleportCastComponent>(uid);
 
-            if (!Exists(target))
+            // Fish-start
+            if (Deleted(target) || Deleted(rune))
             {
                 _popupSystem.PopupEntity(Loc.GetString("cult-teleport-interrupted"), uid, uid);
                 return;
             }
 
-            var eui = new TeleportSpellEui(args.Args.User, target);
-            _euiManager.OpenEui(eui, actor.PlayerSession);
-            eui.StateDirty();
+            var runeTransform = Transform(rune);
+            var targetTransform = Transform(target);
+            // Fish-end
+
+            _entityManager.SpawnEntity("CultTeleportInEffect", runeTransform.Coordinates);
+            _entityManager.SpawnEntity("CultTeleportOutEffect", targetTransform.Coordinates);
+            _audio.PlayPvs(new SoundPathSpecifier("/Audio/_Sunrise/BloodCult/veilin.ogg"), runeTransform.Coordinates);
+            _audio.PlayPvs(new SoundPathSpecifier("/Audio/_Sunrise/BloodCult/veilout.ogg"), targetTransform.Coordinates);
+            _transformSystem.SetCoordinates(target, runeTransform.Coordinates);
+
+            var ev = new TeleportSpellUsedEvent();
+            _entityManager.EventBus.RaiseLocalEvent(uid, ev);
         }
 
         private void OnConcealPresence(EntityUid uid,
