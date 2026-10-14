@@ -137,6 +137,7 @@
   - type: SpawnPoint
     job_id: CentCommMaid
   - type: Sprite
+    sprite: _Sunrise/Markers/jobs.rsi
     layers:
       - state: green
       - state: jobicon
