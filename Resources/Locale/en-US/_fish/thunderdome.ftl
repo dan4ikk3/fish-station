@@ -3,18 +3,15 @@ thunderdome-ghost-button = Thunderdome ({$count})
 thunderdome-ghost-button-default = Thunderdome (0)
 
 # Loadout window
-thunderdome-loadout-title = Thunderdome Loadout
+thunderdome-loadout-title = Deathmatch Arena
 thunderdome-loadout-players = Players in arena: {$count}
-thunderdome-loadout-subtitle = Select your primary weapon
+thunderdome-loadout-subtitle = Build your loadout within the point budget
 thunderdome-loadout-confirm = Enter Arena
 
-# Weapon categories
-thunderdome-category-shotguns = Shotguns
-thunderdome-category-smgs = SMGs
-thunderdome-category-rifles = Rifles
-thunderdome-category-revolvers = Revolvers
-thunderdome-category-snipers = Snipers
-thunderdome-category-melee = Melee
+# Shop categories
+thunderdome-category-weapons = Weapons
+thunderdome-category-armor = Armor
+thunderdome-category-medicine = Medicine
 
 # Weapon names
 thunderdome-loadout-shotgun = Kammerer
@@ -39,6 +36,35 @@ thunderdome-desc-python = AP-loaded revolver + 1 AP speedloader
 thunderdome-desc-inspector = Revolver + 2 speedloaders
 thunderdome-desc-esword = Energy sword + 2 hyperzine injectors
 thunderdome-desc-mosin = Kardashev-Mosin + 2 spare magazines + ushanka + a vodka
+
+# Shop
+thunderdome-shop-balance = Points: { $left } / { $total }
+thunderdome-shop-cost = { $cost } pts
+thunderdome-shop-selected = Selected: { $count }
+thunderdome-shop-clear = Reset
+thunderdome-shop-preset-save = Save preset
+thunderdome-shop-preset-load = Load preset
+thunderdome-shop-preset-hint = One slot, erased at the start of the next round
+
+# Armor and medicine
+thunderdome-item-armor-bulletproof = Bulletproof vest
+thunderdome-item-armor-riot = Riot armor
+thunderdome-item-armor-heavy = Heavy armor
+thunderdome-item-med-stim = Stimulants
+thunderdome-item-med-combat = Combat medkit
+thunderdome-item-med-advanced = Advanced medkit
+thunderdome-desc-armor-bulletproof = Bulletproof vest + basic helmet
+thunderdome-desc-armor-riot = Riot armor + riot helmet
+thunderdome-desc-armor-heavy = Heavy armor + SWAT helmet
+thunderdome-desc-med-stim = 2 stimulant injectors
+thunderdome-desc-med-combat = Combat medical kit
+thunderdome-desc-med-advanced = Advanced medical kit
+
+# Exit window
+thunderdome-exit-title = Arena
+thunderdome-exit-offer = You left the arena. What next?
+thunderdome-exit-stay = Stay on the arena
+thunderdome-exit-return = Return to body
 
 # Kill streak announcements
 thunderdome-streak-3 = {$player} is on a Killing Spree!

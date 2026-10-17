@@ -14,10 +14,8 @@ public sealed class ThunderdomeLoadoutEui : BaseEui
     {
         _window = new ThunderdomeLoadoutWindow();
         _window.OnClose += () => SendMessage(new CloseEuiMessage());
-        _window.OnLoadoutConfirmed += weaponIdx =>
-        {
-            SendMessage(new ThunderdomeLoadoutSelectedMessage(weaponIdx));
-        };
+        _window.OnLoadoutConfirmed += items => SendMessage(new ThunderdomeLoadoutSelectedMessage(items));
+        _window.OnPresetSaved += items => SendMessage(new ThunderdomePresetSaveMessage(items));
     }
 
     public override void Opened()

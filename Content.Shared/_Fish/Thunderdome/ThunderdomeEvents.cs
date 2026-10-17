@@ -53,3 +53,23 @@ public sealed class ThunderdomeRevivalOfferEvent : EntityEventArgs;
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class ThunderdomeRevivalAcceptEvent : EntityEventArgs;
+
+/// <summary>
+/// Server offers a player who just left the arena to stay or return to the body.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class ThunderdomeExitOfferEvent : EntityEventArgs;
+
+/// <summary>
+/// Client answer to the exit offer: stay on the arena or return to the original body.
+/// </summary>
+[Serializable, NetSerializable]
+public sealed class ThunderdomeExitChoiceEvent : EntityEventArgs
+{
+    public bool Stay { get; }
+
+    public ThunderdomeExitChoiceEvent(bool stay)
+    {
+        Stay = stay;
+    }
+}

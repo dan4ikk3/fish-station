@@ -5,12 +5,14 @@ namespace Content.Client._Fish.Thunderdome;
 public sealed class ThunderdomeUISystem : EntitySystem
 {
     private ThunderdomeRevivalWindow? _revivalWindow;
+    private ThunderdomeExitWindow? _exitWindow;
 
     public override void Initialize()
     {
         base.Initialize();
 
         SubscribeNetworkEvent<ThunderdomeRevivalOfferEvent>(OnRevivalOffer);
+        SubscribeNetworkEvent<ThunderdomeExitOfferEvent>(OnExitOffer);
     }
 
     private void OnRevivalOffer(ThunderdomeRevivalOfferEvent ev)
@@ -24,10 +26,20 @@ public sealed class ThunderdomeUISystem : EntitySystem
         _revivalWindow.OpenCentered();
     }
 
+    private void OnExitOffer(ThunderdomeExitOfferEvent ev)
+    {
+        _exitWindow?.Close();
+        _exitWindow = new ThunderdomeExitWindow();
+        _exitWindow.OnChoice += stay => RaiseNetworkEvent(new ThunderdomeExitChoiceEvent(stay));
+        _exitWindow.OpenCentered();
+    }
+
     public override void Shutdown()
     {
         base.Shutdown();
         _revivalWindow?.Close();
         _revivalWindow = null;
+        _exitWindow?.Close();
+        _exitWindow = null;
     }
 }

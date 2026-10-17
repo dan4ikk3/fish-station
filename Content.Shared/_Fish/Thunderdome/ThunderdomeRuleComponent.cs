@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Fish.Thunderdome;
 
 [DataDefinition]
-public sealed partial class ThunderdomeWeaponLoadout
+public sealed partial class ThunderdomeShopItem
 {
     [DataField(required: true)]
     public ProtoId<StartingGearPrototype> Gear;
@@ -22,6 +22,12 @@ public sealed partial class ThunderdomeWeaponLoadout
 
     [DataField(required: true)]
     public EntProtoId Sprite;
+
+    [DataField(required: true)]
+    public int Cost;
+
+    [DataField]
+    public bool EquipFirst;
 }
 
 [RegisterComponent]
@@ -39,13 +45,19 @@ public sealed partial class ThunderdomeRuleComponent : Component
 
     public bool Active;
 
+    // Пресет живёт только в рамках раунда: правило пересоздаётся каждый раунд
+    public Dictionary<NetUserId, List<int>> Presets = new();
+
     public TimeSpan NextCleanup;
 
     [DataField]
     public ProtoId<StartingGearPrototype> Gear = "ThunderdomeBaseGear";
 
     [DataField]
-    public List<ThunderdomeWeaponLoadout> WeaponLoadouts = new();
+    public List<ThunderdomeShopItem> ShopItems = new();
+
+    [DataField]
+    public int Budget = 100;
 
     [DataField]
     public TimeSpan CleanupInterval = TimeSpan.FromSeconds(25);

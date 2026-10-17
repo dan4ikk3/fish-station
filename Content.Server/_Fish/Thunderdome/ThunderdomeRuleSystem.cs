@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Server.EUI;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
@@ -26,6 +27,7 @@ using Content.Shared.Popups;
 using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Weapons.Ranged.Components;
+using Robust.Shared.Network;
 using Robust.Server.Audio;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
@@ -81,6 +83,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         SubscribeLocalEvent<ThunderdomePlayerComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<ThunderdomeOriginalBodyComponent, MobStateChangedEvent>(OnOriginalBodyStateChanged);
         SubscribeNetworkEvent<ThunderdomeRevivalAcceptEvent>(OnRevivalAccept);
+        SubscribeNetworkEvent<ThunderdomeExitChoiceEvent>(OnExitChoice);
         SubscribeLocalEvent<ThunderdomePlayerComponent, SuicideGhostEvent>(OnSuicideAttempt);
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
         SubscribeLocalEvent<ThunderdomeArenaProtectedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
@@ -137,6 +140,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             }
 
             rule.Players.Clear();
+            rule.Presets.Clear();
             rule.Active = false;
             BroadcastPlayerCount(rule);
         }
@@ -176,8 +180,11 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
 
     private void OnJoinRequest(ThunderdomeJoinRequestEvent ev, EntitySessionEventArgs args)
     {
-        var session = args.SenderSession;
+        TryOpenLoadout(args.SenderSession);
+    }
 
+    private void TryOpenLoadout(ICommonSession session)
+    {
         if (!_cfg.GetCVar(ThunderdomeCVars.ThunderdomeEnabled))
             return;
 
@@ -202,6 +209,33 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         var eui = new ThunderdomeLoadoutEui(this, _ruleEntity.Value, session);
         _euiManager.OpenEui(eui, session);
         _activeEuis[session] = eui;
+    }
+
+    private void OnExitChoice(ThunderdomeExitChoiceEvent ev, EntitySessionEventArgs args)
+    {
+        var session = args.SenderSession;
+
+        if (session.AttachedEntity is not { Valid: true } ghost
+            || !HasComp<GhostComponent>(ghost)
+            || HasComp<ThunderdomePlayerComponent>(ghost))
+            return;
+
+        if (ev.Stay)
+        {
+            TryOpenLoadout(session);
+            return;
+        }
+
+        if (!_mind.TryGetMind(ghost, out var mindId, out var mind)
+            || mind.OwnedEntity is not { Valid: true } body
+            || body == ghost
+            || !Exists(body))
+            return;
+
+        _mind.UnVisit(mindId, mind);
+
+        if (!TerminatingOrDeleted(ghost))
+            QueueDel(ghost);
     }
 
     private void OnLeaveRequest(ThunderdomeLeaveRequestEvent ev, EntitySessionEventArgs args)
@@ -231,12 +265,13 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         GhostDomePlayer(ent, rule, playSound: false);
     }
 
-    public void SpawnPlayer(ICommonSession session, EntityUid ruleEntity, int weaponIdx)
+    public void SpawnPlayer(ICommonSession session, EntityUid ruleEntity, List<int> items)
     {
         if (!TryComp<ThunderdomeRuleComponent>(ruleEntity, out var rule)
             || !rule.Active
             || session.AttachedEntity is not { Valid: true } ghostEntity
-            || !HasComp<GhostComponent>(ghostEntity))
+            || !HasComp<GhostComponent>(ghostEntity)
+            || !TryGetValidItems(rule, items, out var chosen))
             return;
 
         var spawnCoords = GetRandomSpawnPoint(rule);
@@ -257,11 +292,13 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
 
         var mob = _stationSpawning.SpawnPlayerMob(spawnCoords.Value, null, profile, null);
         _stationSpawning.EquipStartingGear(mob, rule.Gear);
-        SpawnLoadoutItems(mob, weaponIdx, rule);
+        foreach (var item in chosen.OrderByDescending(x => x.EquipFirst))
+        {
+            _stationSpawning.EquipStartingGear(mob, item.Gear);
+        }
 
         var tdPlayer = EnsureComp<ThunderdomePlayerComponent>(mob);
         tdPlayer.RuleEntity = ruleEntity;
-        tdPlayer.WeaponSelection = weaponIdx;
 
         if (originalBody is { Valid: true } body && !HasComp<ThunderdomeOriginalBodyComponent>(body))
         {
@@ -296,10 +333,15 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             _audio.PlayStatic(sound, filter, deathCoords.Value, true, audioParams);
         }
 
+        TryComp<ActorComponent>(ent, out var actor);
+
         ClearOriginalBodyMarker(ent);
         _tempMind.TryRestoreAsGhost(ent);
         QueueDel(ent);
         BroadcastPlayerCount(rule);
+
+        if (actor != null)
+            RaiseNetworkEvent(new ThunderdomeExitOfferEvent(), actor.PlayerSession.Channel);
     }
 
     private void OnSuicideAttempt(Entity<ThunderdomePlayerComponent> ent, ref SuicideGhostEvent args)
@@ -507,15 +549,6 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         EnsureComp<TimedDespawnComponent>(uid).Lifetime = lifetime;
     }
 
-    private void SpawnLoadoutItems(EntityUid mob, int weaponIdx, ThunderdomeRuleComponent rule)
-    {
-        if (rule.WeaponLoadouts.Count == 0)
-            return;
-
-        weaponIdx = Math.Clamp(weaponIdx, 0, rule.WeaponLoadouts.Count - 1);
-        _stationSpawning.EquipStartingGear(mob, rule.WeaponLoadouts[weaponIdx].Gear);
-    }
-
     private EntityCoordinates? GetRandomSpawnPoint(ThunderdomeRuleComponent rule)
     {
         if (rule.ArenaMap == null)
@@ -578,23 +611,51 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
     }
 
-    public ThunderdomeLoadoutEuiState GetLoadoutState(ThunderdomeRuleComponent rule)
+    public ThunderdomeLoadoutEuiState GetLoadoutState(ThunderdomeRuleComponent rule, NetUserId userId)
     {
-        var weapons = new List<ThunderdomeLoadoutOption>();
-        for (var i = 0; i < rule.WeaponLoadouts.Count; i++)
+        var items = new List<ThunderdomeShopOption>();
+        for (var i = 0; i < rule.ShopItems.Count; i++)
         {
-            var loadout = rule.WeaponLoadouts[i];
-            weapons.Add(new ThunderdomeLoadoutOption
+            var item = rule.ShopItems[i];
+            items.Add(new ThunderdomeShopOption
             {
                 Index = i,
-                Name = Loc.GetString(loadout.Name),
-                Description = loadout.Description is { } description ? Loc.GetString(description) : string.Empty,
-                Category = Loc.GetString(loadout.Category),
-                SpritePrototype = loadout.Sprite,
+                Name = Loc.GetString(item.Name),
+                Description = item.Description is { } description ? Loc.GetString(description) : string.Empty,
+                Category = Loc.GetString(item.Category),
+                SpritePrototype = item.Sprite,
+                GearPrototype = item.Gear,
+                Cost = item.Cost,
+                EquipFirst = item.EquipFirst,
             });
         }
 
-        return new ThunderdomeLoadoutEuiState(weapons, rule.Players.Count);
+        rule.Presets.TryGetValue(userId, out var preset);
+        return new ThunderdomeLoadoutEuiState(items, rule.Players.Count, rule.Budget, preset, rule.Gear);
+    }
+
+    public void SavePreset(ThunderdomeRuleComponent rule, NetUserId userId, List<int> items)
+    {
+        if (TryGetValidItems(rule, items, out _))
+            rule.Presets[userId] = new List<int>(items);
+    }
+
+    private static bool TryGetValidItems(ThunderdomeRuleComponent rule, List<int> indexes, out List<ThunderdomeShopItem> items)
+    {
+        items = new List<ThunderdomeShopItem>();
+        var total = 0;
+
+        foreach (var index in indexes.Distinct())
+        {
+            if (index < 0 || index >= rule.ShopItems.Count)
+                return false;
+
+            var item = rule.ShopItems[index];
+            total += item.Cost;
+            items.Add(item);
+        }
+
+        return total <= rule.Budget;
     }
 
     private void RefillAmmo(EntityUid killer)

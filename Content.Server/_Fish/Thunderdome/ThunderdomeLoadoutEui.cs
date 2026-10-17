@@ -23,9 +23,9 @@ public sealed class ThunderdomeLoadoutEui : BaseEui
     public override EuiStateBase GetNewState()
     {
         if (!_entManager.TryGetComponent<ThunderdomeRuleComponent>(_ruleEntity, out var rule))
-            return new ThunderdomeLoadoutEuiState(new List<ThunderdomeLoadoutOption>(), 0);
+            return new ThunderdomeLoadoutEuiState(new List<ThunderdomeShopOption>(), 0, 0, null, string.Empty);
 
-        return _thunderdomeSystem.GetLoadoutState(rule);
+        return _thunderdomeSystem.GetLoadoutState(rule, _session.UserId);
     }
 
     public override void HandleMessage(EuiMessageBase msg)
@@ -35,8 +35,13 @@ public sealed class ThunderdomeLoadoutEui : BaseEui
         switch (msg)
         {
             case ThunderdomeLoadoutSelectedMessage selected:
-                _thunderdomeSystem.SpawnPlayer(_session, _ruleEntity, selected.WeaponIndex);
+                _thunderdomeSystem.SpawnPlayer(_session, _ruleEntity, selected.Items);
                 Close();
+                break;
+            case ThunderdomePresetSaveMessage preset:
+                if (_entManager.TryGetComponent<ThunderdomeRuleComponent>(_ruleEntity, out var rule))
+                    _thunderdomeSystem.SavePreset(rule, _session.UserId, preset.Items);
+                StateDirty();
                 break;
         }
     }

@@ -83,7 +83,7 @@ public class ThunderdomeWindow : BaseWindow
 
         _titleLabel = new Label
         {
-            Text = "THUNDERDOME",
+            Text = string.Empty,
             StyleClasses = { "LabelHeadingBigger" },
             VerticalAlignment = VAlignment.Center,
             HorizontalExpand = true,

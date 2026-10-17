@@ -6,33 +6,53 @@ namespace Content.Shared._Fish.Thunderdome;
 [Serializable, NetSerializable]
 public sealed class ThunderdomeLoadoutEuiState : EuiStateBase
 {
-    public List<ThunderdomeLoadoutOption> Weapons { get; }
+    public List<ThunderdomeShopOption> Items { get; }
     public int PlayerCount { get; }
+    public int Budget { get; }
+    public List<int>? Preset { get; }
+    public string BaseGear { get; }
 
-    public ThunderdomeLoadoutEuiState(List<ThunderdomeLoadoutOption> weapons, int playerCount)
+    public ThunderdomeLoadoutEuiState(List<ThunderdomeShopOption> items, int playerCount, int budget, List<int>? preset, string baseGear)
     {
-        Weapons = weapons;
+        BaseGear = baseGear;
+        Items = items;
         PlayerCount = playerCount;
+        Budget = budget;
+        Preset = preset;
     }
 }
 
 [Serializable, NetSerializable]
-public sealed class ThunderdomeLoadoutOption
+public sealed class ThunderdomeShopOption
 {
     public int Index { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
     public string Category { get; set; } = string.Empty;
     public string SpritePrototype { get; set; } = string.Empty;
+    public string GearPrototype { get; set; } = string.Empty;
+    public int Cost { get; set; }
+    public bool EquipFirst { get; set; }
 }
 
 [Serializable, NetSerializable]
 public sealed class ThunderdomeLoadoutSelectedMessage : EuiMessageBase
 {
-    public int WeaponIndex { get; }
+    public List<int> Items { get; }
 
-    public ThunderdomeLoadoutSelectedMessage(int weaponIndex)
+    public ThunderdomeLoadoutSelectedMessage(List<int> items)
     {
-        WeaponIndex = weaponIndex;
+        Items = items;
+    }
+}
+
+[Serializable, NetSerializable]
+public sealed class ThunderdomePresetSaveMessage : EuiMessageBase
+{
+    public List<int> Items { get; }
+
+    public ThunderdomePresetSaveMessage(List<int> items)
+    {
+        Items = items;
     }
 }

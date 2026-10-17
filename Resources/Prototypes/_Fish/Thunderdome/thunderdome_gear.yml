@@ -104,3 +104,40 @@
     - SpeedLoaderLightRifle
     - ClothingHeadHatUshanka
     - DrinkVodkaBottleFull
+
+- type: startingGear
+  id: ThunderdomeArmorBulletproof
+  equipment:
+    outerClothing: ClothingOuterArmorBulletproof
+    head: ClothingHeadHelmetBasic
+
+- type: startingGear
+  id: ThunderdomeArmorRiot
+  equipment:
+    outerClothing: ClothingOuterArmorRiot
+    head: ClothingHeadHelmetRiot
+
+- type: startingGear
+  id: ThunderdomeArmorHeavy
+  equipment:
+    outerClothing: ClothingOuterArmorHeavy
+    head: ClothingHeadHelmetSwat
+
+- type: startingGear
+  id: ThunderdomeMedStim
+  storage:
+    back:
+    - Stimpack
+    - Stimpack
+
+- type: startingGear
+  id: ThunderdomeMedCombat
+  storage:
+    back:
+    - MedkitCombatFilled
+
+- type: startingGear
+  id: ThunderdomeMedAdvanced
+  storage:
+    back:
+    - MedkitAdvancedFilled

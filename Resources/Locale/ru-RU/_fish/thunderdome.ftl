@@ -3,18 +3,15 @@ thunderdome-ghost-button = ДМ Арена ({ $count })
 thunderdome-ghost-button-default = ДМ Арена (0)
 
 # Loadout window
-thunderdome-loadout-title = Снаряжение ДМ Арены
+thunderdome-loadout-title = ДМ Арена
 thunderdome-loadout-players = игроков на арене: { $count }
-thunderdome-loadout-subtitle = Выбери свой комплект оружия
+thunderdome-loadout-subtitle = Собери снаряжение в рамках лимита очков
 thunderdome-loadout-confirm = Зайти на арену
 
-# Weapon categories
-thunderdome-category-shotguns = Дробовики
-thunderdome-category-smgs = Пистолеты-пулемёты
-thunderdome-category-rifles = Винтовки
-thunderdome-category-revolvers = Револьверы
-thunderdome-category-snipers = Снайперские винтовки
-thunderdome-category-melee = Рукопашное
+# Shop categories
+thunderdome-category-weapons = Оружие
+thunderdome-category-armor = Броня
+thunderdome-category-medicine = Медикаменты
 
 # Weapon names
 thunderdome-loadout-shotgun = Каммерер
@@ -39,6 +36,35 @@ thunderdome-desc-python = Заряженный бронебойный револ
 thunderdome-desc-inspector = Револьвер + 2 спидлоадера
 thunderdome-desc-esword = Энергетический меч + 2 инъектора стимуляторов
 thunderdome-desc-mosin = Кардашев-Мосин + 2 запасных магазина + ушанка + водка
+
+# Магазин
+thunderdome-shop-balance = Очки: { $left } / { $total }
+thunderdome-shop-cost = { $cost } оч.
+thunderdome-shop-selected = Выбрано: { $count }
+thunderdome-shop-clear = Сбросить
+thunderdome-shop-preset-save = Сохранить пресет
+thunderdome-shop-preset-load = Загрузить пресет
+thunderdome-shop-preset-hint = Один слот, стирается в начале следующего раунда
+
+# Броня и медикаменты
+thunderdome-item-armor-bulletproof = Пуленепробиваемый жилет
+thunderdome-item-armor-riot = Противоударная броня
+thunderdome-item-armor-heavy = Тяжёлая броня
+thunderdome-item-med-stim = Стимуляторы
+thunderdome-item-med-combat = Боевая аптечка
+thunderdome-item-med-advanced = Продвинутая аптечка
+thunderdome-desc-armor-bulletproof = Пуленепробиваемый жилет + обычный шлем
+thunderdome-desc-armor-riot = Противоударная броня + противоударный шлем
+thunderdome-desc-armor-heavy = Тяжёлая броня + шлем спецназа
+thunderdome-desc-med-stim = 2 инъектора стимуляторов
+thunderdome-desc-med-combat = Боевая аптечка
+thunderdome-desc-med-advanced = Продвинутая аптечка
+
+# Окно выхода
+thunderdome-exit-title = Арена
+thunderdome-exit-offer = Ты покинул арену. Что дальше?
+thunderdome-exit-stay = Остаться на арене
+thunderdome-exit-return = Вернуться в тело
 
 # Kill streak announcements
 thunderdome-streak-3 = { $player } устроил мясную серию!
