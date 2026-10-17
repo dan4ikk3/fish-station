@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking.Rules.Components;
+using Content.Shared._Fish.Thunderdome; // FIsh edit
 using Content.Shared.Antag;
 using Content.Shared.Database;
 using Content.Shared.Ghost;
@@ -190,6 +191,11 @@ public sealed partial class AntagSelectionSystem
         // No ghosts!!!
         if (HasComp<GhostComponent>(uid))
             return false;
+
+        // Fish-start
+        if (HasComp<ThunderdomePlayerComponent>(uid))
+            return false;
+        // Fish-end
 
         if (!def.AllowNonHumans && !HasComp<HumanoidProfileComponent>(uid))
             return false;

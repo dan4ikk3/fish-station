@@ -1,4 +1,5 @@
 ﻿using Content.Shared.Humanoid;
+using Content.Shared._Fish.Thunderdome; // FIsh edit
 using Content.Shared.Mind;
 using Content.Shared.Mind.Filters;
 using Content.Shared.Mobs.Components;
@@ -43,6 +44,11 @@ public sealed partial class TargetSystem : EntitySystem
             // the player has to be alive
             if (!_mind.TryGetMind(uid, out var mind, out var mindComp) || mind == exclude || !_mobState.IsAlive(uid, mobState))
                 continue;
+
+            // Fish-start
+            if (HasComp<ThunderdomePlayerComponent>(uid))
+                continue;
+            // Fish-end
 
             allHumans.Add((mind, mindComp));
         }
