@@ -144,13 +144,19 @@ public sealed partial class BluespaceArtilleryDesignatorSystem : SharedBluespace
         var mode = ent.Comp.FireModes[modeIndex];
         var mapCoords = _transform.ToMapCoordinates(location);
 
-        _chat.DispatchGlobalAnnouncement(
+        // Fish-start
+        // Объявление и звук слышны только на карте, где вызван удар.
+        var mapFilter = Filter.BroadcastMap(mapCoords.MapId);
+
+        _chat.DispatchFilteredAnnouncement(
+            mapFilter,
             Loc.GetString(ent.Comp.Announcement),
-            Loc.GetString(ent.Comp.AnnouncementSender),
+            sender: Loc.GetString(ent.Comp.AnnouncementSender),
             playDefault: false,
             colorOverride: ent.Comp.AnnouncementColor);
 
-        _audio.PlayGlobal(ent.Comp.AnnouncementSound, Filter.Broadcast(), true);
+        _audio.PlayGlobal(ent.Comp.AnnouncementSound, mapFilter, true);
+        // Fish-end
 
         if (user != null)
         {
