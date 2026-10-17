@@ -114,6 +114,32 @@
       category: dm-arena-category-weapons
       sprite: WeaponLaserSvalinn
       cost: 15
+    - gear: DmArenaBat
+      name: dm-arena-item-bat
+      description: dm-arena-desc-bat
+      category: dm-arena-category-weapons
+      sprite: BaseBallBat
+      cost: 10
+      inHand: true
+    - gear: DmArenaSpear
+      name: dm-arena-item-spear
+      description: dm-arena-desc-spear
+      category: dm-arena-category-weapons
+      sprite: Spear
+      cost: 10
+      inHand: true
+    - gear: DmArenaThrowingKnives
+      name: dm-arena-item-knives
+      description: dm-arena-desc-knives
+      category: dm-arena-category-weapons
+      sprite: ThrowingKnife
+      cost: 15
+    - gear: DmArenaMateba
+      name: dm-arena-item-mateba
+      description: dm-arena-desc-mateba
+      category: dm-arena-category-weapons
+      sprite: WeaponRevolverMateba
+      cost: 30
     - gear: DmArenaArmorBulletproof
       name: dm-arena-item-armor-bulletproof
       description: dm-arena-desc-armor-bulletproof
@@ -179,6 +205,12 @@
       category: dm-arena-category-gear
       sprite: ClothingEyesHudSecurity
       cost: 5
+    - gear: DmArenaSpeedBoots
+      name: dm-arena-item-speedboots
+      description: dm-arena-desc-speedboots
+      category: dm-arena-category-gear
+      sprite: ClothingShoesBootsSpeed
+      cost: 20
     - gear: DmArenaMedStim
       name: dm-arena-item-med-stim
       description: dm-arena-desc-med-stim
@@ -215,6 +247,74 @@
       category: dm-arena-category-medicine
       sprite: CombatMedipen
       cost: 15
+    - gear: DmArenaClownKit
+      name: dm-arena-item-clown
+      description: dm-arena-desc-clown
+      category: dm-arena-category-fun
+      sprite: ClothingMaskClown
+      cost: 5
+    - gear: DmArenaBananaStash
+      name: dm-arena-item-banana
+      description: dm-arena-desc-banana
+      category: dm-arena-category-fun
+      sprite: FoodPieBananaCream
+      cost: 5
+    - gear: DmArenaSoapTrap
+      name: dm-arena-item-soap
+      description: dm-arena-desc-soap
+      category: dm-arena-category-fun
+      sprite: SoapNT
+      cost: 5
+    - gear: DmArenaBoxer
+      name: dm-arena-item-boxer
+      description: dm-arena-desc-boxer
+      category: dm-arena-category-fun
+      sprite: ClothingHandsGlovesBoxingRed
+      cost: 10
+    - gear: DmArenaCowboyHat
+      name: dm-arena-item-cowboy
+      description: dm-arena-desc-cowboy
+      category: dm-arena-category-fun
+      sprite: ClothingHeadHatCowboyBrown
+      cost: 1
+    - gear: DmArenaSombrero
+      name: dm-arena-item-sombrero
+      description: dm-arena-desc-sombrero
+      category: dm-arena-category-fun
+      sprite: ClothingHeadHatSombrero
+      cost: 1
+    - gear: DmArenaPirateHat
+      name: dm-arena-item-pirate
+      description: dm-arena-desc-pirate
+      category: dm-arena-category-fun
+      sprite: ClothingHeadHatPirate
+      cost: 1
+    - gear: DmArenaDuck
+      name: dm-arena-item-duck
+      description: dm-arena-desc-duck
+      category: dm-arena-category-fun
+      sprite: ToyRubberDuck
+      cost: 1
+      inHand: true
+    - gear: DmArenaToySword
+      name: dm-arena-item-toysword
+      description: dm-arena-desc-toysword
+      category: dm-arena-category-fun
+      sprite: ToySword
+      cost: 1
+      inHand: true
+    - gear: DmArenaBeerStash
+      name: dm-arena-item-beer
+      description: dm-arena-desc-beer
+      category: dm-arena-category-fun
+      sprite: DrinkBeerBottleFull
+      cost: 3
+    - gear: DmArenaGlowsticks
+      name: dm-arena-item-glow
+      description: dm-arena-desc-glow
+      category: dm-arena-category-fun
+      sprite: GlowstickRed
+      cost: 2
   - type: LoadMapRule
     mapPath: /Maps/_Fish/Nonstations/dm01-entryway.yml
   - type: RuleGrids

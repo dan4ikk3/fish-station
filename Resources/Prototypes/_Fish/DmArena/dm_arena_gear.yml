@@ -238,3 +238,112 @@
     back:
     - CombatMedipen
     - CombatMedipen
+
+- type: startingGear
+  id: DmArenaBat
+  inhand:
+  - BaseBallBat
+
+- type: startingGear
+  id: DmArenaSpear
+  inhand:
+  - Spear
+
+- type: startingGear
+  id: DmArenaThrowingKnives
+  storage:
+    back:
+    - ThrowingKnife
+    - ThrowingKnife
+    - ThrowingKnife
+    - ThrowingKnife
+    - ThrowingKnife
+
+- type: startingGear
+  id: DmArenaMateba
+  equipment:
+    suitstorage: WeaponRevolverMateba
+  storage:
+    back:
+    - SpeedLoaderMagnum
+    - SpeedLoaderMagnum
+
+- type: startingGear
+  id: DmArenaSpeedBoots
+  equipment:
+    shoes: ClothingShoesBootsSpeed
+
+- type: startingGear
+  id: DmArenaClownKit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitClown
+    mask: ClothingMaskClown
+    shoes: ClothingShoesClownLarge
+  storage:
+    back:
+    - BikeHorn
+
+- type: startingGear
+  id: DmArenaBananaStash
+  storage:
+    back:
+    - FoodPieBananaCream
+    - FoodPieBananaCream
+    - FoodPieBananaCream
+    - BananaPeel
+    - BananaPeel
+    - BananaPeel
+
+- type: startingGear
+  id: DmArenaSoapTrap
+  storage:
+    back:
+    - SoapNT
+    - SoapNT
+
+- type: startingGear
+  id: DmArenaBoxer
+  equipment:
+    gloves: ClothingHandsGlovesBoxingRed
+    belt: ClothingBeltChampion
+
+- type: startingGear
+  id: DmArenaCowboyHat
+  equipment:
+    head: ClothingHeadHatCowboyBrown
+
+- type: startingGear
+  id: DmArenaSombrero
+  equipment:
+    head: ClothingHeadHatSombrero
+
+- type: startingGear
+  id: DmArenaPirateHat
+  equipment:
+    head: ClothingHeadHatPirate
+
+- type: startingGear
+  id: DmArenaDuck
+  inhand:
+  - ToyRubberDuck
+
+- type: startingGear
+  id: DmArenaToySword
+  inhand:
+  - ToySword
+
+- type: startingGear
+  id: DmArenaBeerStash
+  storage:
+    back:
+    - DrinkBeerBottleFull
+    - DrinkBeerBottleFull
+    - DrinkBeerBottleFull
+
+- type: startingGear
+  id: DmArenaGlowsticks
+  storage:
+    back:
+    - GlowstickRed
+    - GlowstickRed
+    - GlowstickRed

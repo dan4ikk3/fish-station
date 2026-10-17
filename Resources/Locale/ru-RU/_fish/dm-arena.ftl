@@ -13,6 +13,7 @@ dm-arena-category-weapons = Оружие
 dm-arena-category-armor = Броня
 dm-arena-category-gear = Снаряжение
 dm-arena-category-medicine = Медикаменты
+dm-arena-category-fun = Приколы
 
 # Названия оружия
 dm-arena-loadout-shotgun = Каммерер
@@ -47,7 +48,7 @@ dm-arena-shop-preset-save = Сохранить пресет
 dm-arena-shop-preset-load = Загрузить пресет
 dm-arena-shop-preset-hint = Один слот, стирается в начале следующего раунда
 
-# Броня и медикаменты
+# Предметы магазина
 dm-arena-item-armor-bulletproof = Пуленепробиваемый жилет
 dm-arena-item-armor-riot = Противоударная броня
 dm-arena-item-armor-heavy = Тяжёлая броня
@@ -60,25 +61,6 @@ dm-arena-desc-armor-heavy = Тяжёлая броня + шлем спецназ�
 dm-arena-desc-med-stim = 2 инъектора стимуляторов
 dm-arena-desc-med-combat = Боевая аптечка
 dm-arena-desc-med-advanced = Продвинутая аптечка
-
-# Окно выхода
-dm-arena-exit-title = Бой окончен
-dm-arena-exit-offer = Вы выбыли из схватки. Вернуться на арену или в своё тело?
-dm-arena-exit-stay = Вернуться в бой
-dm-arena-exit-return = В своё тело
-
-# Воскрешение тела
-dm-arena-revival-title = Тело Воскрешено
-dm-arena-revival-offer = Ваше первоначальное тело восстановлено! Вернётесь в него?
-dm-arena-revival-accept = Вернуться в тело
-dm-arena-revival-decline = Остаться на арене
-
-# Сообщения в чате
-dm-arena-join = { $player } вошёл на Грозовой ринг!
-dm-arena-leave = { $player } покинул Грозовой ринг.
-dm-arena-leave-01 = { $user } исчезает, устав убивать.
-
-# Новые предметы магазина
 dm-arena-item-katana = Катана
 dm-arena-desc-katana = Катана: быстрая и острая
 dm-arena-item-machete = Мачете
@@ -113,3 +95,52 @@ dm-arena-item-med-burn = Аптечка от ожогов
 dm-arena-desc-med-burn = Аптечка для лечения ожогов
 dm-arena-item-med-pens = Боевые медипены
 dm-arena-desc-med-pens = 2 боевых медипена
+dm-arena-item-bat = Бейсбольная бита
+dm-arena-desc-bat = Классическая бейсбольная бита
+dm-arena-item-spear = Копьё
+dm-arena-desc-spear = Копьё, бьёт издалека
+dm-arena-item-knives = Метательные ножи
+dm-arena-desc-knives = Пять метательных ножей
+dm-arena-item-mateba = Матеба
+dm-arena-desc-mateba = Тяжёлый револьвер и два спидлоадера
+dm-arena-item-speedboots = Скоростные ботинки
+dm-arena-desc-speedboots = Бегай быстрее всех
+dm-arena-item-clown = Набор клоуна
+dm-arena-desc-clown = Костюм клоуна и велосипедный гудок. Гуднуть перед выстрелом
+dm-arena-item-banana = Банановый запас
+dm-arena-desc-banana = Три банановых пирога и три банановые кожуры
+dm-arena-item-soap = Мыльная ловушка
+dm-arena-desc-soap = Два куска мыла для скользких полов
+dm-arena-item-boxer = Боксёр
+dm-arena-desc-boxer = Боксёрские перчатки и пояс чемпиона
+dm-arena-item-cowboy = Ковбойская шляпа
+dm-arena-desc-cowboy = Заменяет шлем. Стиль важнее безопасности
+dm-arena-item-sombrero = Сомбреро
+dm-arena-desc-sombrero = Заменяет шлем. Время фиесты
+dm-arena-item-pirate = Пиратская шляпа
+dm-arena-desc-pirate = Заменяет шлем. Йо-хо-хо
+dm-arena-item-duck = Резиновая уточка
+dm-arena-desc-duck = Пищащее оружие массового отвлечения
+dm-arena-item-toysword = Игрушечный меч
+dm-arena-desc-toysword = Выглядит грозно, урона не наносит
+dm-arena-item-beer = Пивной запас
+dm-arena-desc-beer = Три бутылки пива для праздника победы
+dm-arena-item-glow = Неоновые палочки
+dm-arena-desc-glow = Три светящиеся палочки, рейв на арене
+
+# Окно выхода
+dm-arena-exit-title = Бой окончен
+dm-arena-exit-offer = Вы выбыли из схватки. Вернуться на арену или в своё тело?
+dm-arena-exit-stay = Вернуться в бой
+dm-arena-exit-return = В своё тело
+
+# Воскрешение тела
+dm-arena-revival-title = Тело Воскрешено
+dm-arena-revival-offer = Ваше первоначальное тело восстановлено! Вернётесь в него?
+dm-arena-revival-accept = Вернуться в тело
+dm-arena-revival-decline = Остаться на арене
+
+# Сообщения в чате
+dm-arena-join = { $player } вышел на ДМ арену!
+dm-arena-leave = { $player } покинул ДМ арену.
+dm-arena-leave-01 = { $user } исчезает, устав убивать.

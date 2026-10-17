@@ -1,18 +1,19 @@
 # Кнопка в интерфейсе призрака
-dm-arena-ghost-button = DmArena ({$count})
-dm-arena-ghost-button-default = DmArena (0)
+dm-arena-ghost-button = DM Arena ({ $count })
+dm-arena-ghost-button-default = DM Arena (0)
 
 # Окно выбора снаряжения
-dm-arena-loadout-title = Deathmatch Arena
-dm-arena-loadout-players = Players in arena: {$count}
-dm-arena-loadout-subtitle = Build your loadout within the point budget
-dm-arena-loadout-confirm = Enter Arena
+dm-arena-loadout-title = DM Arena
+dm-arena-loadout-players = Fighters in the arena: { $count }
+dm-arena-loadout-subtitle = Spend your points on a loadout
+dm-arena-loadout-confirm = Drop into the arena
 
 # Категории магазина
 dm-arena-category-weapons = Weapons
 dm-arena-category-armor = Armor
-dm-arena-category-gear = Equipment
-dm-arena-category-medicine = Medicine
+dm-arena-category-gear = Gear
+dm-arena-category-medicine = Medical
+dm-arena-category-fun = Fun and games
 
 # Названия оружия
 dm-arena-loadout-shotgun = Kammerer
@@ -27,58 +28,39 @@ dm-arena-loadout-esword = Energy Sword
 dm-arena-loadout-mosin = Kardashev-Mosin
 
 # Описания оружия (подсказки)
-dm-arena-desc-shotgun = Pump shotgun + 1 box buckshot, 1 box slugs
-dm-arena-desc-doublebarreled = Break-action 2-shot + 2 boxes buckshot
-dm-arena-desc-smg = SMG + 2 spare magazines
-dm-arena-desc-wt550 = Top-fed SMG + 2 spare magazines
-dm-arena-desc-lecter = Rifle + 2 standard mags, 1 incendiary mag
-dm-arena-desc-akms = Assault rifle + 2 spare magazines
-dm-arena-desc-python = AP-loaded revolver + 1 AP speedloader
-dm-arena-desc-inspector = Revolver + 2 speedloaders
-dm-arena-desc-esword = Energy sword + 2 hyperzine injectors
-dm-arena-desc-mosin = Kardashev-Mosin + 2 spare magazines + ushanka + a vodka
+dm-arena-desc-shotgun = Pump-action shotgun with a box of buckshot and a box of slugs
+dm-arena-desc-doublebarreled = Double-barreled shotgun with two boxes of buckshot
+dm-arena-desc-smg = Submachine gun with two spare magazines
+dm-arena-desc-wt550 = Top-fed submachine gun with two spare magazines
+dm-arena-desc-lecter = Rifle with two standard magazines and one incendiary magazine
+dm-arena-desc-akms = Assault rifle with two spare magazines
+dm-arena-desc-python = Armor-piercing revolver with a spare speedloader
+dm-arena-desc-inspector = Revolver with two speedloaders
+dm-arena-desc-esword = Energy sword and two stimulant injectors
+dm-arena-desc-mosin = Bolt-action rifle, two spare magazines, an ushanka and a bottle of vodka
 
 # Магазин
-dm-arena-shop-balance = Points: { $left } / { $total }
+dm-arena-shop-balance = Points left: { $left } of { $total }
 dm-arena-shop-cost = { $cost } pts
-dm-arena-shop-selected = Selected: { $count }
-dm-arena-shop-clear = Reset
+dm-arena-shop-selected = In the cart: { $count }
+dm-arena-shop-clear = Clear cart
 dm-arena-shop-preset-save = Save preset
 dm-arena-shop-preset-load = Load preset
-dm-arena-shop-preset-hint = One slot, erased at the start of the next round
+dm-arena-shop-preset-hint = One slot, wiped when the next round starts
 
-# Броня и медикаменты
+# Предметы магазина
 dm-arena-item-armor-bulletproof = Bulletproof vest
 dm-arena-item-armor-riot = Riot armor
 dm-arena-item-armor-heavy = Heavy armor
 dm-arena-item-med-stim = Stimulants
 dm-arena-item-med-combat = Combat medkit
 dm-arena-item-med-advanced = Advanced medkit
-dm-arena-desc-armor-bulletproof = Bulletproof vest + basic helmet
-dm-arena-desc-armor-riot = Riot armor + riot helmet
-dm-arena-desc-armor-heavy = Heavy armor + SWAT helmet
-dm-arena-desc-med-stim = 2 stimulant injectors
+dm-arena-desc-armor-bulletproof = Bulletproof vest and a basic helmet
+dm-arena-desc-armor-riot = Riot armor and a riot helmet
+dm-arena-desc-armor-heavy = Heavy armor and a SWAT helmet
+dm-arena-desc-med-stim = Two stimulant injectors
 dm-arena-desc-med-combat = Combat medical kit
 dm-arena-desc-med-advanced = Advanced medical kit
-
-# Окно выхода
-dm-arena-exit-title = Fight over
-dm-arena-exit-offer = You are out of the fight. Return to the arena or to your own body?
-dm-arena-exit-stay = Back to the fight
-dm-arena-exit-return = Return to my body
-
-# Воскрешение тела
-dm-arena-revival-title = Body Revived
-dm-arena-revival-offer = Your original body has been revived! Return to it?
-dm-arena-revival-accept = Return to Body
-dm-arena-revival-decline = Stay in Arena
-
-# Сообщения в чате
-dm-arena-join = {$player} has entered the DmArena!
-dm-arena-leave = {$player} has left the DmArena.
-dm-arena-leave-01 = {$user} disappears, having grown tired of killing.
-
-# Новые предметы магазина
 dm-arena-item-katana = Katana
 dm-arena-desc-katana = Katana, fast and sharp
 dm-arena-item-machete = Machete
@@ -113,3 +95,52 @@ dm-arena-item-med-burn = Burn kit
 dm-arena-desc-med-burn = Medical kit for burns
 dm-arena-item-med-pens = Combat medipens
 dm-arena-desc-med-pens = 2 combat medipens
+dm-arena-item-bat = Baseball bat
+dm-arena-desc-bat = Classic baseball bat
+dm-arena-item-spear = Spear
+dm-arena-desc-spear = Spear, good reach
+dm-arena-item-knives = Throwing knives
+dm-arena-desc-knives = Five throwing knives
+dm-arena-item-mateba = Mateba
+dm-arena-desc-mateba = Heavy revolver with two speedloaders
+dm-arena-item-speedboots = Speed boots
+dm-arena-desc-speedboots = Run faster than everyone else
+dm-arena-item-clown = Clown kit
+dm-arena-desc-clown = Clown outfit and a bike horn. Honk before you shoot
+dm-arena-item-banana = Banana stash
+dm-arena-desc-banana = Three banana cream pies and three banana peels
+dm-arena-item-soap = Soap trap
+dm-arena-desc-soap = Two bars of soap for slippery floors
+dm-arena-item-boxer = Boxer
+dm-arena-desc-boxer = Boxing gloves and a champion belt
+dm-arena-item-cowboy = Cowboy hat
+dm-arena-desc-cowboy = Replaces your helmet. Style over safety
+dm-arena-item-sombrero = Sombrero
+dm-arena-desc-sombrero = Replaces your helmet. Fiesta time
+dm-arena-item-pirate = Pirate hat
+dm-arena-desc-pirate = Replaces your helmet. Arr
+dm-arena-item-duck = Rubber duck
+dm-arena-desc-duck = A squeaky weapon of mass distraction
+dm-arena-item-toysword = Toy sword
+dm-arena-desc-toysword = Looks scary, deals no damage
+dm-arena-item-beer = Beer stash
+dm-arena-desc-beer = Three bottles of beer for the victory party
+dm-arena-item-glow = Glowsticks
+dm-arena-desc-glow = Three glowsticks, rave on the arena
+
+# Окно выхода
+dm-arena-exit-title = Out of the fight
+dm-arena-exit-offer = You've been knocked out. Jump back in or return to your own body?
+dm-arena-exit-stay = Back into the fight
+dm-arena-exit-return = Back to my body
+
+# Воскрешение тела
+dm-arena-revival-title = Your body is alive
+dm-arena-revival-offer = Your original body has been revived. Return to it?
+dm-arena-revival-accept = Return to body
+dm-arena-revival-decline = Stay on the arena
+
+# Сообщения в чате
+dm-arena-join = { $player } stepped into the DM arena!
+dm-arena-leave = { $player } left the DM arena.
+dm-arena-leave-01 = { $user } vanishes, tired of the killing.
