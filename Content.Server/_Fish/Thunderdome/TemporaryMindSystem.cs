@@ -19,6 +19,7 @@ public sealed class TemporaryMindSystem : EntitySystem
 {
     [Dependency] private MindSystem _mind = default!;
     [Dependency] private GhostSystem _ghost = default!;
+    [Dependency] private MindExamineSystem _mindExamine = default!;
     [Dependency] private MetaDataSystem _meta = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
@@ -30,7 +31,7 @@ public sealed class TemporaryMindSystem : EntitySystem
         SubscribeLocalEvent<TemporaryMindComponent, PlayerDetachedEvent>(OnPlayerDetached);
     }
 
-    private void OnPlayerDetached(Entity<TemporaryMindComponent> ent, PlayerDetachedEvent args)
+    private void OnPlayerDetached(Entity<TemporaryMindComponent> ent, ref PlayerDetachedEvent args)
     {
         if (args.Player.Status != SessionStatus.Disconnected)
             return;
@@ -52,14 +53,6 @@ public sealed class TemporaryMindSystem : EntitySystem
 
         // Снимаем userId с прежнего разума, чтобы одноразовый мог его занять
         _mind.SetUserId(origMindId, null, origMind);
-
-        // Пока разум подменён, у прежнего тела не должно быть надписи про кататонию
-        if (origMind.OwnedEntity is { } originalBody
-            && TryComp<MindExaminableComponent>(originalBody, out var mindExaminable))
-        {
-            mindExaminable.State = MindState.None;
-            Dirty(originalBody, mindExaminable);
-        }
 
         var newMind = _mind.CreateMind(userId, origMind.CharacterName);
         _mind.TransferTo(newMind, newBody);
@@ -135,8 +128,7 @@ public sealed class TemporaryMindSystem : EntitySystem
 
         _mind.SetUserId(temp.OriginalMind, userId);
 
-        if (origMind.OwnedEntity is { } originalBody
-            && TryComp<MindExaminableComponent>(originalBody, out var mindExaminable))
-            Dirty(originalBody, mindExaminable);
+        if (origMind.OwnedEntity is { } originalBody)
+            _mindExamine.RefreshMindStatus(originalBody);
     }
 }

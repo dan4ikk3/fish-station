@@ -457,7 +457,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             args.PushMarkup($"[color=yellow]{Loc.GetString("comp-mind-examined-ssd", ("ent", ent))}[/color]");
     }
 
-    private void OnPlayerDetached(Entity<ThunderdomePlayerComponent> ent, PlayerDetachedEvent args)
+    private void OnPlayerDetached(Entity<ThunderdomePlayerComponent> ent, ref PlayerDetachedEvent args)
     {
         if (args.Player.Status != SessionStatus.Disconnected)
             return;
