@@ -174,6 +174,8 @@
     location: 240mm HE Payload
   - type: TimedDespawn
     lifetime: 15
+  - type: SpawnOnDespawn # Fish edit
+    prototype: BulletLeviathan240mmHESelfExplode
 
 - type: entity
   id: BulletLeviathan240mmNuke
@@ -262,6 +264,33 @@
   - type: WarpPoint
     follow: true
     location: 240mm Cluster Payload
+
+# Fish edit start - Добавление self-explode для 240мм фугасного снаряда
+- type: entity
+  id: BulletLeviathan240mmHESelfExplode
+  name: 240mm HE shell
+  suffix: self-explode, NOW, FISH
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Sunrise/Objects/Weapons/Guns/Ammunition/Explosives/explosives.rsi
+    layers:
+      - state: blast240mm
+    scale: 1.2, 1.2
+  - type: TriggerOnSpawn
+    keyOut: trigger
+  - type: ExplodeOnTrigger
+    keysIn:
+    - trigger
+  - type: Explosive
+    explosionType: Default
+    totalIntensity: 900
+    intensitySlope: 5
+    maxIntensity: 50
+    canCreateVacuum: true
+  - type: TimedDespawn
+    lifetime: 0.25
+# Fish edit end
 
 - type: entity
   id: BulletLeviathan240mmNukeSelfExplode

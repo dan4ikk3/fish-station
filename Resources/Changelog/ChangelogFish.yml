@@ -845,3 +845,32 @@
     message: Тактическая модификация брони синего щита получила изменения по защите до уровня тактика синдиката (с её слабостью к тепловому урону).
   id: 85
   url: https://github.com/makura-games/fish-station/pull/491
+- author: Endennsss
+  time: '2026-10-15T22:17:33.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Отображение рук и ног в меню
+  - type: Fix
+    message: Если волосы цветные то они не обесцвечиваются
+  - type: Fix
+    message: Можно вылечить дефект речи
+  - type: Fix
+    message: Ноги после ампутации корректно обновляются
+  id: 86
+  url: https://github.com/makura-games/fish-station/pull/503
+- author: sakurochka
+  time: '2026-10-15T22:34:07.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлен плащ для ПНТ
+  id: 87
+  url: https://github.com/makura-games/fish-station/pull/501
+- author: Kaiten
+  time: '2026-10-16T09:53:10.0000000+00:00'
+  changes:
+  - type: Add
+    message: Взрыв 240mm фугасом с мгновенным подрывом.
+  - type: Tweak
+    message: Локализация для пары других взрывов админ панели.
+  id: 88
+  url: https://github.com/makura-games/fish-station/pull/497
