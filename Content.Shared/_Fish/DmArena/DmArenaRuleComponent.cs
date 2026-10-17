@@ -3,10 +3,10 @@ using Robust.Shared.Map;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared._Fish.Thunderdome;
+namespace Content.Shared._Fish.DmArena;
 
 [DataDefinition]
-public sealed partial class ThunderdomeShopItem
+public sealed partial class DmArenaShopItem
 {
     [DataField(required: true)]
     public ProtoId<StartingGearPrototype> Gear;
@@ -31,7 +31,7 @@ public sealed partial class ThunderdomeShopItem
 }
 
 [RegisterComponent]
-public sealed partial class ThunderdomeRuleComponent : Component
+public sealed partial class DmArenaRuleComponent : Component
 {
     public MapId? ArenaMap;
 
@@ -51,10 +51,10 @@ public sealed partial class ThunderdomeRuleComponent : Component
     public TimeSpan NextCleanup;
 
     [DataField]
-    public ProtoId<StartingGearPrototype> Gear = "ThunderdomeBaseGear";
+    public ProtoId<StartingGearPrototype> Gear = "DmArenaBaseGear";
 
     [DataField]
-    public List<ThunderdomeShopItem> ShopItems = new();
+    public List<DmArenaShopItem> ShopItems = new();
 
     [DataField]
     public int Budget = 100;

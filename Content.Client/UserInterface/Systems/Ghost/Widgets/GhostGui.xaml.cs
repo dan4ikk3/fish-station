@@ -19,7 +19,7 @@ public sealed partial class GhostGui : UIWidget
     private int _prevNumberRoles;
     public event Action? RespawnPressed; // Sunrise-Edit
     public event Action? ChangeServerPressed;
-    public event Action? ThunderdomePressed; // FIsh edit
+    public event Action? DmArenaPressed; // FIsh edit
 
     public GhostGui()
     {
@@ -36,13 +36,13 @@ public sealed partial class GhostGui : UIWidget
         GhostRolesButton.OnPressed += _ => GhostRolesButton.StyleClasses.Remove(StyleClass.Negative);
         RespawnButton.OnPressed += _ => RespawnPressed?.Invoke(); // Sunrise-Edit
         ChangeServerButton.OnPressed += _ => ChangeServerPressed?.Invoke();
-        ThunderdomeButton.OnPressed += _ => ThunderdomePressed?.Invoke(); // FIsh edit
+        DmArenaButton.OnPressed += _ => DmArenaPressed?.Invoke(); // FIsh edit
     }
 
     // Fish-start
-    public void UpdateThunderdome(int playerCount)
+    public void UpdateDmArena(int playerCount)
     {
-        ThunderdomeButton.Text = Loc.GetString("thunderdome-ghost-button", ("count", playerCount));
+        DmArenaButton.Text = Loc.GetString("dm-arena-ghost-button", ("count", playerCount));
     }
     // Fish-end
 

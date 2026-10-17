@@ -2,7 +2,7 @@ using System.Linq;
 using System.Numerics;
 using Content.Client.Lobby;
 using Content.Client.Station;
-using Content.Shared._Fish.Thunderdome;
+using Content.Shared._Fish.DmArena;
 using Content.Shared.Body;
 using Content.Shared.Hands.Components;
 using Content.Shared.Hands.EntitySystems;
@@ -14,9 +14,9 @@ using Robust.Shared.Map;
 using Robust.Shared.Maths;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
+public sealed class DmArenaLoadoutWindow : DmArenaWindow
 {
     [Dependency] private IEntityManager _entMan = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
@@ -26,9 +26,9 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
     public event Action<List<int>>? OnLoadoutConfirmed;
     public event Action<List<int>>? OnPresetSaved;
 
-    private ThunderdomeLoadoutEuiState? _state;
+    private DmArenaLoadoutEuiState? _state;
     private readonly HashSet<int> _selected = new();
-    private readonly Dictionary<int, ThunderdomeWeaponCard> _cards = new();
+    private readonly Dictionary<int, DmArenaWeaponCard> _cards = new();
 
     private readonly Label _playerCountLabel;
     private readonly Label _balanceLabel;
@@ -36,19 +36,19 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
     private readonly BoxContainer _leftColumn;
     private readonly BoxContainer _rightColumn;
     private readonly SpriteView _preview;
-    private readonly ThunderdomeButton _confirmButton;
-    private readonly ThunderdomeButton _saveButton;
-    private readonly ThunderdomeButton _loadButton;
-    private readonly ThunderdomeButton _clearButton;
+    private readonly DmArenaButton _confirmButton;
+    private readonly DmArenaButton _saveButton;
+    private readonly DmArenaButton _loadButton;
+    private readonly DmArenaButton _clearButton;
 
     private EntityUid _dummy;
     private string? _heldCategory;
 
-    public ThunderdomeLoadoutWindow()
+    public DmArenaLoadoutWindow()
     {
         IoCManager.InjectDependencies(this);
 
-        WindowTitle = Loc.GetString("thunderdome-loadout-title");
+        WindowTitle = Loc.GetString("dm-arena-loadout-title");
         Resizable = false;
         SetSize = _uiManager.WindowRoot.Size * 0.94f;
 
@@ -60,7 +60,7 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
         };
         header.AddChild(new Label
         {
-            Text = Loc.GetString("thunderdome-loadout-subtitle"),
+            Text = Loc.GetString("dm-arena-loadout-subtitle"),
             StyleClasses = { "LabelSubText" },
             HorizontalExpand = true,
         });
@@ -118,10 +118,10 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
         out SpriteView preview,
         out Label balance,
         out Label selected,
-        out ThunderdomeButton confirm,
-        out ThunderdomeButton save,
-        out ThunderdomeButton load,
-        out ThunderdomeButton clear)
+        out DmArenaButton confirm,
+        out DmArenaButton save,
+        out DmArenaButton load,
+        out DmArenaButton clear)
     {
         var center = new BoxContainer
         {
@@ -137,8 +137,8 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
             HorizontalExpand = true,
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = ThunderdomeTheme.CardBg,
-                BorderColor = ThunderdomeTheme.AccentDim,
+                BackgroundColor = DmArenaTheme.CardBg,
+                BorderColor = DmArenaTheme.AccentDim,
                 BorderThickness = new Thickness(1),
             },
         };
@@ -155,7 +155,7 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
         balance = new Label
         {
             StyleClasses = { "LabelHeadingBigger" },
-            FontColorOverride = ThunderdomeTheme.Accent,
+            FontColorOverride = DmArenaTheme.Accent,
             HorizontalAlignment = HAlignment.Center,
         };
         center.AddChild(balance);
@@ -173,9 +173,9 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
             HorizontalExpand = true,
             SeparationOverride = 6,
         };
-        save = new ThunderdomeButton { Text = Loc.GetString("thunderdome-shop-preset-save") };
-        load = new ThunderdomeButton { Text = Loc.GetString("thunderdome-shop-preset-load") };
-        clear = new ThunderdomeButton { Text = Loc.GetString("thunderdome-shop-clear") };
+        save = new DmArenaButton { Text = Loc.GetString("dm-arena-shop-preset-save") };
+        load = new DmArenaButton { Text = Loc.GetString("dm-arena-shop-preset-load") };
+        clear = new DmArenaButton { Text = Loc.GetString("dm-arena-shop-clear") };
         presetRow.AddChild(save);
         presetRow.AddChild(load);
         presetRow.AddChild(clear);
@@ -183,14 +183,14 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
 
         center.AddChild(new Label
         {
-            Text = Loc.GetString("thunderdome-shop-preset-hint"),
+            Text = Loc.GetString("dm-arena-shop-preset-hint"),
             StyleClasses = { "LabelSubText" },
             HorizontalAlignment = HAlignment.Center,
         });
 
-        confirm = new ThunderdomeButton
+        confirm = new DmArenaButton
         {
-            Text = Loc.GetString("thunderdome-loadout-confirm"),
+            Text = Loc.GetString("dm-arena-loadout-confirm"),
             Disabled = true,
         };
         center.AddChild(confirm);
@@ -198,10 +198,10 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
         return center;
     }
 
-    public void UpdateState(ThunderdomeLoadoutEuiState state)
+    public void UpdateState(DmArenaLoadoutEuiState state)
     {
         _state = state;
-        _playerCountLabel.Text = Loc.GetString("thunderdome-loadout-players", ("count", state.PlayerCount));
+        _playerCountLabel.Text = Loc.GetString("dm-arena-loadout-players", ("count", state.PlayerCount));
 
         _leftColumn.RemoveAllChildren();
         _rightColumn.RemoveAllChildren();
@@ -223,12 +223,12 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
                 {
                     Text = item.Category,
                     StyleClasses = { "LabelKeyText" },
-                    FontColorOverride = ThunderdomeTheme.Accent,
+                    FontColorOverride = DmArenaTheme.Accent,
                     Margin = new Thickness(4, 8, 0, 2),
                 });
             }
 
-            var card = new ThunderdomeWeaponCard(item);
+            var card = new DmArenaWeaponCard(item);
             card.OnToggled += OnCardToggled;
             _cards[item.Index] = card;
             column.AddChild(card);
@@ -237,7 +237,7 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
         Refresh();
     }
 
-    private void OnCardToggled(ThunderdomeWeaponCard card)
+    private void OnCardToggled(DmArenaWeaponCard card)
     {
         if (!_selected.Remove(card.ItemIndex))
             _selected.Add(card.ItemIndex);
@@ -284,8 +284,8 @@ public sealed class ThunderdomeLoadoutWindow : ThunderdomeWindow
             card.SetState(selected, !selected && spent + card.Cost > _state.Budget);
         }
 
-        _balanceLabel.Text = Loc.GetString("thunderdome-shop-balance", ("left", _state.Budget - spent), ("total", _state.Budget));
-        _selectedLabel.Text = Loc.GetString("thunderdome-shop-selected", ("count", _selected.Count));
+        _balanceLabel.Text = Loc.GetString("dm-arena-shop-balance", ("left", _state.Budget - spent), ("total", _state.Budget));
+        _selectedLabel.Text = Loc.GetString("dm-arena-shop-selected", ("count", _selected.Count));
 
         _confirmButton.Disabled = _selected.Count == 0;
         _saveButton.Disabled = _selected.Count == 0;

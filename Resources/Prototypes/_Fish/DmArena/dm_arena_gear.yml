@@ -1,5 +1,5 @@
 - type: startingGear
-  id: ThunderdomeBaseGear
+  id: DmArenaBaseGear
   equipment:
     jumpsuit: ClothingUniformJumpsuitOperative
     outerClothing: ClothingOuterArmorBasic
@@ -14,7 +14,7 @@
     - MedkitFilled
 
 - type: startingGear
-  id: ThunderdomeShotgun
+  id: DmArenaShotgun
   equipment:
     suitstorage: WeaponShotgunKammerer
   storage:
@@ -23,7 +23,7 @@
     - BoxShotgunSlug
 
 - type: startingGear
-  id: ThunderdomeDoubleBarreled
+  id: DmArenaDoubleBarreled
   equipment:
     suitstorage: WeaponShotgunDoubleBarreled
   storage:
@@ -32,7 +32,7 @@
     - BoxLethalshot
 
 - type: startingGear
-  id: ThunderdomeSmg
+  id: DmArenaSmg
   equipment:
     suitstorage: WeaponSubMachineGunDrozd
   storage:
@@ -41,7 +41,7 @@
     - MagazinePistolSubMachineGun
 
 - type: startingGear
-  id: ThunderdomeWt550
+  id: DmArenaWt550
   equipment:
     suitstorage: WeaponSubMachineGunWt550
   storage:
@@ -50,7 +50,7 @@
     - MagazinePistolSubMachineGunTopMounted
 
 - type: startingGear
-  id: ThunderdomeLecter
+  id: DmArenaLecter
   equipment:
     suitstorage: WeaponRifleLecter
   storage:
@@ -60,7 +60,7 @@
     - MagazineRifleIncendiary
 
 - type: startingGear
-  id: ThunderdomeAkms
+  id: DmArenaAkms
   equipment:
     suitstorage: WeaponRifleAk
   storage:
@@ -69,7 +69,7 @@
     - MagazineLightRifle
 
 - type: startingGear
-  id: ThunderdomePython
+  id: DmArenaPython
   equipment:
     suitstorage: WeaponRevolverPythonAP
   storage:
@@ -77,7 +77,7 @@
     - SpeedLoaderMagnumAP
 
 - type: startingGear
-  id: ThunderdomeInspector
+  id: DmArenaInspector
   equipment:
     suitstorage: WeaponRevolverInspector
   storage:
@@ -86,7 +86,7 @@
     - SpeedLoaderMagnum
 
 - type: startingGear
-  id: ThunderdomeEsword
+  id: DmArenaEsword
   equipment:
     suitstorage: EnergySword
   storage:
@@ -95,7 +95,7 @@
     - Stimpack
 
 - type: startingGear
-  id: ThunderdomeMosin
+  id: DmArenaMosin
   equipment:
     suitstorage: WeaponSniperMosin
   storage:
@@ -106,38 +106,38 @@
     - DrinkVodkaBottleFull
 
 - type: startingGear
-  id: ThunderdomeArmorBulletproof
+  id: DmArenaArmorBulletproof
   equipment:
     outerClothing: ClothingOuterArmorBulletproof
     head: ClothingHeadHelmetBasic
 
 - type: startingGear
-  id: ThunderdomeArmorRiot
+  id: DmArenaArmorRiot
   equipment:
     outerClothing: ClothingOuterArmorRiot
     head: ClothingHeadHelmetRiot
 
 - type: startingGear
-  id: ThunderdomeArmorHeavy
+  id: DmArenaArmorHeavy
   equipment:
     outerClothing: ClothingOuterArmorHeavy
     head: ClothingHeadHelmetSwat
 
 - type: startingGear
-  id: ThunderdomeMedStim
+  id: DmArenaMedStim
   storage:
     back:
     - Stimpack
     - Stimpack
 
 - type: startingGear
-  id: ThunderdomeMedCombat
+  id: DmArenaMedCombat
   storage:
     back:
     - MedkitCombatFilled
 
 - type: startingGear
-  id: ThunderdomeMedAdvanced
+  id: DmArenaMedAdvanced
   storage:
     back:
     - MedkitAdvancedFilled

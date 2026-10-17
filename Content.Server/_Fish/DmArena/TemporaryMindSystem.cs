@@ -1,6 +1,6 @@
 using Content.Server.Ghost;
 using Content.Server.Mind;
-using Content.Shared._Fish.Thunderdome;
+using Content.Shared._Fish.DmArena;
 using Content.Shared.Ghost;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
@@ -9,7 +9,7 @@ using Robust.Shared.Enums;
 using Robust.Shared.Player;
 using Robust.Shared.Utility;
 
-namespace Content.Server._Fish.Thunderdome;
+namespace Content.Server._Fish.DmArena;
 
 /// <summary>
 /// Временная подмена разума: настоящий разум игрока откладывается, а в тело арены идёт одноразовый.

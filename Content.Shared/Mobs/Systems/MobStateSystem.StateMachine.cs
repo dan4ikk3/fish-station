@@ -1,4 +1,4 @@
-﻿using Content.Shared._Fish.Thunderdome; // FIsh edit
+﻿using Content.Shared._Fish.DmArena; // FIsh edit
 using Content.Shared.Database;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs.Components;
@@ -114,7 +114,7 @@ public partial class MobStateSystem
         OnStateChanged(target, component, oldState, newState);
         RaiseLocalEvent(target, ev, true);
         // Fish-start
-        if (HasComp<ThunderdomePlayerComponent>(target))
+        if (HasComp<DmArenaPlayerComponent>(target))
         {
             Dirty(target, component);
             return;

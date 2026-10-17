@@ -1,7 +1,7 @@
 using Robust.Shared.GameObjects;
 using Robust.Shared.Serialization.Manager.Attributes;
 
-namespace Content.Shared._Fish.Thunderdome;
+namespace Content.Shared._Fish.DmArena;
 
 /// <summary>
 /// Used in cases the mind has to be somewhere else without interacting the main mind or inheriting what it knows.

@@ -1,8 +1,8 @@
 using Robust.Shared.Maths;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public static class ThunderdomeTheme
+public static class DmArenaTheme
 {
     public static readonly Color Accent = Color.FromHex("#2ee6d6");
     public static readonly Color AccentHover = Color.FromHex("#7ff5ea");

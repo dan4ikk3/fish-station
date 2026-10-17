@@ -1,18 +1,18 @@
 using Content.Shared.Eui;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared._Fish.Thunderdome;
+namespace Content.Shared._Fish.DmArena;
 
 [Serializable, NetSerializable]
-public sealed class ThunderdomeLoadoutEuiState : EuiStateBase
+public sealed class DmArenaLoadoutEuiState : EuiStateBase
 {
-    public List<ThunderdomeShopOption> Items { get; }
+    public List<DmArenaShopOption> Items { get; }
     public int PlayerCount { get; }
     public int Budget { get; }
     public List<int>? Preset { get; }
     public string BaseGear { get; }
 
-    public ThunderdomeLoadoutEuiState(List<ThunderdomeShopOption> items, int playerCount, int budget, List<int>? preset, string baseGear)
+    public DmArenaLoadoutEuiState(List<DmArenaShopOption> items, int playerCount, int budget, List<int>? preset, string baseGear)
     {
         BaseGear = baseGear;
         Items = items;
@@ -23,7 +23,7 @@ public sealed class ThunderdomeLoadoutEuiState : EuiStateBase
 }
 
 [Serializable, NetSerializable]
-public sealed class ThunderdomeShopOption
+public sealed class DmArenaShopOption
 {
     public int Index { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -36,22 +36,22 @@ public sealed class ThunderdomeShopOption
 }
 
 [Serializable, NetSerializable]
-public sealed class ThunderdomeLoadoutSelectedMessage : EuiMessageBase
+public sealed class DmArenaLoadoutSelectedMessage : EuiMessageBase
 {
     public List<int> Items { get; }
 
-    public ThunderdomeLoadoutSelectedMessage(List<int> items)
+    public DmArenaLoadoutSelectedMessage(List<int> items)
     {
         Items = items;
     }
 }
 
 [Serializable, NetSerializable]
-public sealed class ThunderdomePresetSaveMessage : EuiMessageBase
+public sealed class DmArenaPresetSaveMessage : EuiMessageBase
 {
     public List<int> Items { get; }
 
-    public ThunderdomePresetSaveMessage(List<int> items)
+    public DmArenaPresetSaveMessage(List<int> items)
     {
         Items = items;
     }

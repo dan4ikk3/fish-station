@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking.Rules.Components;
-using Content.Shared._Fish.Thunderdome; // FIsh edit
+using Content.Shared._Fish.DmArena; // FIsh edit
 using Content.Shared.Antag;
 using Content.Shared.Database;
 using Content.Shared.Ghost;
@@ -193,7 +193,7 @@ public sealed partial class AntagSelectionSystem
             return false;
 
         // Fish-start
-        if (HasComp<ThunderdomePlayerComponent>(uid))
+        if (HasComp<DmArenaPlayerComponent>(uid))
             return false;
         // Fish-end
 

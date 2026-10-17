@@ -1,5 +1,5 @@
 ﻿using Content.Shared.Humanoid;
-using Content.Shared._Fish.Thunderdome; // FIsh edit
+using Content.Shared._Fish.DmArena; // FIsh edit
 using Content.Shared.Mind;
 using Content.Shared.Mind.Filters;
 using Content.Shared.Mobs.Components;
@@ -46,7 +46,7 @@ public sealed partial class TargetSystem : EntitySystem
                 continue;
 
             // Fish-start
-            if (HasComp<ThunderdomePlayerComponent>(uid))
+            if (HasComp<DmArenaPlayerComponent>(uid))
                 continue;
             // Fish-end
 

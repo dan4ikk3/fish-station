@@ -1,21 +1,21 @@
 using System.Numerics;
 using Robust.Client.UserInterface.Controls;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public sealed class ThunderdomeExitWindow : ThunderdomeWindow
+public sealed class DmArenaExitWindow : DmArenaWindow
 {
     public event Action<bool>? OnChoice;
 
-    public ThunderdomeExitWindow()
+    public DmArenaExitWindow()
     {
-        WindowTitle = Loc.GetString("thunderdome-exit-title");
+        WindowTitle = Loc.GetString("dm-arena-exit-title");
         SetSize = new Vector2(380, 180);
         Resizable = false;
 
         Contents.AddChild(new Label
         {
-            Text = Loc.GetString("thunderdome-exit-offer"),
+            Text = Loc.GetString("dm-arena-exit-offer"),
             HorizontalAlignment = HAlignment.Center,
             Margin = new Thickness(8, 14),
         });
@@ -28,14 +28,14 @@ public sealed class ThunderdomeExitWindow : ThunderdomeWindow
             Margin = new Thickness(8, 4),
         };
 
-        buttons.AddChild(MakeButton("thunderdome-exit-stay", true));
-        buttons.AddChild(MakeButton("thunderdome-exit-return", false));
+        buttons.AddChild(MakeButton("dm-arena-exit-stay", true));
+        buttons.AddChild(MakeButton("dm-arena-exit-return", false));
         Contents.AddChild(buttons);
     }
 
-    private ThunderdomeButton MakeButton(string locId, bool stay)
+    private DmArenaButton MakeButton(string locId, bool stay)
     {
-        var button = new ThunderdomeButton { Text = Loc.GetString(locId) };
+        var button = new DmArenaButton { Text = Loc.GetString(locId) };
         button.OnPressed += () =>
         {
             OnChoice?.Invoke(stay);

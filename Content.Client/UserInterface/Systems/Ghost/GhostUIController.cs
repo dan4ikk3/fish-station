@@ -2,7 +2,7 @@
 using Content.Client.Ghost;
 using Content.Client.UserInterface.Systems.Gameplay;
 using Content.Client.UserInterface.Systems.Ghost.Widgets;
-using Content.Shared._Fish.Thunderdome; // FIsh edit
+using Content.Shared._Fish.DmArena; // FIsh edit
 using Content.Shared.Ghost;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
@@ -39,7 +39,7 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
         IoCManager.Instance!.TryResolveType(out _sponsorsManager); // Sunrise-Sponsors
 
         // Fish-start
-        _entManager.EventBus.SubscribeEvent<ThunderdomePlayerCountEvent>(EventSource.Network, this, OnThunderdomePlayerCount);
+        _entManager.EventBus.SubscribeEvent<DmArenaPlayerCountEvent>(EventSource.Network, this, OnDmArenaPlayerCount);
         // Fish-end
     }
 
@@ -169,7 +169,7 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
         Gui.GhostRolesPressed += GhostRolesPressed;
         Gui.RespawnPressed += Respawn; // Sunrise-Sponsors
         Gui.ChangeServerPressed += ChangeServerPressed;
-        Gui.ThunderdomePressed += ThunderdomePressed; // FIsh edit
+        Gui.DmArenaPressed += DmArenaPressed; // FIsh edit
         Gui.TargetWindow.WarpClicked += OnWarpClicked;
 
         // Sunrise edit - нету фичи
@@ -188,21 +188,21 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
         Gui.GhostRolesPressed -= GhostRolesPressed;
         Gui.RespawnPressed -= Respawn; // Sunrise-Sponsors
         Gui.ChangeServerPressed -= ChangeServerPressed;
-        Gui.ThunderdomePressed -= ThunderdomePressed; // FIsh edit
+        Gui.DmArenaPressed -= DmArenaPressed; // FIsh edit
         Gui.TargetWindow.WarpClicked -= OnWarpClicked;
 
         Gui.Hide();
     }
 
     // Fish-start
-    private void ThunderdomePressed()
+    private void DmArenaPressed()
     {
-        _net.SendSystemNetworkMessage(new ThunderdomeJoinRequestEvent());
+        _net.SendSystemNetworkMessage(new DmArenaJoinRequestEvent());
     }
 
-    private void OnThunderdomePlayerCount(ThunderdomePlayerCountEvent ev)
+    private void OnDmArenaPlayerCount(DmArenaPlayerCountEvent ev)
     {
-        Gui?.UpdateThunderdome(ev.Count);
+        Gui?.UpdateDmArena(ev.Count);
     }
     // Fish-end
 

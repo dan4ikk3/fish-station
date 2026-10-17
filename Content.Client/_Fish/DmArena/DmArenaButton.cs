@@ -3,9 +3,9 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public sealed class ThunderdomeButton : PanelContainer
+public sealed class DmArenaButton : PanelContainer
 {
     public event Action? OnPressed;
 
@@ -29,7 +29,7 @@ public sealed class ThunderdomeButton : PanelContainer
         set => _label.Text = value;
     }
 
-    public ThunderdomeButton()
+    public DmArenaButton()
     {
         MouseFilter = MouseFilterMode.Stop;
         HorizontalExpand = true;
@@ -37,8 +37,8 @@ public sealed class ThunderdomeButton : PanelContainer
 
         _styleBox = new StyleBoxFlat
         {
-            BackgroundColor = ThunderdomeTheme.ButtonBg,
-            BorderColor = ThunderdomeTheme.Accent,
+            BackgroundColor = DmArenaTheme.ButtonBg,
+            BorderColor = DmArenaTheme.Accent,
             BorderThickness = new Thickness(1),
             ContentMarginLeftOverride = 12,
             ContentMarginRightOverride = 12,
@@ -53,7 +53,7 @@ public sealed class ThunderdomeButton : PanelContainer
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
             HorizontalExpand = true,
-            FontColorOverride = ThunderdomeTheme.ButtonText,
+            FontColorOverride = DmArenaTheme.ButtonText,
         };
         AddChild(_label);
 
@@ -71,7 +71,7 @@ public sealed class ThunderdomeButton : PanelContainer
         OnMouseEntered += _ =>
         {
             if (!_disabled)
-                _styleBox.BackgroundColor = ThunderdomeTheme.ButtonHoverBg;
+                _styleBox.BackgroundColor = DmArenaTheme.ButtonHoverBg;
         };
 
         OnMouseExited += _ => UpdateVisual();
@@ -81,15 +81,15 @@ public sealed class ThunderdomeButton : PanelContainer
     {
         if (_disabled)
         {
-            _styleBox.BackgroundColor = ThunderdomeTheme.ButtonDisabledBg;
-            _styleBox.BorderColor = ThunderdomeTheme.AccentDim;
-            _label.FontColorOverride = ThunderdomeTheme.ButtonDisabledFg;
+            _styleBox.BackgroundColor = DmArenaTheme.ButtonDisabledBg;
+            _styleBox.BorderColor = DmArenaTheme.AccentDim;
+            _label.FontColorOverride = DmArenaTheme.ButtonDisabledFg;
         }
         else
         {
-            _styleBox.BackgroundColor = ThunderdomeTheme.ButtonBg;
-            _styleBox.BorderColor = ThunderdomeTheme.Accent;
-            _label.FontColorOverride = ThunderdomeTheme.ButtonText;
+            _styleBox.BackgroundColor = DmArenaTheme.ButtonBg;
+            _styleBox.BorderColor = DmArenaTheme.Accent;
+            _label.FontColorOverride = DmArenaTheme.ButtonText;
         }
     }
 }

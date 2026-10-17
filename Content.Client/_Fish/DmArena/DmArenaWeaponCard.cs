@@ -1,16 +1,16 @@
 using System.Numerics;
-using Content.Shared._Fish.Thunderdome;
+using Content.Shared._Fish.DmArena;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public sealed class ThunderdomeWeaponCard : PanelContainer
+public sealed class DmArenaWeaponCard : PanelContainer
 {
-    public event Action<ThunderdomeWeaponCard>? OnToggled;
+    public event Action<DmArenaWeaponCard>? OnToggled;
 
     public int ItemIndex { get; }
     public int Cost { get; }
@@ -21,7 +21,7 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
     private readonly Label _nameLabel;
     private readonly Label _costLabel;
 
-    public ThunderdomeWeaponCard(ThunderdomeShopOption option)
+    public DmArenaWeaponCard(DmArenaShopOption option)
     {
         ItemIndex = option.Index;
         Cost = option.Cost;
@@ -35,8 +35,8 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
                 {
                     PanelOverride = new StyleBoxFlat
                     {
-                        BackgroundColor = ThunderdomeTheme.TitleBarBg,
-                        BorderColor = ThunderdomeTheme.Accent,
+                        BackgroundColor = DmArenaTheme.TitleBarBg,
+                        BorderColor = DmArenaTheme.Accent,
                         BorderThickness = new Thickness(1),
                         ContentMarginLeftOverride = 8,
                         ContentMarginRightOverride = 8,
@@ -44,14 +44,14 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
                         ContentMarginBottomOverride = 4,
                     },
                 };
-                panel.AddChild(new Label { Text = option.Description, FontColorOverride = ThunderdomeTheme.ButtonText });
+                panel.AddChild(new Label { Text = option.Description, FontColorOverride = DmArenaTheme.ButtonText });
                 return panel;
             };
         }
 
         _styleBox = new StyleBoxFlat
         {
-            BackgroundColor = ThunderdomeTheme.CardBg,
+            BackgroundColor = DmArenaTheme.CardBg,
             ContentMarginLeftOverride = 8,
             ContentMarginRightOverride = 8,
             ContentMarginTopOverride = 4,
@@ -97,8 +97,8 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
 
         _costLabel = new Label
         {
-            Text = Loc.GetString("thunderdome-shop-cost", ("cost", option.Cost)),
-            FontColorOverride = ThunderdomeTheme.Accent,
+            Text = Loc.GetString("dm-arena-shop-cost", ("cost", option.Cost)),
+            FontColorOverride = DmArenaTheme.Accent,
             VerticalAlignment = VAlignment.Center,
         };
         hbox.AddChild(_costLabel);
@@ -119,7 +119,7 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
         OnMouseEntered += _ =>
         {
             if (!_selected && !_locked)
-                _styleBox.BackgroundColor = ThunderdomeTheme.CardHoverBg;
+                _styleBox.BackgroundColor = DmArenaTheme.CardHoverBg;
         };
 
         OnMouseExited += _ => UpdateVisual();
@@ -134,11 +134,11 @@ public sealed class ThunderdomeWeaponCard : PanelContainer
 
     private void UpdateVisual()
     {
-        _styleBox.BorderColor = _selected ? ThunderdomeTheme.Border : Color.Transparent;
-        _styleBox.BackgroundColor = _selected ? ThunderdomeTheme.CardHoverBg : ThunderdomeTheme.CardBg;
+        _styleBox.BorderColor = _selected ? DmArenaTheme.Border : Color.Transparent;
+        _styleBox.BackgroundColor = _selected ? DmArenaTheme.CardHoverBg : DmArenaTheme.CardBg;
 
         var dim = _locked && !_selected;
-        _nameLabel.FontColorOverride = dim ? ThunderdomeTheme.ButtonDisabledFg : null;
-        _costLabel.FontColorOverride = dim ? ThunderdomeTheme.ButtonDisabledFg : ThunderdomeTheme.Accent;
+        _nameLabel.FontColorOverride = dim ? DmArenaTheme.ButtonDisabledFg : null;
+        _costLabel.FontColorOverride = dim ? DmArenaTheme.ButtonDisabledFg : DmArenaTheme.Accent;
     }
 }

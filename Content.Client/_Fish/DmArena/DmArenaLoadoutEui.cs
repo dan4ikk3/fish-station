@@ -1,21 +1,21 @@
 using Content.Client.Eui;
-using Content.Shared._Fish.Thunderdome;
+using Content.Shared._Fish.DmArena;
 using Content.Shared.Eui;
 using JetBrains.Annotations;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
 [UsedImplicitly]
-public sealed class ThunderdomeLoadoutEui : BaseEui
+public sealed class DmArenaLoadoutEui : BaseEui
 {
-    private readonly ThunderdomeLoadoutWindow _window;
+    private readonly DmArenaLoadoutWindow _window;
 
-    public ThunderdomeLoadoutEui()
+    public DmArenaLoadoutEui()
     {
-        _window = new ThunderdomeLoadoutWindow();
+        _window = new DmArenaLoadoutWindow();
         _window.OnClose += () => SendMessage(new CloseEuiMessage());
-        _window.OnLoadoutConfirmed += items => SendMessage(new ThunderdomeLoadoutSelectedMessage(items));
-        _window.OnPresetSaved += items => SendMessage(new ThunderdomePresetSaveMessage(items));
+        _window.OnLoadoutConfirmed += items => SendMessage(new DmArenaLoadoutSelectedMessage(items));
+        _window.OnPresetSaved += items => SendMessage(new DmArenaPresetSaveMessage(items));
     }
 
     public override void Opened()
@@ -34,7 +34,7 @@ public sealed class ThunderdomeLoadoutEui : BaseEui
     {
         base.HandleState(state);
 
-        if (state is not ThunderdomeLoadoutEuiState loadoutState)
+        if (state is not DmArenaLoadoutEuiState loadoutState)
             return;
 
         _window.UpdateState(loadoutState);

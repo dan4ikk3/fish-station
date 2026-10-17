@@ -9,7 +9,7 @@ using Content.Server.Preferences.Managers;
 using Content.Server.Spawners.Components;
 using Content.Server.Station.Systems;
 using Content.Server.Weapons.Ranged.Systems;
-using Content.Shared._Fish.Thunderdome;
+using Content.Shared._Fish.DmArena;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Dataset;
@@ -41,9 +41,9 @@ using Robust.Shared.Random;
 using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
 
-namespace Content.Server._Fish.Thunderdome;
+namespace Content.Server._Fish.DmArena;
 
-public sealed class ThunderdomeRuleSystem : EntitySystem
+public sealed class DmArenaRuleSystem : EntitySystem
 {
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
@@ -63,40 +63,40 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
     [Dependency] private GunSystem _gun = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
 
-    private static readonly EntProtoId RulePrototype = "ThunderdomeRule";
-    private static readonly ProtoId<LocalizedDatasetPrototype> ThunderdomeNameSuffixDataset = "NamesOperationPrefix";
+    private static readonly EntProtoId RulePrototype = "DmArenaRule";
+    private static readonly ProtoId<LocalizedDatasetPrototype> DmArenaNameSuffixDataset = "NamesOperationPrefix";
     private EntityUid? _ruleEntity;
     private bool _refillOnKill;
 
-    private readonly Dictionary<ICommonSession, ThunderdomeLoadoutEui> _activeEuis = new();
+    private readonly Dictionary<ICommonSession, DmArenaLoadoutEui> _activeEuis = new();
 
     public override void Initialize()
     {
         base.Initialize();
 
-        Subs.CVar(_cfg, ThunderdomeCVars.ThunderdomeRefill, value => _refillOnKill = value, true);
+        Subs.CVar(_cfg, DmArenaCVars.DmArenaRefill, value => _refillOnKill = value, true);
 
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundEnding);
-        SubscribeLocalEvent<ThunderdomeRuleComponent, RuleLoadedGridsEvent>(OnGridsLoaded);
-        SubscribeNetworkEvent<ThunderdomeJoinRequestEvent>(OnJoinRequest);
-        SubscribeNetworkEvent<ThunderdomeLeaveRequestEvent>(OnLeaveRequest);
-        SubscribeLocalEvent<ThunderdomePlayerComponent, MobStateChangedEvent>(OnMobStateChanged);
-        SubscribeLocalEvent<ThunderdomeOriginalBodyComponent, MobStateChangedEvent>(OnOriginalBodyStateChanged);
-        SubscribeNetworkEvent<ThunderdomeRevivalAcceptEvent>(OnRevivalAccept);
-        SubscribeNetworkEvent<ThunderdomeExitChoiceEvent>(OnExitChoice);
-        SubscribeLocalEvent<ThunderdomePlayerComponent, SuicideGhostEvent>(OnSuicideAttempt);
+        SubscribeLocalEvent<DmArenaRuleComponent, RuleLoadedGridsEvent>(OnGridsLoaded);
+        SubscribeNetworkEvent<DmArenaJoinRequestEvent>(OnJoinRequest);
+        SubscribeNetworkEvent<DmArenaLeaveRequestEvent>(OnLeaveRequest);
+        SubscribeLocalEvent<DmArenaPlayerComponent, MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<DmArenaOriginalBodyComponent, MobStateChangedEvent>(OnOriginalBodyStateChanged);
+        SubscribeNetworkEvent<DmArenaRevivalAcceptEvent>(OnRevivalAccept);
+        SubscribeNetworkEvent<DmArenaExitChoiceEvent>(OnExitChoice);
+        SubscribeLocalEvent<DmArenaPlayerComponent, SuicideGhostEvent>(OnSuicideAttempt);
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
-        SubscribeLocalEvent<ThunderdomeArenaProtectedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
+        SubscribeLocalEvent<DmArenaProtectedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
-        SubscribeLocalEvent<ThunderdomeOriginalBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
-        SubscribeLocalEvent<ThunderdomePlayerComponent, PlayerDetachedEvent>(OnPlayerDetached);
+        SubscribeLocalEvent<DmArenaOriginalBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
+        SubscribeLocalEvent<DmArenaPlayerComponent, PlayerDetachedEvent>(OnPlayerDetached);
     }
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
-        if (_ruleEntity != null && TryComp<ThunderdomeRuleComponent>(_ruleEntity.Value, out var rule) && rule.Active)
+        if (_ruleEntity != null && TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule) && rule.Active)
         {
             var now = _timing.CurTime;
             if (now >= rule.NextCleanup)
@@ -130,9 +130,9 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         if (_ruleEntity == null)
             return;
 
-        if (TryComp<ThunderdomeRuleComponent>(_ruleEntity.Value, out var rule))
+        if (TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule))
         {
-            var query = EntityQueryEnumerator<ThunderdomePlayerComponent>();
+            var query = EntityQueryEnumerator<DmArenaPlayerComponent>();
             while (query.MoveNext(out var uid, out _))
             {
                 _tempMind.TryRestoreAsGhost(uid);
@@ -145,16 +145,16 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             BroadcastPlayerCount(rule);
         }
 
-        var bodyQuery = EntityQueryEnumerator<ThunderdomeOriginalBodyComponent>();
+        var bodyQuery = EntityQueryEnumerator<DmArenaOriginalBodyComponent>();
         while (bodyQuery.MoveNext(out var uid, out _))
         {
-            RemComp<ThunderdomeOriginalBodyComponent>(uid);
+            RemComp<DmArenaOriginalBodyComponent>(uid);
         }
 
         _ruleEntity = null;
     }
 
-    private void OnGridsLoaded(Entity<ThunderdomeRuleComponent> ent, ref RuleLoadedGridsEvent args)
+    private void OnGridsLoaded(Entity<DmArenaRuleComponent> ent, ref RuleLoadedGridsEvent args)
     {
         ent.Comp.ArenaMap = args.Map;
         ent.Comp.ArenaGrids.UnionWith(args.Grids);
@@ -168,36 +168,36 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         var query = EntityQueryEnumerator<DamageableComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out _, out var xform))
         {
-            if (xform.MapID == map && !HasComp<ThunderdomePlayerComponent>(uid))
-                EnsureComp<ThunderdomeArenaProtectedComponent>(uid);
+            if (xform.MapID == map && !HasComp<DmArenaPlayerComponent>(uid))
+                EnsureComp<DmArenaProtectedComponent>(uid);
         }
     }
 
-    private static void OnArenaEntityDamage(Entity<ThunderdomeArenaProtectedComponent> ent, ref BeforeDamageChangedEvent args)
+    private static void OnArenaEntityDamage(Entity<DmArenaProtectedComponent> ent, ref BeforeDamageChangedEvent args)
     {
         args.Cancelled = true;
     }
 
-    private void OnJoinRequest(ThunderdomeJoinRequestEvent ev, EntitySessionEventArgs args)
+    private void OnJoinRequest(DmArenaJoinRequestEvent ev, EntitySessionEventArgs args)
     {
         TryOpenLoadout(args.SenderSession);
     }
 
     private void TryOpenLoadout(ICommonSession session)
     {
-        if (!_cfg.GetCVar(ThunderdomeCVars.ThunderdomeEnabled))
+        if (!_cfg.GetCVar(DmArenaCVars.DmArenaEnabled))
             return;
 
         EnsureRule();
 
         if (_ruleEntity == null
-            || !TryComp<ThunderdomeRuleComponent>(_ruleEntity.Value, out var rule)
+            || !TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule)
             || !rule.Active)
             return;
 
         if (session.AttachedEntity is not { Valid: true } ghostEntity
             || !HasComp<GhostComponent>(ghostEntity)
-            || HasComp<ThunderdomePlayerComponent>(ghostEntity))
+            || HasComp<DmArenaPlayerComponent>(ghostEntity))
             return;
 
         if (_activeEuis.TryGetValue(session, out var existingEui))
@@ -206,18 +206,18 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             _activeEuis.Remove(session);
         }
 
-        var eui = new ThunderdomeLoadoutEui(this, _ruleEntity.Value, session);
+        var eui = new DmArenaLoadoutEui(this, _ruleEntity.Value, session);
         _euiManager.OpenEui(eui, session);
         _activeEuis[session] = eui;
     }
 
-    private void OnExitChoice(ThunderdomeExitChoiceEvent ev, EntitySessionEventArgs args)
+    private void OnExitChoice(DmArenaExitChoiceEvent ev, EntitySessionEventArgs args)
     {
         var session = args.SenderSession;
 
         if (session.AttachedEntity is not { Valid: true } ghost
             || !HasComp<GhostComponent>(ghost)
-            || HasComp<ThunderdomePlayerComponent>(ghost))
+            || HasComp<DmArenaPlayerComponent>(ghost))
             return;
 
         if (ev.Stay)
@@ -238,24 +238,24 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             QueueDel(ghost);
     }
 
-    private void OnLeaveRequest(ThunderdomeLeaveRequestEvent ev, EntitySessionEventArgs args)
+    private void OnLeaveRequest(DmArenaLeaveRequestEvent ev, EntitySessionEventArgs args)
     {
         var session = args.SenderSession;
 
         if (session.AttachedEntity is not { Valid: true } entity
-            || !TryComp<ThunderdomePlayerComponent>(entity, out var tdPlayer))
+            || !TryComp<DmArenaPlayerComponent>(entity, out var tdPlayer))
             return;
 
-        LeaveThunderdome((entity, tdPlayer));
+        LeaveDmArena((entity, tdPlayer));
     }
 
-    private void OnMobStateChanged(Entity<ThunderdomePlayerComponent> ent, ref MobStateChangedEvent args)
+    private void OnMobStateChanged(Entity<DmArenaPlayerComponent> ent, ref MobStateChangedEvent args)
     {
         if (ent.Comp.RuleEntity == null
-            || !TryComp<ThunderdomeRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
+            || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
             return;
 
-        if (args.NewMobState == MobState.Critical && args.Origin is { } attacker && HasComp<ThunderdomePlayerComponent>(attacker))
+        if (args.NewMobState == MobState.Critical && args.Origin is { } attacker && HasComp<DmArenaPlayerComponent>(attacker))
             ent.Comp.LastAttacker = attacker;
 
         if (args.NewMobState != MobState.Dead)
@@ -267,7 +267,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
 
     public void SpawnPlayer(ICommonSession session, EntityUid ruleEntity, List<int> items)
     {
-        if (!TryComp<ThunderdomeRuleComponent>(ruleEntity, out var rule)
+        if (!TryComp<DmArenaRuleComponent>(ruleEntity, out var rule)
             || !rule.Active
             || session.AttachedEntity is not { Valid: true } ghostEntity
             || !HasComp<GhostComponent>(ghostEntity)
@@ -283,7 +283,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             && _prefs.TryGetCachedPreferences(userId, out var prefs)
             && prefs.SelectedCharacter is HumanoidCharacterProfile selectedProfile)
         {
-            var dataset = _prototype.Index(ThunderdomeNameSuffixDataset);
+            var dataset = _prototype.Index(DmArenaNameSuffixDataset);
             var suffix = _loc.GetString(_random.Pick(dataset.Values));
             profile = selectedProfile.WithName($"{suffix} {selectedProfile.Name}");
         }
@@ -297,12 +297,12 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             _stationSpawning.EquipStartingGear(mob, item.Gear);
         }
 
-        var tdPlayer = EnsureComp<ThunderdomePlayerComponent>(mob);
+        var tdPlayer = EnsureComp<DmArenaPlayerComponent>(mob);
         tdPlayer.RuleEntity = ruleEntity;
 
-        if (originalBody is { Valid: true } body && !HasComp<ThunderdomeOriginalBodyComponent>(body))
+        if (originalBody is { Valid: true } body && !HasComp<DmArenaOriginalBodyComponent>(body))
         {
-            var marker = EnsureComp<ThunderdomeOriginalBodyComponent>(body);
+            var marker = EnsureComp<DmArenaOriginalBodyComponent>(body);
             if (mindComp.UserId is { } ownerId)
                 marker.Owner = ownerId;
 
@@ -318,14 +318,14 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         BroadcastPlayerCount(rule);
     }
 
-    private void CleanUpPlayer(Entity<ThunderdomePlayerComponent> ent, ThunderdomeRuleComponent rule, bool playSound, SoundPathSpecifier sound)
+    private void CleanUpPlayer(Entity<DmArenaPlayerComponent> ent, DmArenaRuleComponent rule, bool playSound, SoundPathSpecifier sound)
     {
         rule.Players.Remove(GetNetEntity(ent));
 
         if (playSound && _transform.TryGetMapOrGridCoordinates(ent, out var deathCoords))
         {
             var name = Identity.Entity(ent, EntityManager);
-            _popup.PopupCoordinates(Loc.GetString("thunderdome-leave-01", ("user", name)),
+            _popup.PopupCoordinates(Loc.GetString("dm-arena-leave-01", ("user", name)),
                 deathCoords.Value,
                 PopupType.LargeCaution);
             var filter = Filter.Pvs(deathCoords.Value, 1, EntityManager, _playerManager);
@@ -341,13 +341,13 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         BroadcastPlayerCount(rule);
 
         if (actor != null)
-            RaiseNetworkEvent(new ThunderdomeExitOfferEvent(), actor.PlayerSession.Channel);
+            RaiseNetworkEvent(new DmArenaExitOfferEvent(), actor.PlayerSession.Channel);
     }
 
-    private void OnSuicideAttempt(Entity<ThunderdomePlayerComponent> ent, ref SuicideGhostEvent args)
+    private void OnSuicideAttempt(Entity<DmArenaPlayerComponent> ent, ref SuicideGhostEvent args)
     {
         if (ent.Comp.RuleEntity == null
-            || !TryComp<ThunderdomeRuleComponent>(ent.Comp.RuleEntity.Value, out var rule)
+            || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule)
             || args.Victim != ent.Owner
             )
             return;
@@ -360,9 +360,9 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
     private void OnGhostAttempt(GhostAttemptHandleEvent args)
     {
         if (args.Mind.CurrentEntity is not { } entity
-            || !TryComp<ThunderdomePlayerComponent>(entity, out var tdPlayer)
+            || !TryComp<DmArenaPlayerComponent>(entity, out var tdPlayer)
             || tdPlayer.RuleEntity == null
-            || !TryComp<ThunderdomeRuleComponent>(tdPlayer.RuleEntity.Value, out var rule))
+            || !TryComp<DmArenaRuleComponent>(tdPlayer.RuleEntity.Value, out var rule))
             return;
 
         CreditKill((entity, tdPlayer), rule);
@@ -371,7 +371,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         args.Result = true;
     }
 
-    private void CreditKill(Entity<ThunderdomePlayerComponent> victim, ThunderdomeRuleComponent rule, EntityUid? killer = null)
+    private void CreditKill(Entity<DmArenaPlayerComponent> victim, DmArenaRuleComponent rule, EntityUid? killer = null)
     {
         victim.Comp.Deaths++;
         victim.Comp.CurrentStreak = 0;
@@ -384,7 +384,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
 
         killer ??= victim.Comp.LastAttacker;
-        if (killer is not { } killerUid || !TryComp<ThunderdomePlayerComponent>(killerUid, out var killerComp))
+        if (killer is not { } killerUid || !TryComp<DmArenaPlayerComponent>(killerUid, out var killerComp))
             return;
 
         killerComp.Kills++;
@@ -402,8 +402,8 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
     }
 
     private void GhostDomePlayer(
-        Entity<ThunderdomePlayerComponent> ent,
-        ThunderdomeRuleComponent rule,
+        Entity<DmArenaPlayerComponent> ent,
+        DmArenaRuleComponent rule,
         bool playSound = true,
         SoundPathSpecifier? sound = null)
     {
@@ -412,10 +412,10 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
     }
 
 
-    private void LeaveThunderdome(Entity<ThunderdomePlayerComponent> ent)
+    private void LeaveDmArena(Entity<DmArenaPlayerComponent> ent)
     {
         if (ent.Comp.RuleEntity == null
-            || !TryComp<ThunderdomeRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
+            || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
             return;
 
         rule.Players.Remove(GetNetEntity(ent));
@@ -426,7 +426,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         BroadcastPlayerCount(rule);
     }
 
-    private void OnOriginalBodyStateChanged(Entity<ThunderdomeOriginalBodyComponent> ent, ref MobStateChangedEvent args)
+    private void OnOriginalBodyStateChanged(Entity<DmArenaOriginalBodyComponent> ent, ref MobStateChangedEvent args)
     {
         if (args.NewMobState is MobState.Dead or MobState.Invalid || args.OldMobState == MobState.Alive)
             return;
@@ -435,15 +435,15 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             || session.AttachedEntity is not { Valid: true })
             return;
 
-        RaiseNetworkEvent(new ThunderdomeRevivalOfferEvent(), session.Channel);
+        RaiseNetworkEvent(new DmArenaRevivalOfferEvent(), session.Channel);
     }
 
-    private void OnRevivalAccept(ThunderdomeRevivalAcceptEvent ev, EntitySessionEventArgs args)
+    private void OnRevivalAccept(DmArenaRevivalAcceptEvent ev, EntitySessionEventArgs args)
     {
         var session = args.SenderSession;
 
         if (session.AttachedEntity is not { Valid: true } currentEntity
-            || !TryComp<ThunderdomePlayerComponent>(currentEntity, out var tdPlayer)
+            || !TryComp<DmArenaPlayerComponent>(currentEntity, out var tdPlayer)
             || !TryComp<TemporaryMindComponent>(currentEntity, out var tempMind))
             return;
 
@@ -457,18 +457,18 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             return;
 
         if (tdPlayer.RuleEntity != null
-            && TryComp<ThunderdomeRuleComponent>(tdPlayer.RuleEntity.Value, out var rule))
+            && TryComp<DmArenaRuleComponent>(tdPlayer.RuleEntity.Value, out var rule))
         {
             rule.Players.Remove(GetNetEntity(currentEntity));
             BroadcastPlayerCount(rule);
         }
 
         _tempMind.TryRestoreToOriginalBody(currentEntity);
-        RemComp<ThunderdomeOriginalBodyComponent>(originalBody.Value);
+        RemComp<DmArenaOriginalBodyComponent>(originalBody.Value);
         QueueDel(currentEntity);
     }
 
-    private void SweepLooseItems(ThunderdomeRuleComponent rule)
+    private void SweepLooseItems(DmArenaRuleComponent rule)
     {
         if (rule.ArenaMap is not { } map)
             return;
@@ -488,7 +488,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
     }
 
-    private void OnOriginalBodyExamined(Entity<ThunderdomeOriginalBodyComponent> ent, ref ExaminedEvent args)
+    private void OnOriginalBodyExamined(Entity<DmArenaOriginalBodyComponent> ent, ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange)
             return;
@@ -499,24 +499,24 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
             args.PushMarkup($"[color=yellow]{Loc.GetString("comp-mind-examined-ssd", ("ent", ent))}[/color]");
     }
 
-    private void OnPlayerDetached(Entity<ThunderdomePlayerComponent> ent, ref PlayerDetachedEvent args)
+    private void OnPlayerDetached(Entity<DmArenaPlayerComponent> ent, ref PlayerDetachedEvent args)
     {
         if (args.Player.Status != SessionStatus.Disconnected)
             return;
 
         // TemporaryMindSystem may have already cleaned up, so search by UserId
-        var query = EntityQueryEnumerator<ThunderdomeOriginalBodyComponent>();
+        var query = EntityQueryEnumerator<DmArenaOriginalBodyComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
             if (comp.Owner == args.Player.UserId)
             {
-                RemComp<ThunderdomeOriginalBodyComponent>(uid);
+                RemComp<DmArenaOriginalBodyComponent>(uid);
                 break;
             }
         }
 
         if (ent.Comp.RuleEntity == null
-            || !TryComp<ThunderdomeRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
+            || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
             return;
 
         rule.Players.Remove(GetNetEntity(ent));
@@ -529,12 +529,12 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         if (TryComp<TemporaryMindComponent>(tempBody, out var temp)
             && TryComp<MindComponent>(temp.OriginalMind, out var origMind)
             && origMind.OwnedEntity is { } originalBody)
-            RemComp<ThunderdomeOriginalBodyComponent>(originalBody);
+            RemComp<DmArenaOriginalBodyComponent>(originalBody);
     }
 
     private void OnDespawnPickedUp(Entity<TimedDespawnComponent> ent, ref EntGotInsertedIntoContainerMessage args)
     {
-        if (HasComp<ThunderdomePlayerComponent>(args.Container.Owner))
+        if (HasComp<DmArenaPlayerComponent>(args.Container.Owner))
             RemComp<TimedDespawnComponent>(ent);
     }
 
@@ -549,7 +549,7 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         EnsureComp<TimedDespawnComponent>(uid).Lifetime = lifetime;
     }
 
-    private EntityCoordinates? GetRandomSpawnPoint(ThunderdomeRuleComponent rule)
+    private EntityCoordinates? GetRandomSpawnPoint(DmArenaRuleComponent rule)
     {
         if (rule.ArenaMap == null)
             return null;
@@ -582,17 +582,17 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         return spawns.Count > 0 ? _random.Pick(spawns) : null;
     }
 
-    private void CheckKillStreak(Entity<ThunderdomePlayerComponent> killer, ThunderdomeRuleComponent rule)
+    private void CheckKillStreak(Entity<DmArenaPlayerComponent> killer, DmArenaRuleComponent rule)
     {
         var streak = killer.Comp.CurrentStreak;
         if (streak < 3 || streak > 12)
             return;
 
         var name = Identity.Name(killer, EntityManager);
-        if (!_loc.TryGetString($"thunderdome-streak-{streak}", out var message, ("player", name)))
+        if (!_loc.TryGetString($"dm-arena-streak-{streak}", out var message, ("player", name)))
             return;
 
-        var ev = new ThunderdomeAnnouncementEvent(message);
+        var ev = new DmArenaAnnouncementEvent(message);
         foreach (var netEntity in rule.Players)
         {
             if (!TryGetEntity(netEntity, out var playerEntity))
@@ -602,22 +602,22 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
     }
 
-    private void BroadcastPlayerCount(ThunderdomeRuleComponent rule)
+    private void BroadcastPlayerCount(DmArenaRuleComponent rule)
     {
-        var ev = new ThunderdomePlayerCountEvent(rule.Players.Count);
+        var ev = new DmArenaPlayerCountEvent(rule.Players.Count);
         foreach (var session in _playerManager.Sessions)
         {
             RaiseNetworkEvent(ev, session.Channel);
         }
     }
 
-    public ThunderdomeLoadoutEuiState GetLoadoutState(ThunderdomeRuleComponent rule, NetUserId userId)
+    public DmArenaLoadoutEuiState GetLoadoutState(DmArenaRuleComponent rule, NetUserId userId)
     {
-        var items = new List<ThunderdomeShopOption>();
+        var items = new List<DmArenaShopOption>();
         for (var i = 0; i < rule.ShopItems.Count; i++)
         {
             var item = rule.ShopItems[i];
-            items.Add(new ThunderdomeShopOption
+            items.Add(new DmArenaShopOption
             {
                 Index = i,
                 Name = Loc.GetString(item.Name),
@@ -631,18 +631,18 @@ public sealed class ThunderdomeRuleSystem : EntitySystem
         }
 
         rule.Presets.TryGetValue(userId, out var preset);
-        return new ThunderdomeLoadoutEuiState(items, rule.Players.Count, rule.Budget, preset, rule.Gear);
+        return new DmArenaLoadoutEuiState(items, rule.Players.Count, rule.Budget, preset, rule.Gear);
     }
 
-    public void SavePreset(ThunderdomeRuleComponent rule, NetUserId userId, List<int> items)
+    public void SavePreset(DmArenaRuleComponent rule, NetUserId userId, List<int> items)
     {
         if (TryGetValidItems(rule, items, out _))
             rule.Presets[userId] = new List<int>(items);
     }
 
-    private static bool TryGetValidItems(ThunderdomeRuleComponent rule, List<int> indexes, out List<ThunderdomeShopItem> items)
+    private static bool TryGetValidItems(DmArenaRuleComponent rule, List<int> indexes, out List<DmArenaShopItem> items)
     {
-        items = new List<ThunderdomeShopItem>();
+        items = new List<DmArenaShopItem>();
         var total = 0;
 
         foreach (var index in indexes.Distinct())

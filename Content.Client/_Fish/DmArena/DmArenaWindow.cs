@@ -6,9 +6,9 @@ using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Input;
 using Robust.Shared.Maths;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public class ThunderdomeWindow : BaseWindow
+public class DmArenaWindow : BaseWindow
 {
     private const float TitleBarHeight = 36;
     private const float BorderWidth = 2;
@@ -29,7 +29,7 @@ public class ThunderdomeWindow : BaseWindow
 
     public BoxContainer Contents => _contentBox;
 
-    public ThunderdomeWindow()
+    public DmArenaWindow()
     {
         MouseFilter = MouseFilterMode.Stop;
         Resizable = true;
@@ -38,8 +38,8 @@ public class ThunderdomeWindow : BaseWindow
         {
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = ThunderdomeTheme.BodyBg,
-                BorderColor = ThunderdomeTheme.Border,
+                BackgroundColor = DmArenaTheme.BodyBg,
+                BorderColor = DmArenaTheme.Border,
                 BorderThickness = new Thickness(BorderWidth),
             },
         };
@@ -56,8 +56,8 @@ public class ThunderdomeWindow : BaseWindow
             MinHeight = TitleBarHeight,
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = ThunderdomeTheme.TitleBarBg,
-                BorderColor = ThunderdomeTheme.Accent,
+                BackgroundColor = DmArenaTheme.TitleBarBg,
+                BorderColor = DmArenaTheme.Accent,
                 BorderThickness = new Thickness(0, 0, 0, 1),
             },
         };
@@ -76,7 +76,7 @@ public class ThunderdomeWindow : BaseWindow
             Margin = new Thickness(0, 6, 8, 6),
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = ThunderdomeTheme.Accent,
+                BackgroundColor = DmArenaTheme.Accent,
             },
         };
         titleBarContent.AddChild(accentBar);
@@ -99,15 +99,15 @@ public class ThunderdomeWindow : BaseWindow
         var closeLabel = new Label
         {
             Text = "X",
-            FontColorOverride = ThunderdomeTheme.Accent,
+            FontColorOverride = DmArenaTheme.Accent,
             VerticalAlignment = VAlignment.Center,
             HorizontalAlignment = HAlignment.Center,
         };
         _closeButton.AddChild(closeLabel);
 
         _closeButton.OnPressed += _ => Close();
-        _closeButton.OnMouseEntered += _ => closeLabel.FontColorOverride = ThunderdomeTheme.AccentHover;
-        _closeButton.OnMouseExited += _ => closeLabel.FontColorOverride = ThunderdomeTheme.Accent;
+        _closeButton.OnMouseEntered += _ => closeLabel.FontColorOverride = DmArenaTheme.AccentHover;
+        _closeButton.OnMouseExited += _ => closeLabel.FontColorOverride = DmArenaTheme.Accent;
 
         titleBarContent.AddChild(_closeButton);
         _titleBar.AddChild(titleBarContent);

@@ -1,21 +1,21 @@
 using System.Numerics;
 using Robust.Client.UserInterface.Controls;
 
-namespace Content.Client._Fish.Thunderdome;
+namespace Content.Client._Fish.DmArena;
 
-public sealed class ThunderdomeRevivalWindow : ThunderdomeWindow
+public sealed class DmArenaRevivalWindow : DmArenaWindow
 {
     public event Action? OnAccepted;
 
-    public ThunderdomeRevivalWindow()
+    public DmArenaRevivalWindow()
     {
-        WindowTitle = Loc.GetString("thunderdome-revival-title");
+        WindowTitle = Loc.GetString("dm-arena-revival-title");
         SetSize = new Vector2(350, 160);
         Resizable = false;
 
         var message = new Label
         {
-            Text = Loc.GetString("thunderdome-revival-offer"),
+            Text = Loc.GetString("dm-arena-revival-offer"),
             HorizontalAlignment = HAlignment.Center,
             Margin = new Thickness(8, 12),
         };
@@ -30,9 +30,9 @@ public sealed class ThunderdomeRevivalWindow : ThunderdomeWindow
             Margin = new Thickness(8, 4),
         };
 
-        var acceptButton = new ThunderdomeButton
+        var acceptButton = new DmArenaButton
         {
-            Text = Loc.GetString("thunderdome-revival-accept"),
+            Text = Loc.GetString("dm-arena-revival-accept"),
         };
         acceptButton.OnPressed += () =>
         {
@@ -41,9 +41,9 @@ public sealed class ThunderdomeRevivalWindow : ThunderdomeWindow
         };
         buttons.AddChild(acceptButton);
 
-        var declineButton = new ThunderdomeButton
+        var declineButton = new DmArenaButton
         {
-            Text = Loc.GetString("thunderdome-revival-decline"),
+            Text = Loc.GetString("dm-arena-revival-decline"),
         };
         declineButton.OnPressed += () => Close();
         buttons.AddChild(declineButton);

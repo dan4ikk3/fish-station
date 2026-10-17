@@ -7,7 +7,7 @@
             <Button Name="GhostWarpButton" Text="{Loc ghost-gui-ghost-warp-button}" />
             <Button Name="GhostRolesButton" />
             <!-- Fish-start -->
-            <Button Name="ThunderdomeButton" Text="{Loc thunderdome-ghost-button-default}" />
+            <Button Name="DmArenaButton" Text="{Loc dm-arena-ghost-button-default}" />
             <!-- Fish-end -->
         </BoxContainer>
         <!-- Sunrise-Sponsor-Start -->

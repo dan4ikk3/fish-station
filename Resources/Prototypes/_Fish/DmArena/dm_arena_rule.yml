@@ -1,0 +1,111 @@
+- type: entity
+  parent: BaseGameRule
+  id: DmArenaRule
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: DmArenaRule
+    gear: DmArenaBaseGear
+    budget: 100
+    shopItems:
+    - gear: DmArenaShotgun
+      name: dm-arena-loadout-shotgun
+      description: dm-arena-desc-shotgun
+      category: dm-arena-category-weapons
+      sprite: WeaponShotgunKammerer
+      cost: 20
+    - gear: DmArenaDoubleBarreled
+      name: dm-arena-loadout-doublebarreled
+      description: dm-arena-desc-doublebarreled
+      category: dm-arena-category-weapons
+      sprite: WeaponShotgunDoubleBarreled
+      cost: 15
+    - gear: DmArenaSmg
+      name: dm-arena-loadout-smg
+      description: dm-arena-desc-smg
+      category: dm-arena-category-weapons
+      sprite: WeaponSubMachineGunDrozd
+      cost: 25
+    - gear: DmArenaWt550
+      name: dm-arena-loadout-wt550
+      description: dm-arena-desc-wt550
+      category: dm-arena-category-weapons
+      sprite: WeaponSubMachineGunWt550
+      cost: 30
+    - gear: DmArenaLecter
+      name: dm-arena-loadout-lecter
+      description: dm-arena-desc-lecter
+      category: dm-arena-category-weapons
+      sprite: WeaponRifleLecter
+      cost: 35
+    - gear: DmArenaAkms
+      name: dm-arena-loadout-akms
+      description: dm-arena-desc-akms
+      category: dm-arena-category-weapons
+      sprite: WeaponRifleAk
+      cost: 40
+    - gear: DmArenaPython
+      name: dm-arena-loadout-python
+      description: dm-arena-desc-python
+      category: dm-arena-category-weapons
+      sprite: WeaponRevolverPython
+      cost: 30
+    - gear: DmArenaInspector
+      name: dm-arena-loadout-inspector
+      description: dm-arena-desc-inspector
+      category: dm-arena-category-weapons
+      sprite: WeaponRevolverInspector
+      cost: 20
+    - gear: DmArenaEsword
+      name: dm-arena-loadout-esword
+      description: dm-arena-desc-esword
+      category: dm-arena-category-weapons
+      sprite: EnergySword
+      cost: 30
+    - gear: DmArenaMosin
+      name: dm-arena-loadout-mosin
+      description: dm-arena-desc-mosin
+      category: dm-arena-category-weapons
+      sprite: WeaponSniperMosin
+      cost: 35
+    - gear: DmArenaArmorBulletproof
+      name: dm-arena-item-armor-bulletproof
+      description: dm-arena-desc-armor-bulletproof
+      category: dm-arena-category-armor
+      sprite: ClothingOuterArmorBulletproof
+      cost: 10
+      equipFirst: true
+    - gear: DmArenaArmorRiot
+      name: dm-arena-item-armor-riot
+      description: dm-arena-desc-armor-riot
+      category: dm-arena-category-armor
+      sprite: ClothingOuterArmorRiot
+      cost: 20
+      equipFirst: true
+    - gear: DmArenaArmorHeavy
+      name: dm-arena-item-armor-heavy
+      description: dm-arena-desc-armor-heavy
+      category: dm-arena-category-armor
+      sprite: ClothingOuterArmorHeavy
+      cost: 30
+      equipFirst: true
+    - gear: DmArenaMedStim
+      name: dm-arena-item-med-stim
+      description: dm-arena-desc-med-stim
+      category: dm-arena-category-medicine
+      sprite: Stimpack
+      cost: 10
+    - gear: DmArenaMedCombat
+      name: dm-arena-item-med-combat
+      description: dm-arena-desc-med-combat
+      category: dm-arena-category-medicine
+      sprite: MedkitCombatFilled
+      cost: 15
+    - gear: DmArenaMedAdvanced
+      name: dm-arena-item-med-advanced
+      description: dm-arena-desc-med-advanced
+      category: dm-arena-category-medicine
+      sprite: MedkitAdvancedFilled
+      cost: 20
+  - type: LoadMapRule
+    mapPath: /Maps/_Fish/Nonstations/dm01-entryway.yml
+  - type: RuleGrids
