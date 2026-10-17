@@ -874,3 +874,10 @@
     message: Локализация для пары других взрывов админ панели.
   id: 88
   url: https://github.com/makura-games/fish-station/pull/497
+- author: TiFeRi
+  time: '2026-10-17T06:24:53.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Доработка нового шаттла лон-опера.
+  id: 89
+  url: https://github.com/makura-games/fish-station/pull/506
