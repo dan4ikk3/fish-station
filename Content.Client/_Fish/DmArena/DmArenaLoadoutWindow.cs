@@ -320,7 +320,7 @@ public sealed class DmArenaLoadoutWindow : DmArenaWindow
             spawning.EquipStartingGear(_dummy, item.GearPrototype);
 
             // Оружие показываем в руках, чтобы оно было видно на модели
-            if (item.Category != _heldCategory || !_entMan.TryGetComponent(_dummy, out HandsComponent? handsComp))
+            if (item.InHand || item.Category != _heldCategory || !_entMan.TryGetComponent(_dummy, out HandsComponent? handsComp))
                 continue;
 
             var held = _entMan.SpawnEntity(item.SpritePrototype, MapCoordinates.Nullspace);

@@ -10,7 +10,7 @@ public sealed class DmArenaExitWindow : DmArenaWindow
     public DmArenaExitWindow()
     {
         WindowTitle = Loc.GetString("dm-arena-exit-title");
-        SetSize = new Vector2(380, 180);
+        SetSize = new Vector2(480, 170);
         Resizable = false;
 
         Contents.AddChild(new Label

@@ -67,6 +67,53 @@
       category: dm-arena-category-weapons
       sprite: WeaponSniperMosin
       cost: 35
+    - gear: DmArenaKatana
+      name: dm-arena-item-katana
+      description: dm-arena-desc-katana
+      category: dm-arena-category-weapons
+      sprite: Katana
+      cost: 20
+      inHand: true
+    - gear: DmArenaMachete
+      name: dm-arena-item-machete
+      description: dm-arena-desc-machete
+      category: dm-arena-category-weapons
+      sprite: Machete
+      cost: 10
+      inHand: true
+    - gear: DmArenaFireAxe
+      name: dm-arena-item-fireaxe
+      description: dm-arena-desc-fireaxe
+      category: dm-arena-category-weapons
+      sprite: FireAxe
+      cost: 20
+      inHand: true
+    - gear: DmArenaStunbaton
+      name: dm-arena-item-stunbaton
+      description: dm-arena-desc-stunbaton
+      category: dm-arena-category-weapons
+      sprite: Stunbaton
+      cost: 10
+      inHand: true
+    - gear: DmArenaCombatKnife
+      name: dm-arena-item-knife
+      description: dm-arena-desc-knife
+      category: dm-arena-category-weapons
+      sprite: CombatKnife
+      cost: 5
+      inHand: true
+    - gear: DmArenaLaserCarbine
+      name: dm-arena-item-lasercarbine
+      description: dm-arena-desc-lasercarbine
+      category: dm-arena-category-weapons
+      sprite: WeaponLaserCarbine
+      cost: 30
+    - gear: DmArenaLaserSvalinn
+      name: dm-arena-item-lasersvalinn
+      description: dm-arena-desc-lasersvalinn
+      category: dm-arena-category-weapons
+      sprite: WeaponLaserSvalinn
+      cost: 15
     - gear: DmArenaArmorBulletproof
       name: dm-arena-item-armor-bulletproof
       description: dm-arena-desc-armor-bulletproof
@@ -88,6 +135,50 @@
       sprite: ClothingOuterArmorHeavy
       cost: 30
       equipFirst: true
+    - gear: DmArenaArmorReflective
+      name: dm-arena-item-armor-reflective
+      description: dm-arena-desc-armor-reflective
+      category: dm-arena-category-armor
+      sprite: ClothingOuterArmorReflective
+      cost: 20
+      equipFirst: true
+    - gear: DmArenaShield
+      name: dm-arena-item-shield
+      description: dm-arena-desc-shield
+      category: dm-arena-category-armor
+      sprite: RiotShield
+      cost: 15
+      inHand: true
+    - gear: DmArenaGlovesCombat
+      name: dm-arena-item-gloves
+      description: dm-arena-desc-gloves
+      category: dm-arena-category-armor
+      sprite: ClothingHandsGlovesCombat
+      cost: 5
+    - gear: DmArenaGrenadesFlash
+      name: dm-arena-item-gren-flash
+      description: dm-arena-desc-gren-flash
+      category: dm-arena-category-gear
+      sprite: GrenadeFlashBang
+      cost: 10
+    - gear: DmArenaGrenadesSmoke
+      name: dm-arena-item-gren-smoke
+      description: dm-arena-desc-gren-smoke
+      category: dm-arena-category-gear
+      sprite: SmokeGrenade
+      cost: 5
+    - gear: DmArenaGrenadesFrag
+      name: dm-arena-item-gren-frag
+      description: dm-arena-desc-gren-frag
+      category: dm-arena-category-gear
+      sprite: GrenadeFrag
+      cost: 25
+    - gear: DmArenaHudSecurity
+      name: dm-arena-item-hud
+      description: dm-arena-desc-hud
+      category: dm-arena-category-gear
+      sprite: ClothingEyesHudSecurity
+      cost: 5
     - gear: DmArenaMedStim
       name: dm-arena-item-med-stim
       description: dm-arena-desc-med-stim
@@ -106,6 +197,24 @@
       category: dm-arena-category-medicine
       sprite: MedkitAdvancedFilled
       cost: 20
+    - gear: DmArenaMedBrute
+      name: dm-arena-item-med-brute
+      description: dm-arena-desc-med-brute
+      category: dm-arena-category-medicine
+      sprite: MedkitBruteFilled
+      cost: 10
+    - gear: DmArenaMedBurn
+      name: dm-arena-item-med-burn
+      description: dm-arena-desc-med-burn
+      category: dm-arena-category-medicine
+      sprite: MedkitBurnFilled
+      cost: 10
+    - gear: DmArenaMedPens
+      name: dm-arena-item-med-pens
+      description: dm-arena-desc-med-pens
+      category: dm-arena-category-medicine
+      sprite: CombatMedipen
+      cost: 15
   - type: LoadMapRule
     mapPath: /Maps/_Fish/Nonstations/dm01-entryway.yml
   - type: RuleGrids

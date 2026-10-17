@@ -11,7 +11,8 @@
     pocket2: MagazinePistol
   storage:
     back:
-    - MedkitFilled
+    - Brutepack
+    - Ointment
 
 - type: startingGear
   id: DmArenaShotgun
@@ -141,3 +142,99 @@
   storage:
     back:
     - MedkitAdvancedFilled
+
+- type: startingGear
+  id: DmArenaKatana
+  inhand:
+  - Katana
+
+- type: startingGear
+  id: DmArenaMachete
+  inhand:
+  - Machete
+
+- type: startingGear
+  id: DmArenaFireAxe
+  inhand:
+  - FireAxe
+
+- type: startingGear
+  id: DmArenaStunbaton
+  inhand:
+  - Stunbaton
+
+- type: startingGear
+  id: DmArenaCombatKnife
+  inhand:
+  - CombatKnife
+
+- type: startingGear
+  id: DmArenaLaserCarbine
+  equipment:
+    suitstorage: WeaponLaserCarbine
+
+- type: startingGear
+  id: DmArenaLaserSvalinn
+  equipment:
+    suitstorage: WeaponLaserSvalinn
+
+- type: startingGear
+  id: DmArenaArmorReflective
+  equipment:
+    outerClothing: ClothingOuterArmorReflective
+    head: ClothingHeadHelmetBasic
+
+- type: startingGear
+  id: DmArenaShield
+  inhand:
+  - RiotShield
+
+- type: startingGear
+  id: DmArenaGlovesCombat
+  equipment:
+    gloves: ClothingHandsGlovesCombat
+
+- type: startingGear
+  id: DmArenaGrenadesFlash
+  storage:
+    back:
+    - GrenadeFlashBang
+    - GrenadeFlashBang
+
+- type: startingGear
+  id: DmArenaGrenadesSmoke
+  storage:
+    back:
+    - SmokeGrenade
+    - SmokeGrenade
+
+- type: startingGear
+  id: DmArenaGrenadesFrag
+  storage:
+    back:
+    - GrenadeFrag
+    - GrenadeFrag
+
+- type: startingGear
+  id: DmArenaHudSecurity
+  equipment:
+    eyes: ClothingEyesHudSecurity
+
+- type: startingGear
+  id: DmArenaMedBrute
+  storage:
+    back:
+    - MedkitBruteFilled
+
+- type: startingGear
+  id: DmArenaMedBurn
+  storage:
+    back:
+    - MedkitBurnFilled
+
+- type: startingGear
+  id: DmArenaMedPens
+  storage:
+    back:
+    - CombatMedipen
+    - CombatMedipen

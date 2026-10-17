@@ -374,7 +374,6 @@ public sealed class DmArenaRuleSystem : EntitySystem
     private void CreditKill(Entity<DmArenaPlayerComponent> victim, DmArenaRuleComponent rule, EntityUid? killer = null)
     {
         victim.Comp.Deaths++;
-        victim.Comp.CurrentStreak = 0;
 
         _mind.TryGetMind(victim, out _, out var deadMind);
         if (deadMind?.UserId is { } deadUserId)
@@ -388,13 +387,11 @@ public sealed class DmArenaRuleSystem : EntitySystem
             return;
 
         killerComp.Kills++;
-        killerComp.CurrentStreak++;
 
         if (_mind.TryGetMind(killerUid, out _, out var killerMind) && killerMind.UserId is { } killerUserId)
         {
             rule.Kills.TryGetValue(killerUserId, out var existingKills);
             rule.Kills[killerUserId] = existingKills + 1;
-            CheckKillStreak((killerUid, killerComp), rule);
         }
 
         if (_refillOnKill)
@@ -504,7 +501,7 @@ public sealed class DmArenaRuleSystem : EntitySystem
         if (args.Player.Status != SessionStatus.Disconnected)
             return;
 
-        // TemporaryMindSystem may have already cleaned up, so search by UserId
+        // TemporaryMindSystem мог уже всё очистить, поэтому ищем по UserId
         var query = EntityQueryEnumerator<DmArenaOriginalBodyComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
@@ -582,26 +579,6 @@ public sealed class DmArenaRuleSystem : EntitySystem
         return spawns.Count > 0 ? _random.Pick(spawns) : null;
     }
 
-    private void CheckKillStreak(Entity<DmArenaPlayerComponent> killer, DmArenaRuleComponent rule)
-    {
-        var streak = killer.Comp.CurrentStreak;
-        if (streak < 3 || streak > 12)
-            return;
-
-        var name = Identity.Name(killer, EntityManager);
-        if (!_loc.TryGetString($"dm-arena-streak-{streak}", out var message, ("player", name)))
-            return;
-
-        var ev = new DmArenaAnnouncementEvent(message);
-        foreach (var netEntity in rule.Players)
-        {
-            if (!TryGetEntity(netEntity, out var playerEntity))
-                continue;
-
-            RaiseNetworkEvent(ev, playerEntity.Value);
-        }
-    }
-
     private void BroadcastPlayerCount(DmArenaRuleComponent rule)
     {
         var ev = new DmArenaPlayerCountEvent(rule.Players.Count);
@@ -627,6 +604,7 @@ public sealed class DmArenaRuleSystem : EntitySystem
                 GearPrototype = item.Gear,
                 Cost = item.Cost,
                 EquipFirst = item.EquipFirst,
+                InHand = item.InHand,
             });
         }
 

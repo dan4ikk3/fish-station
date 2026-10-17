@@ -28,6 +28,9 @@ public sealed partial class DmArenaShopItem
 
     [DataField]
     public bool EquipFirst;
+
+    [DataField]
+    public bool InHand;
 }
 
 [RegisterComponent]

@@ -15,8 +15,5 @@ public sealed partial class DmArenaPlayerComponent : Component
     [DataField]
     public int Deaths;
 
-    [DataField]
-    public int CurrentStreak;
-
     public EntityUid? LastAttacker;
 }

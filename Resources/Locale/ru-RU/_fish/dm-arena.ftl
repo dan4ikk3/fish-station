@@ -1,19 +1,20 @@
-# Ghost HUD button
+# Кнопка в интерфейсе призрака
 dm-arena-ghost-button = ДМ Арена ({ $count })
 dm-arena-ghost-button-default = ДМ Арена (0)
 
-# Loadout window
+# Окно выбора снаряжения
 dm-arena-loadout-title = ДМ Арена
 dm-arena-loadout-players = игроков на арене: { $count }
 dm-arena-loadout-subtitle = Собери снаряжение в рамках лимита очков
 dm-arena-loadout-confirm = Зайти на арену
 
-# Shop categories
+# Категории магазина
 dm-arena-category-weapons = Оружие
 dm-arena-category-armor = Броня
+dm-arena-category-gear = Снаряжение
 dm-arena-category-medicine = Медикаменты
 
-# Weapon names
+# Названия оружия
 dm-arena-loadout-shotgun = Каммерер
 dm-arena-loadout-doublebarreled = Двустволка
 dm-arena-loadout-smg = Дрозд
@@ -25,7 +26,7 @@ dm-arena-loadout-inspector = Инспектор
 dm-arena-loadout-esword = Энергетический меч
 dm-arena-loadout-mosin = Кардашев-Мосин
 
-# Weapon descriptions (tooltips)
+# Описания оружия (подсказки)
 dm-arena-desc-shotgun = Дробовик + 1 коробка картечи, 1 коробка ружейных патронов
 dm-arena-desc-doublebarreled = Двустволка + 2 коробки картечи
 dm-arena-desc-smg = Пистолет пулемёт + 2 пары магазинов
@@ -61,28 +62,54 @@ dm-arena-desc-med-combat = Боевая аптечка
 dm-arena-desc-med-advanced = Продвинутая аптечка
 
 # Окно выхода
-dm-arena-exit-title = Арена
-dm-arena-exit-offer = Ты покинул арену. Что дальше?
-dm-arena-exit-stay = Остаться на арене
-dm-arena-exit-return = Вернуться в тело
+dm-arena-exit-title = Бой окончен
+dm-arena-exit-offer = Вы выбыли из схватки. Вернуться на арену или в своё тело?
+dm-arena-exit-stay = Вернуться в бой
+dm-arena-exit-return = В своё тело
 
-# Kill streak announcements
-dm-arena-streak-3 = { $player } устроил мясную серию!
-dm-arena-streak-4 = { $player } всех нагибает!
-dm-arena-streak-5 = { $player } сделал МЕГА-КИЛЛ!
-dm-arena-streak-6 = { $player } НЕ ОСТАНОВИТЬ!
-dm-arena-streak-7 = { $player } просто БОЛЬНОЙ УБЛЮДОК!
-dm-arena-streak-8 = { $player } сделал МОНСТР-КИЛЛ!
-dm-arena-streak-9 = { $player } ЧЁРТОВ БОГ УБИЙСТВ!
-dm-arena-streak-12 = { $player } ВООБЩЕ ВНЕ УРОВНЯ БОГОВ!
-
-# Revival
+# Воскрешение тела
 dm-arena-revival-title = Тело Воскрешено
 dm-arena-revival-offer = Ваше первоначальное тело восстановлено! Вернётесь в него?
 dm-arena-revival-accept = Вернуться в тело
 dm-arena-revival-decline = Остаться на арене
 
-# Chat / messages
+# Сообщения в чате
 dm-arena-join = { $player } вошёл на Грозовой ринг!
 dm-arena-leave = { $player } покинул Грозовой ринг.
 dm-arena-leave-01 = { $user } исчезает, устав убивать.
+
+# Новые предметы магазина
+dm-arena-item-katana = Катана
+dm-arena-desc-katana = Катана: быстрая и острая
+dm-arena-item-machete = Мачете
+dm-arena-desc-machete = Тяжёлое мачете
+dm-arena-item-fireaxe = Пожарный топор
+dm-arena-desc-fireaxe = Пожарный топор, бьёт сильно
+dm-arena-item-stunbaton = Электрошоковая дубинка
+dm-arena-desc-stunbaton = Электрошоковая дубинка для ближнего боя
+dm-arena-item-knife = Боевой нож
+dm-arena-desc-knife = Боевой нож, самый дешёвый способ драться
+dm-arena-item-lasercarbine = Лазерный карабин
+dm-arena-desc-lasercarbine = Лазерный карабин, запасные патроны не нужны
+dm-arena-item-lasersvalinn = Лазерный пистолет Свалинн
+dm-arena-desc-lasersvalinn = Лазерный пистолет, лёгкий и дешёвый
+dm-arena-item-armor-reflective = Отражающая броня
+dm-arena-desc-armor-reflective = Отражающая броня + обычный шлем, хороша против лазеров
+dm-arena-item-shield = Противоударный щит
+dm-arena-desc-shield = Противоударный щит в руке
+dm-arena-item-gloves = Боевые перчатки
+dm-arena-desc-gloves = Боевые перчатки
+dm-arena-item-gren-flash = Светошумовые гранаты
+dm-arena-desc-gren-flash = 2 светошумовые гранаты
+dm-arena-item-gren-smoke = Дымовые гранаты
+dm-arena-desc-gren-smoke = 2 дымовые гранаты
+dm-arena-item-gren-frag = Осколочные гранаты
+dm-arena-desc-gren-frag = 2 осколочные гранаты
+dm-arena-item-hud = Охранный визор
+dm-arena-desc-hud = Охранный визор
+dm-arena-item-med-brute = Аптечка от ушибов
+dm-arena-desc-med-brute = Аптечка для лечения ушибов
+dm-arena-item-med-burn = Аптечка от ожогов
+dm-arena-desc-med-burn = Аптечка для лечения ожогов
+dm-arena-item-med-pens = Боевые медипены
+dm-arena-desc-med-pens = 2 боевых медипена

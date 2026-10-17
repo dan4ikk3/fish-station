@@ -3,19 +3,19 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Fish.DmArena;
 
 /// <summary>
-/// Ghost requests to join the DM arena.
+/// Призрак просит войти на ДМ арену.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaJoinRequestEvent : EntityEventArgs;
 
 /// <summary>
-/// Player requests to leave the DM arena.
+/// Игрок просит покинуть ДМ арену.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaLeaveRequestEvent : EntityEventArgs;
 
 /// <summary>
-/// Server broadcasts the current DM arena player count to ghosts.
+/// Сервер рассылает призракам текущее число игроков на ДМ арене.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaPlayerCountEvent : EntityEventArgs
@@ -29,39 +29,25 @@ public sealed class DmArenaPlayerCountEvent : EntityEventArgs
 }
 
 /// <summary>
-/// Server announces kill streaks / events to DM arena participants.
-/// </summary>
-[Serializable, NetSerializable]
-public sealed class DmArenaAnnouncementEvent : EntityEventArgs
-{
-    public string Message { get; }
-
-    public DmArenaAnnouncementEvent(string message)
-    {
-        Message = message;
-    }
-}
-
-/// <summary>
-/// Server notifies a DM arena player that their original station body has been revived.
+/// Сервер сообщает игроку на арене, что его прежнее тело на станции снова живо.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaRevivalOfferEvent : EntityEventArgs;
 
 /// <summary>
-/// Client accepts the revival offer and wants to return to their original body.
+/// Игрок принимает предложение и хочет вернуться в своё прежнее тело.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaRevivalAcceptEvent : EntityEventArgs;
 
 /// <summary>
-/// Server offers a player who just left the arena to stay or return to the body.
+/// Сервер предлагает покинувшему арену игроку вернуться в бой или в своё тело.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaExitOfferEvent : EntityEventArgs;
 
 /// <summary>
-/// Client answer to the exit offer: stay on the arena or return to the original body.
+/// Ответ игрока на предложение: вернуться на арену или в своё прежнее тело.
 /// </summary>
 [Serializable, NetSerializable]
 public sealed class DmArenaExitChoiceEvent : EntityEventArgs

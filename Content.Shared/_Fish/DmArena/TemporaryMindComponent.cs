@@ -4,7 +4,7 @@ using Robust.Shared.Serialization.Manager.Attributes;
 namespace Content.Shared._Fish.DmArena;
 
 /// <summary>
-/// Used in cases the mind has to be somewhere else without interacting the main mind or inheriting what it knows.
+/// Нужен, когда разуму надо побыть в другом теле, не затрагивая основной разум и не наследуя его знания.
 /// </summary>
 [RegisterComponent]
 public sealed partial class TemporaryMindComponent : Component

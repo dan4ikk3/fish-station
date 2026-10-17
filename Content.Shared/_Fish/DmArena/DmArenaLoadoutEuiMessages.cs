@@ -33,6 +33,7 @@ public sealed class DmArenaShopOption
     public string GearPrototype { get; set; } = string.Empty;
     public int Cost { get; set; }
     public bool EquipFirst { get; set; }
+    public bool InHand { get; set; }
 }
 
 [Serializable, NetSerializable]
