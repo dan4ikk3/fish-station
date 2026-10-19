@@ -393,6 +393,29 @@ public abstract partial class SharedGunSystem
         Appearance.SetData(ent, AmmoVisuals.AmmoMax, ent.Comp.Capacity);
     }
 
+    // Fish-start
+    /// <summary>
+    /// Убирает все патроны и заполняет до вместимости неспавненными.
+    /// </summary>
+    public void RefillBallisticAmmo(Entity<BallisticAmmoProviderComponent> entity)
+    {
+        if (entity.Comp.Proto == null)
+            return;
+
+        foreach (var ent in entity.Comp.Entities)
+        {
+            Containers.Remove(ent, entity.Comp.Container);
+            PredictedQueueDel(ent);
+        }
+
+        entity.Comp.Entities.Clear();
+        entity.Comp.UnspawnedCount = entity.Comp.Capacity;
+        UpdateBallisticAppearance(entity);
+        UpdateAmmoCount(entity.Owner);
+        Dirty(entity);
+    }
+    // Fish-end
+
     public void SetBallisticUnspawned(Entity<BallisticAmmoProviderComponent> entity, int count)
     {
         if (entity.Comp.UnspawnedCount == count)
