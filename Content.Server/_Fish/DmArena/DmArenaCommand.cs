@@ -13,7 +13,7 @@ namespace Content.Server._Fish.DmArena;
 /// Включает и выключает ДМ арену. Состояние хранится только на сервере, клиент его изменить не может.
 /// </summary>
 [AdminCommand(AdminFlags.Fun)]
-public sealed class DmArenaCommand : LocalizedCommands
+public sealed partial class DmArenaCommand : LocalizedCommands
 {
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IAdminManager _admin = default!;

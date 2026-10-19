@@ -45,7 +45,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Fish.DmArena;
 
-public sealed class DmArenaRuleSystem : EntitySystem
+public sealed partial class DmArenaRuleSystem : EntitySystem
 {
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IPlayerManager _playerManager = default!;

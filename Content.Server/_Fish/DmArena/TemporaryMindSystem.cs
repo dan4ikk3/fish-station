@@ -15,7 +15,7 @@ namespace Content.Server._Fish.DmArena;
 /// Временная подмена разума: настоящий разум игрока откладывается, а в тело арены идёт одноразовый.
 /// После выхода одноразовый разум удаляется, и игрок возвращается к своему прежнему разуму.
 /// </summary>
-public sealed class TemporaryMindSystem : EntitySystem
+public sealed partial class TemporaryMindSystem : EntitySystem
 {
     [Dependency] private MindSystem _mind = default!;
     [Dependency] private GhostSystem _ghost = default!;

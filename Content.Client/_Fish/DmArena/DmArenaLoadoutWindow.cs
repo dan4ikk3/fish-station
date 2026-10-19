@@ -17,7 +17,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed class DmArenaLoadoutWindow : DmArenaWindow
+public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
 {
     [Dependency] private IEntityManager _entMan = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
