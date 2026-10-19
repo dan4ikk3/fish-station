@@ -1,19 +1,31 @@
 using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Shared._Fish.DmArena;
 
 [RegisterComponent]
 public sealed partial class DmArenaPlayerComponent : Component
 {
-    [DataField]
+    /// <summary>
+    /// Сущность правила арены, к которому привязан игрок.
+    /// </summary>
+    [ViewVariables]
     public EntityUid? RuleEntity;
 
-    [DataField]
+    /// <summary>
+    /// Количество убийств игрока на арене.
+    /// </summary>
+    [ViewVariables]
     public int Kills;
 
-    [DataField]
+    /// <summary>
+    /// Количество смертей игрока на арене.
+    /// </summary>
+    [ViewVariables]
     public int Deaths;
 
+    /// <summary>
+    /// Последний участник арены, атаковавший игрока.
+    /// </summary>
+    [ViewVariables]
     public EntityUid? LastAttacker;
 }

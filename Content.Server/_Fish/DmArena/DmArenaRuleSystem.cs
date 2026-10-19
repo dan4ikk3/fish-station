@@ -120,21 +120,33 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
         if (!_ticker.StartGameRule(RulePrototype, out var ruleEntity))
         {
-            Log.Error($"ДМ арена: не удалось запустить правило {RulePrototype}");
+            Log.Error($"Failed to start DM arena rule {RulePrototype}");
             return;
         }
 
         _ruleEntity = ruleEntity;
     }
 
-    private void OnRoundEnding(RoundRestartCleanupEvent ev)
+    public void OnEuiClosed(ICommonSession session, DmArenaLoadoutEui eui)
     {
-        foreach (var eui in _activeEuis.Values)
+        if (_activeEuis.TryGetValue(session, out var current) && current == eui)
+            _activeEuis.Remove(session);
+    }
+
+    private void CloseEuis()
+    {
+        foreach (var eui in _activeEuis.Values.ToList())
         {
             if (eui.Player.Status != SessionStatus.Disconnected)
                 eui.Close();
         }
+
         _activeEuis.Clear();
+    }
+
+    private void OnRoundEnding(RoundRestartCleanupEvent ev)
+    {
+        CloseEuis();
 
         if (_ruleEntity == null)
             return;
@@ -207,7 +219,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             || !TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule)
             || !rule.Active)
         {
-            Log.Warning($"ДМ арена: правило не запущено или карта не загружена (rule={_ruleEntity})");
+            Log.Warning($"DM arena join rejected: rule {ToPrettyString(_ruleEntity)} is not active or the map is not loaded");
             return;
         }
 
@@ -215,15 +227,12 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             || !HasComp<GhostComponent>(ghostEntity)
             || HasComp<DmArenaPlayerComponent>(ghostEntity))
         {
-            Log.Warning($"ДМ арена: {session.Name} не призрак или уже на арене");
+            Log.Warning($"DM arena join rejected for {session.Name}: {ToPrettyString(session.AttachedEntity)} is not a ghost or is already on the arena");
             return;
         }
 
-        if (_activeEuis.TryGetValue(session, out var existingEui))
-        {
+        if (_activeEuis.Remove(session, out var existingEui) && existingEui.Player.Status != SessionStatus.Disconnected)
             existingEui.Close();
-            _activeEuis.Remove(session);
-        }
 
         var eui = new DmArenaLoadoutEui(this, _ruleEntity.Value, session);
         _euiManager.OpenEui(eui, session);
@@ -328,7 +337,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         }
         catch (Exception e)
         {
-            Log.Error($"ДМ арена: не удалось выдать снаряжение игроку {session.Name}: {e}");
+            Log.Error($"Failed to equip DM arena loadout for {session.Name} on {ToPrettyString(mob)}: {e}");
             QueueDel(mob);
             return;
         }
@@ -378,11 +387,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             return;
         }
 
-        foreach (var eui in _activeEuis.Values)
-        {
-            eui.Close();
-        }
-        _activeEuis.Clear();
+        CloseEuis();
 
         var query = EntityQueryEnumerator<DmArenaPlayerComponent>();
         var players = new List<Entity<DmArenaPlayerComponent>>();

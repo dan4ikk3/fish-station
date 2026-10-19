@@ -51,4 +51,10 @@ public sealed class DmArenaLoadoutEui : BaseEui
         base.Opened();
         StateDirty();
     }
+
+    public override void Closed()
+    {
+        base.Closed();
+        _dmArenaSystem.OnEuiClosed(_session, this);
+    }
 }

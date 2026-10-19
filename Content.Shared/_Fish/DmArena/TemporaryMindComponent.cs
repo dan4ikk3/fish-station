@@ -1,5 +1,4 @@
 using Robust.Shared.GameObjects;
-using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Shared._Fish.DmArena;
 
@@ -9,9 +8,15 @@ namespace Content.Shared._Fish.DmArena;
 [RegisterComponent]
 public sealed partial class TemporaryMindComponent : Component
 {
-    [DataField]
+    /// <summary>
+    /// Настоящий разум игрока, отложенный на время подмены.
+    /// </summary>
+    [ViewVariables]
     public EntityUid OriginalMind;
 
-    [DataField]
+    /// <summary>
+    /// Одноразовый разум, который играет в теле арены.
+    /// </summary>
+    [ViewVariables]
     public EntityUid DisposableMind;
 }
