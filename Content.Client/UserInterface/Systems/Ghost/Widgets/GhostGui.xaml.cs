@@ -19,7 +19,7 @@ public sealed partial class GhostGui : UIWidget
     private int _prevNumberRoles;
     public event Action? RespawnPressed; // Sunrise-Edit
     public event Action? ChangeServerPressed;
-    public event Action? DmArenaPressed; // FIsh edit
+    public event Action? DmArenaPressed; // Fish-edit
 
     public GhostGui()
     {
@@ -36,7 +36,7 @@ public sealed partial class GhostGui : UIWidget
         GhostRolesButton.OnPressed += _ => GhostRolesButton.StyleClasses.Remove(StyleClass.Negative);
         RespawnButton.OnPressed += _ => RespawnPressed?.Invoke(); // Sunrise-Edit
         ChangeServerButton.OnPressed += _ => ChangeServerPressed?.Invoke();
-        DmArenaButton.OnPressed += _ => DmArenaPressed?.Invoke(); // FIsh edit
+        DmArenaButton.OnPressed += _ => DmArenaPressed?.Invoke(); // Fish-edit
     }
 
     // Fish-start

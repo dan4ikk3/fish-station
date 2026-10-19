@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Antag.Components;
 using Content.Server.GameTicking.Rules.Components;
-using Content.Shared._Fish.DmArena; // FIsh edit
+using Content.Shared._Fish.DmArena; // Fish-edit
 using Content.Shared.Antag;
 using Content.Shared.Database;
 using Content.Shared.Ghost;

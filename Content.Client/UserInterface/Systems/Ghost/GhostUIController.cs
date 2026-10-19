@@ -2,7 +2,7 @@
 using Content.Client.Ghost;
 using Content.Client.UserInterface.Systems.Gameplay;
 using Content.Client.UserInterface.Systems.Ghost.Widgets;
-using Content.Shared._Fish.DmArena; // FIsh edit
+using Content.Shared._Fish.DmArena; // Fish-edit
 using Content.Shared.Ghost;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controllers;
@@ -19,7 +19,7 @@ namespace Content.Client.UserInterface.Systems.Ghost;
 public sealed partial class GhostUIController : UIController, IOnSystemChanged<GhostSystem>
 {
     [Dependency] private IEntityNetworkManager _net = default!;
-    [Dependency] private IEntityManager _entManager = default!; // FIsh edit
+    [Dependency] private IEntityManager _entManager = default!; // Fish-edit
     [Dependency] private ServersHubManager _serversHubManager = default!;
     [Dependency] private IConfigurationManager _cfg = default!;
     private ISharedSponsorsManager? _sponsorsManager; // Sunrise-Sponsors
@@ -169,7 +169,7 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
         Gui.GhostRolesPressed += GhostRolesPressed;
         Gui.RespawnPressed += Respawn; // Sunrise-Sponsors
         Gui.ChangeServerPressed += ChangeServerPressed;
-        Gui.DmArenaPressed += DmArenaPressed; // FIsh edit
+        Gui.DmArenaPressed += DmArenaPressed; // Fish-edit
         Gui.TargetWindow.WarpClicked += OnWarpClicked;
 
         // Sunrise edit - нету фичи
@@ -188,7 +188,7 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
         Gui.GhostRolesPressed -= GhostRolesPressed;
         Gui.RespawnPressed -= Respawn; // Sunrise-Sponsors
         Gui.ChangeServerPressed -= ChangeServerPressed;
-        Gui.DmArenaPressed -= DmArenaPressed; // FIsh edit
+        Gui.DmArenaPressed -= DmArenaPressed; // Fish-edit
         Gui.TargetWindow.WarpClicked -= OnWarpClicked;
 
         Gui.Hide();

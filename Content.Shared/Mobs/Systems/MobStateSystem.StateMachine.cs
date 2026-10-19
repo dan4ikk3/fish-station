@@ -1,4 +1,4 @@
-﻿using Content.Shared._Fish.DmArena; // FIsh edit
+﻿using Content.Shared._Fish.DmArena; // Fish-edit
 using Content.Shared.Database;
 using Content.Shared.Humanoid;
 using Content.Shared.Mobs.Components;

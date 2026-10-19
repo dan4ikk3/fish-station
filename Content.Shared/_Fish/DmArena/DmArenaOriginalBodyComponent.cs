@@ -8,5 +8,5 @@ namespace Content.Shared._Fish.DmArena;
 public sealed partial class DmArenaOriginalBodyComponent : Component
 {
     [DataField]
-    public NetUserId Owner;
+    public NetUserId UserId;
 }

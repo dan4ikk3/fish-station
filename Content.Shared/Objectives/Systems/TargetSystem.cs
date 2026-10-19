@@ -1,5 +1,5 @@
 ﻿using Content.Shared.Humanoid;
-using Content.Shared._Fish.DmArena; // FIsh edit
+using Content.Shared._Fish.DmArena; // Fish-edit
 using Content.Shared.Mind;
 using Content.Shared.Mind.Filters;
 using Content.Shared.Mobs.Components;

@@ -340,8 +340,7 @@ public sealed class DmArenaRuleSystem : EntitySystem
         {
             var marker = EnsureComp<DmArenaOriginalBodyComponent>(body);
             if (mindComp.UserId is { } ownerId)
-                marker.Owner = ownerId;
-
+                marker.UserId = ownerId;
         }
 
         if (!_tempMind.TrySwapTempMind(session, mob))
@@ -510,7 +509,7 @@ public sealed class DmArenaRuleSystem : EntitySystem
         if (args.NewMobState is MobState.Dead or MobState.Invalid || args.OldMobState == MobState.Alive)
             return;
 
-        if (!_playerManager.TryGetSessionById(ent.Comp.Owner, out var session)
+        if (!_playerManager.TryGetSessionById(ent.Comp.UserId, out var session)
             || session.AttachedEntity is not { Valid: true })
             return;
 
@@ -587,7 +586,7 @@ public sealed class DmArenaRuleSystem : EntitySystem
         var query = EntityQueryEnumerator<DmArenaOriginalBodyComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
-            if (comp.Owner == args.Player.UserId)
+            if (comp.UserId == args.Player.UserId)
             {
                 RemComp<DmArenaOriginalBodyComponent>(uid);
                 break;
