@@ -1,0 +1,5 @@
+# Помехи на экране от облучения игрока.
+- type: shader
+  id: FishRadiationInterference
+  kind: source
+  path: /Textures/_Fish/Shaders/radiation_interference.swsl

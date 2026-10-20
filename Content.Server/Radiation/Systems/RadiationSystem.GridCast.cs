@@ -114,6 +114,10 @@ public partial class RadiationSystem
             // if no radiation rays reached target, that will set it to 0
             receiver.Comp.CurrentRadiation = rads;
 
+            // Fish-start
+            UpdateFishExposure(receiver, rads);
+            // Fish-end
+
             // also send an event with combination of total rad
             if (rads > 0)
                 IrradiateEntity(receiver, rads, GridcastUpdateRate);

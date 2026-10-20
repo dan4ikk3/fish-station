@@ -1,0 +1,58 @@
+light_mode unshaded;
+
+uniform highp float strength; // от 0 до 1
+uniform highp float frame; // кадр зерна внутри пятен
+uniform highp float patchFrame; // кадр, на котором пятна меняют место
+
+highp float hash(highp vec2 p)
+{
+    highp vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+    p3 += dot(p3, p3.yzx + 33.33);
+    return fract((p3.x + p3.y) * p3.z);
+}
+
+// Пятно в клетке сетки: chance - доля клеток с пятнами, к краям экрана их больше.
+// Размер каждого пятна случаен, а с ростом радиации ещё и увеличивается.
+highp float patch(highp vec2 uv, highp vec2 grid, highp float chance, highp float salt)
+{
+    highp vec2 cell = floor(uv * grid);
+    highp vec2 id = cell + vec2(patchFrame * 7.0 + salt, patchFrame * 13.0);
+    highp float edge = clamp(length((cell + 0.5) / grid - 0.5) * 1.4, 0.0, 1.0);
+
+    if (hash(id) >= chance * mix(0.3, 1.0, edge * edge))
+        return 0.0;
+
+    highp float radius = min(mix(0.35, 0.9, hash(id + 3.0)) * (0.8 + 0.4 * strength), 1.0);
+    highp float d = length((fract(uv * grid) - 0.5) * 2.0);
+    return 1.0 - smoothstep(0.2 * radius, radius, d);
+}
+
+void fragment()
+{
+    highp vec2 uv = FRAGCOORD.xy * SCREEN_PIXEL_SIZE.xy;
+
+    // 0 в центре экрана, 1 в углах.
+    highp float edge = clamp(length(uv - 0.5) * 1.4, 0.0, 1.0);
+    edge *= edge;
+
+    // Лёгкое общее затемнение, по краям сильнее.
+    highp float alpha = strength * (0.12 + 0.18 * edge);
+    highp vec3 color = vec3(0.08);
+
+    // Мелкие пятна во множестве мест и крупные, которые добавляются на высокой радиации.
+    highp float weight = max(
+        patch(uv, vec2(28.0, 16.0), 0.14 * strength, 0.0),
+        patch(uv, vec2(14.0, 8.0), 0.12 * strength * strength, 101.0));
+
+    if (weight > 0.0)
+    {
+        highp vec2 pixel = floor(FRAGCOORD.xy / 2.0) + frame * 17.0;
+        if (hash(pixel) < 0.5 * weight)
+        {
+            color = vec3(hash(pixel + 7.0) > 0.5 ? 0.95 : 0.0);
+            alpha = 0.7;
+        }
+    }
+
+    COLOR = vec4(color, alpha);
+}
