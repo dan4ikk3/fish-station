@@ -6,7 +6,7 @@ using Robust.Shared.Maths;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed class DmArenaButton : PanelContainer
+public sealed class DmArenaPillButton : PanelContainer
 {
     public event Action? OnPressed;
 
@@ -42,13 +42,13 @@ public sealed class DmArenaButton : PanelContainer
         set => _label.Text = value;
     }
 
-    public DmArenaButton()
+    public DmArenaPillButton()
     {
         MouseFilter = MouseFilterMode.Stop;
         HorizontalExpand = true;
         MinHeight = 45;
 
-        _styleBox = DmArenaTheme.Rounded(DmArenaTheme.ButtonBg, 14, 8);
+        _styleBox = DmArenaPalette.Rounded(DmArenaPalette.ButtonBg, 14, 8);
         PanelOverride = _styleBox;
 
         _label = new Label
@@ -57,8 +57,8 @@ public sealed class DmArenaButton : PanelContainer
             HorizontalAlignment = HAlignment.Center,
             VerticalAlignment = VAlignment.Center,
             HorizontalExpand = true,
-            FontOverride = DmArenaTheme.GetFont(true, 12),
-            FontColorOverride = DmArenaTheme.ButtonText,
+            FontOverride = DmArenaPalette.GetFont(true, 12),
+            FontColorOverride = DmArenaPalette.ButtonText,
         };
         AddChild(_label);
 
@@ -92,14 +92,14 @@ public sealed class DmArenaButton : PanelContainer
     {
         if (_disabled)
         {
-            _styleBox.Modulate = DmArenaTheme.ButtonDisabledBg;
-            _label.FontColorOverride = DmArenaTheme.ButtonDisabledFg;
+            _styleBox.Modulate = DmArenaPalette.ButtonDisabledBg;
+            _label.FontColorOverride = DmArenaPalette.ButtonDisabledFg;
             return;
         }
 
         _styleBox.Modulate = _selected
-            ? DmArenaTheme.ButtonSelectedBg
-            : _hovered ? DmArenaTheme.ButtonHoverBg : DmArenaTheme.ButtonBg;
-        _label.FontColorOverride = DmArenaTheme.ButtonText;
+            ? DmArenaPalette.ButtonSelectedBg
+            : _hovered ? DmArenaPalette.ButtonHoverBg : DmArenaPalette.ButtonBg;
+        _label.FontColorOverride = DmArenaPalette.ButtonText;
     }
 }

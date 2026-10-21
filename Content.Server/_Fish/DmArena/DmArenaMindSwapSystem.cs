@@ -15,7 +15,7 @@ namespace Content.Server._Fish.DmArena;
 /// Временная подмена разума: настоящий разум игрока откладывается, а в тело арены идёт одноразовый.
 /// После выхода одноразовый разум удаляется, и игрок возвращается к своему прежнему разуму.
 /// </summary>
-public sealed partial class TemporaryMindSystem : EntitySystem
+public sealed partial class DmArenaMindSwapSystem : EntitySystem
 {
     [Dependency] private MindSystem _mind = default!;
     [Dependency] private GhostSystem _ghost = default!;
@@ -28,16 +28,16 @@ public sealed partial class TemporaryMindSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<TemporaryMindComponent, PlayerDetachedEvent>(OnPlayerDetached);
+        SubscribeLocalEvent<DmArenaMindSwapComponent, PlayerDetachedEvent>(OnPlayerDetached);
     }
 
-    private void OnPlayerDetached(Entity<TemporaryMindComponent> ent, ref PlayerDetachedEvent args)
+    private void OnPlayerDetached(Entity<DmArenaMindSwapComponent> ent, ref PlayerDetachedEvent args)
     {
         if (args.Player.Status != SessionStatus.Disconnected)
             return;
 
         CleanupDisposableMind(ent, ent.Comp);
-        RemComp<TemporaryMindComponent>(ent);
+        RemComp<DmArenaMindSwapComponent>(ent);
     }
 
     public bool TrySwapTempMind(ICommonSession session, EntityUid newBody)
@@ -58,7 +58,7 @@ public sealed partial class TemporaryMindSystem : EntitySystem
         _mind.TransferTo(newMind, newBody);
         _playerManager.SetAttachedEntity(session, newBody);
 
-        var comp = EnsureComp<TemporaryMindComponent>(newBody);
+        var comp = EnsureComp<DmArenaMindSwapComponent>(newBody);
         comp.OriginalMind = origMindId;
         comp.DisposableMind = newMind;
 
@@ -67,7 +67,7 @@ public sealed partial class TemporaryMindSystem : EntitySystem
 
     public EntityUid? TryRestoreAsGhost(EntityUid temporaryBody)
     {
-        if (!TryComp<TemporaryMindComponent>(temporaryBody, out var temp)
+        if (!TryComp<DmArenaMindSwapComponent>(temporaryBody, out var temp)
             || !TryComp<MindComponent>(temp.OriginalMind, out var origMind))
             return null;
 
@@ -86,13 +86,13 @@ public sealed partial class TemporaryMindSystem : EntitySystem
         else if (origMind.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session))
             _meta.SetEntityName(ghost, FormattedMessage.EscapeText(session.Name));
 
-        RemComp<TemporaryMindComponent>(temporaryBody);
+        RemComp<DmArenaMindSwapComponent>(temporaryBody);
         return ghost;
     }
 
     public bool TryRestoreToOriginalBody(EntityUid temporaryBody)
     {
-        if (!TryComp<TemporaryMindComponent>(temporaryBody, out var temp)
+        if (!TryComp<DmArenaMindSwapComponent>(temporaryBody, out var temp)
             || !TryComp<MindComponent>(temp.OriginalMind, out var origMind)
             || origMind.OwnedEntity is not { } originalBody
             || !Exists(originalBody))
@@ -103,11 +103,11 @@ public sealed partial class TemporaryMindSystem : EntitySystem
         if (origMind.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session))
             _playerManager.SetAttachedEntity(session, originalBody);
 
-        RemComp<TemporaryMindComponent>(temporaryBody);
+        RemComp<DmArenaMindSwapComponent>(temporaryBody);
         return true;
     }
 
-    private void CleanupDisposableMind(EntityUid temporaryBody, TemporaryMindComponent temp)
+    private void CleanupDisposableMind(EntityUid temporaryBody, DmArenaMindSwapComponent temp)
     {
         if (TryComp<MindContainerComponent>(temporaryBody, out var tempContainer)
             && tempContainer.LastMindStored == temp.DisposableMind)

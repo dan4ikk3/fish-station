@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 namespace Content.Shared._Fish.DmArena;
 
 [DataDefinition]
-public sealed partial class DmArenaShopItem
+public sealed partial class DmArenaStoreItem
 {
     [DataField(required: true)]
     public ProtoId<StartingGearPrototype> Gear;
@@ -47,7 +47,7 @@ public sealed partial class DmArenaShopItem
 }
 
 [DataDefinition]
-public sealed partial class DmArenaShopSet
+public sealed partial class DmArenaStoreSet
 {
     [DataField(required: true)]
     public LocId Name;
@@ -68,10 +68,6 @@ public sealed partial class DmArenaRuleComponent : Component
 
     public HashSet<NetEntity> Players = new();
 
-    public Dictionary<NetUserId, int> Kills = new();
-
-    public Dictionary<NetUserId, int> Deaths = new();
-
     public bool Active;
 
     // Пресет живёт до конца раунда
@@ -83,10 +79,10 @@ public sealed partial class DmArenaRuleComponent : Component
     public ProtoId<StartingGearPrototype> Gear = "DmArenaBaseGear";
 
     [DataField]
-    public List<DmArenaShopItem> ShopItems = new();
+    public List<DmArenaStoreItem> ShopItems = new();
 
     [DataField]
-    public List<DmArenaShopSet> Sets = new();
+    public List<DmArenaStoreSet> Sets = new();
 
     [DataField]
     public int Budget = 100;

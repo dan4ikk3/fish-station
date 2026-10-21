@@ -46,7 +46,7 @@ public sealed partial class TargetSystem : EntitySystem
                 continue;
 
             // Fish-start
-            if (HasComp<DmArenaPlayerComponent>(uid))
+            if (HasComp<DmArenaFighterComponent>(uid))
                 continue;
             // Fish-end
 

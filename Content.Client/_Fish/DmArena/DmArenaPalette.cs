@@ -6,7 +6,7 @@ using Robust.Shared.Maths;
 
 namespace Content.Client._Fish.DmArena;
 
-public static class DmArenaTheme
+public static class DmArenaPalette
 {
     public static StyleBoxTexture Rounded(Color color, float horizontal = 12, float vertical = 6)
     {
@@ -24,7 +24,6 @@ public static class DmArenaTheme
     }
 
     public static readonly Color Accent = Color.FromHex("#4fd1c5");
-    public static readonly Color AccentHover = Color.FromHex("#81e6d9");
     public static readonly Color AccentDim = Color.FromHex("#2c7a7b");
 
     public static readonly Color BodyBg = Color.FromHex("#0d1b2a");

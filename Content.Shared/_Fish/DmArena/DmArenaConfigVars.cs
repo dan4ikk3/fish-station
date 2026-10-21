@@ -3,7 +3,7 @@ using Robust.Shared.Configuration;
 namespace Content.Shared._Fish.DmArena;
 
 [CVarDefs]
-public sealed class DmArenaCVars
+public sealed class DmArenaConfigVars
 {
     public static readonly CVarDef<bool> DmArenaEnabled =
         CVarDef.Create("dmarena.enabled", true, CVar.SERVERONLY);

@@ -10,21 +10,21 @@ namespace Content.Client._Fish.DmArena;
 /// <summary>
 /// Карточка готового набора. По нажатию переносит набор в конструктор.
 /// </summary>
-public sealed class DmArenaSetCard : PanelContainer
+public sealed class DmArenaKitCard : PanelContainer
 {
-    public event Action<DmArenaSetOption>? OnChosen;
+    public event Action<DmArenaStoreSetOption>? OnChosen;
 
     private readonly StyleBoxFlat _styleBox;
 
-    public DmArenaSetCard(DmArenaSetOption option, IReadOnlyList<string> itemNames)
+    public DmArenaKitCard(DmArenaStoreSetOption option, IReadOnlyList<string> itemNames)
     {
         MouseFilter = MouseFilterMode.Stop;
         HorizontalExpand = true;
 
         _styleBox = new StyleBoxFlat
         {
-            BackgroundColor = DmArenaTheme.CardBg,
-            BorderColor = DmArenaTheme.AccentDim,
+            BackgroundColor = DmArenaPalette.CardBg,
+            BorderColor = DmArenaPalette.AccentDim,
             BorderThickness = new Thickness(3, 0, 0, 0),
             ContentMarginLeftOverride = 10,
             ContentMarginRightOverride = 10,
@@ -44,24 +44,24 @@ public sealed class DmArenaSetCard : PanelContainer
         top.AddChild(new Label
         {
             Text = option.Name,
-            FontOverride = DmArenaTheme.GetFont(true, 14),
-            FontColorOverride = DmArenaTheme.ButtonText,
+            FontOverride = DmArenaPalette.GetFont(true, 14),
+            FontColorOverride = DmArenaPalette.ButtonText,
             HorizontalExpand = true,
         });
         top.AddChild(new Label
         {
             Text = Loc.GetString("dm-arena-set-cost", ("cost", option.Cost)),
-            FontOverride = DmArenaTheme.GetFont(true, 12),
-            FontColorOverride = DmArenaTheme.Cost,
+            FontOverride = DmArenaPalette.GetFont(true, 12),
+            FontColorOverride = DmArenaPalette.Cost,
         });
         vbox.AddChild(top);
 
         if (!string.IsNullOrEmpty(option.Description))
-            vbox.AddChild(MakeText(option.Description, DmArenaTheme.TextMuted));
+            vbox.AddChild(MakeText(option.Description, DmArenaPalette.TextMuted));
 
-        vbox.AddChild(MakeText(string.Join(", ", itemNames), DmArenaTheme.Accent));
+        vbox.AddChild(MakeText(string.Join(", ", itemNames), DmArenaPalette.Accent));
 
-        var apply = new DmArenaButton
+        var apply = new DmArenaPillButton
         {
             Text = Loc.GetString("dm-arena-set-apply"),
             MinHeight = 34,
@@ -72,8 +72,8 @@ public sealed class DmArenaSetCard : PanelContainer
 
         AddChild(vbox);
 
-        OnMouseEntered += _ => _styleBox.BackgroundColor = DmArenaTheme.CardHoverBg;
-        OnMouseExited += _ => _styleBox.BackgroundColor = DmArenaTheme.CardBg;
+        OnMouseEntered += _ => _styleBox.BackgroundColor = DmArenaPalette.CardHoverBg;
+        OnMouseExited += _ => _styleBox.BackgroundColor = DmArenaPalette.CardBg;
     }
 
     // RichTextLabel переносит длинный текст

@@ -17,7 +17,7 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
+public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
 {
     [Dependency] private IEntityManager _entMan = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
@@ -27,29 +27,29 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
     public event Action<List<int>>? OnLoadoutConfirmed;
     public event Action<List<int>>? OnPresetSaved;
 
-    private DmArenaLoadoutEuiState? _state;
+    private DmArenaKitEuiState? _state;
 
     private readonly Dictionary<int, int> _selected = new();
-    private readonly Dictionary<int, DmArenaWeaponCard> _cards = new();
-    private readonly Dictionary<int, DmArenaShopOption> _options = new();
+    private readonly Dictionary<int, DmArenaItemCard> _cards = new();
+    private readonly Dictionary<int, DmArenaStoreOption> _options = new();
 
     private readonly Label _playerCountLabel;
     private readonly Label _balanceLabel;
     private readonly BoxContainer _leftColumn;
     private readonly BoxContainer _rightColumn;
-    private readonly DmArenaPreviewHost _preview;
-    private readonly DmArenaButton _confirmButton;
-    private readonly DmArenaButton _saveButton;
-    private readonly DmArenaButton _loadButton;
-    private readonly DmArenaButton _clearButton;
-    private readonly DmArenaButton _builderTab;
-    private readonly DmArenaButton _setsTab;
+    private readonly DmArenaDollFrame _preview;
+    private readonly DmArenaPillButton _confirmButton;
+    private readonly DmArenaPillButton _saveButton;
+    private readonly DmArenaPillButton _loadButton;
+    private readonly DmArenaPillButton _clearButton;
+    private readonly DmArenaPillButton _builderTab;
+    private readonly DmArenaPillButton _setsTab;
 
     private EntityUid _dummy;
     private string? _heldCategory;
     private bool _setsOpen;
 
-    public DmArenaLoadoutWindow()
+    public DmArenaKitWindow()
     {
         IoCManager.InjectDependencies(this);
 
@@ -65,8 +65,8 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
             SeparationOverride = 8,
             Margin = new Thickness(12, 10, 12, 0),
         };
-        _builderTab = new DmArenaButton { Text = Loc.GetString("dm-arena-tab-builder"), HorizontalExpand = false, MinWidth = 190, MinHeight = 38 };
-        _setsTab = new DmArenaButton { Text = Loc.GetString("dm-arena-tab-sets"), HorizontalExpand = false, MinWidth = 190, MinHeight = 38 };
+        _builderTab = new DmArenaPillButton { Text = Loc.GetString("dm-arena-tab-builder"), HorizontalExpand = false, MinWidth = 190, MinHeight = 38 };
+        _setsTab = new DmArenaPillButton { Text = Loc.GetString("dm-arena-tab-sets"), HorizontalExpand = false, MinWidth = 190, MinHeight = 38 };
         tabs.AddChild(_builderTab);
         tabs.AddChild(_setsTab);
         tabs.AddChild(new Control { HorizontalExpand = true });
@@ -125,13 +125,13 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
     }
 
     private BoxContainer MakeCenter(
-        out DmArenaPreviewHost preview,
+        out DmArenaDollFrame preview,
         out Label balance,
         out Label players,
-        out DmArenaButton confirm,
-        out DmArenaButton save,
-        out DmArenaButton load,
-        out DmArenaButton clear)
+        out DmArenaPillButton confirm,
+        out DmArenaPillButton save,
+        out DmArenaPillButton load,
+        out DmArenaPillButton clear)
     {
         var center = new BoxContainer
         {
@@ -148,24 +148,24 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
             VerticalExpand = true,
             HorizontalExpand = true,
             MaxHeight = 420,
-            PanelOverride = DmArenaTheme.Rounded(DmArenaTheme.CardBg, 6, 6),
+            PanelOverride = DmArenaPalette.Rounded(DmArenaPalette.CardBg, 6, 6),
         };
-        preview = new DmArenaPreviewHost();
+        preview = new DmArenaDollFrame();
         previewPanel.AddChild(preview);
         center.AddChild(previewPanel);
 
         balance = new Label
         {
-            FontOverride = DmArenaTheme.GetFont(true, 18),
-            FontColorOverride = DmArenaTheme.Cost,
+            FontOverride = DmArenaPalette.GetFont(true, 18),
+            FontColorOverride = DmArenaPalette.Cost,
             HorizontalAlignment = HAlignment.Center,
         };
         center.AddChild(balance);
 
         players = new Label
         {
-            FontOverride = DmArenaTheme.GetFont(false, 11),
-            FontColorOverride = DmArenaTheme.TextMuted,
+            FontOverride = DmArenaPalette.GetFont(false, 11),
+            FontColorOverride = DmArenaPalette.TextMuted,
             HorizontalAlignment = HAlignment.Center,
         };
         center.AddChild(players);
@@ -176,15 +176,15 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
             HorizontalExpand = true,
             SeparationOverride = 6,
         };
-        save = new DmArenaButton { Text = Loc.GetString("dm-arena-shop-preset-save") };
-        load = new DmArenaButton { Text = Loc.GetString("dm-arena-shop-preset-load") };
-        clear = new DmArenaButton { Text = Loc.GetString("dm-arena-shop-clear") };
+        save = new DmArenaPillButton { Text = Loc.GetString("dm-arena-shop-preset-save") };
+        load = new DmArenaPillButton { Text = Loc.GetString("dm-arena-shop-preset-load") };
+        clear = new DmArenaPillButton { Text = Loc.GetString("dm-arena-shop-clear") };
         presetRow.AddChild(save);
         presetRow.AddChild(load);
         presetRow.AddChild(clear);
         center.AddChild(presetRow);
 
-        confirm = new DmArenaButton
+        confirm = new DmArenaPillButton
         {
             Text = Loc.GetString("dm-arena-loadout-confirm"),
             Disabled = true,
@@ -226,7 +226,7 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
         _setsTab.Selected = _setsOpen;
     }
 
-    public void UpdateState(DmArenaLoadoutEuiState state)
+    public void UpdateState(DmArenaKitEuiState state)
     {
         _state = state;
         _playerCountLabel.Text = Loc.GetString("dm-arena-loadout-players", ("count", state.PlayerCount));
@@ -287,15 +287,15 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
                 column.AddChild(new Label
                 {
                     Text = item.Group,
-                    FontOverride = DmArenaTheme.GetFont(true, 11),
-                    FontColorOverride = DmArenaTheme.TextMuted,
+                    FontOverride = DmArenaPalette.GetFont(true, 11),
+                    FontColorOverride = DmArenaPalette.TextMuted,
                     Margin = new Thickness(8, 6, 0, 0),
                 });
             }
 
             lastGroup = item.Group;
 
-            var card = new DmArenaWeaponCard(item);
+            var card = new DmArenaItemCard(item);
             card.OnCountChanged += OnCountChanged;
             _cards[item.Index] = card;
             column.AddChild(card);
@@ -312,7 +312,7 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
             _leftColumn.AddChild(new Label
             {
                 Text = Loc.GetString("dm-arena-set-empty"),
-                FontColorOverride = DmArenaTheme.TextMuted,
+                FontColorOverride = DmArenaPalette.TextMuted,
                 Margin = new Thickness(8),
             });
             return;
@@ -331,14 +331,14 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
                     : _options[group.Key].Name)
                 .ToList();
 
-            var card = new DmArenaSetCard(set, names);
+            var card = new DmArenaKitCard(set, names);
             card.OnChosen += OnSetChosen;
 
             (i % 2 == 0 ? _leftColumn : _rightColumn).AddChild(card);
         }
     }
 
-    private void OnSetChosen(DmArenaSetOption set)
+    private void OnSetChosen(DmArenaStoreSetOption set)
     {
         _selected.Clear();
         foreach (var index in set.Items)
@@ -354,18 +354,18 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
         var panel = new PanelContainer
         {
             Margin = new Thickness(0, 8, 0, 2),
-            PanelOverride = DmArenaTheme.Rounded(DmArenaTheme.TitleBarBg, 10, 4),
+            PanelOverride = DmArenaPalette.Rounded(DmArenaPalette.TitleBarBg, 10, 4),
         };
         panel.AddChild(new Label
         {
             Text = text,
-            FontOverride = DmArenaTheme.GetFont(true, 14),
-            FontColorOverride = DmArenaTheme.Accent,
+            FontOverride = DmArenaPalette.GetFont(true, 14),
+            FontColorOverride = DmArenaPalette.Accent,
         });
         return panel;
     }
 
-    private void OnCountChanged(DmArenaWeaponCard card, int delta)
+    private void OnCountChanged(DmArenaItemCard card, int delta)
     {
         var index = card.ItemIndex;
         var count = _selected.GetValueOrDefault(index);
@@ -399,7 +399,7 @@ public sealed partial class DmArenaLoadoutWindow : DmArenaWindow
         Refresh();
     }
 
-    private bool AmmoAvailable(DmArenaShopOption option)
+    private bool AmmoAvailable(DmArenaStoreOption option)
     {
         if (string.IsNullOrEmpty(option.AmmoFor) || option.AmmoFor == "base")
             return true;

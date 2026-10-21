@@ -193,7 +193,7 @@ public sealed partial class AntagSelectionSystem
             return false;
 
         // Fish-start
-        if (HasComp<DmArenaPlayerComponent>(uid))
+        if (HasComp<DmArenaFighterComponent>(uid))
             return false;
         // Fish-end
 

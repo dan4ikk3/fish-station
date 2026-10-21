@@ -3,11 +3,11 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed class DmArenaExitWindow : DmArenaWindow
+public sealed class DmArenaLeaveWindow : DmArenaFrameWindow
 {
     public event Action<bool>? OnChoice;
 
-    public DmArenaExitWindow()
+    public DmArenaLeaveWindow()
     {
         WindowTitle = Loc.GetString("dm-arena-exit-title");
         SetSize = new Vector2(480, 170);
@@ -33,9 +33,9 @@ public sealed class DmArenaExitWindow : DmArenaWindow
         Contents.AddChild(buttons);
     }
 
-    private DmArenaButton MakeButton(string locId, bool stay)
+    private DmArenaPillButton MakeButton(string locId, bool stay)
     {
-        var button = new DmArenaButton { Text = Loc.GetString(locId) };
+        var button = new DmArenaPillButton { Text = Loc.GetString(locId) };
         button.OnPressed += () =>
         {
             OnChoice?.Invoke(stay);

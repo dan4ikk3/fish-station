@@ -13,7 +13,7 @@ namespace Content.Server._Fish.DmArena;
 /// Включает и выключает ДМ арену. Состояние хранится только на сервере, клиент его изменить не может.
 /// </summary>
 [AdminCommand(AdminFlags.Fun)]
-public sealed partial class DmArenaCommand : LocalizedCommands
+public sealed partial class DmArenaSwitchCommand : LocalizedCommands
 {
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IAdminManager _admin = default!;
@@ -37,20 +37,23 @@ public sealed partial class DmArenaCommand : LocalizedCommands
             return;
         }
 
-        var current = _cfg.GetCVar(DmArenaCVars.DmArenaEnabled);
+        var current = _cfg.GetCVar(DmArenaConfigVars.DmArenaEnabled);
+        var statusKey = current ? "cmd-dmarena-status-on" : "cmd-dmarena-status-off";
 
         if (args.Length == 0 || args[0].Equals("status", StringComparison.OrdinalIgnoreCase))
         {
-            shell.WriteLine(LocalizationManager.GetString(current ? "cmd-dmarena-status-on" : "cmd-dmarena-status-off"));
+            shell.WriteLine(LocalizationManager.GetString(statusKey));
             return;
         }
 
-        bool value;
-        if (args[0].Equals("on", StringComparison.OrdinalIgnoreCase))
-            value = true;
-        else if (args[0].Equals("off", StringComparison.OrdinalIgnoreCase))
-            value = false;
-        else
+        bool? requested = args[0].ToLowerInvariant() switch
+        {
+            "on" => true,
+            "off" => false,
+            _ => null,
+        };
+
+        if (requested is not { } value)
         {
             shell.WriteError(LocalizationManager.GetString("cmd-dmarena-bad-argument"));
             return;
@@ -58,11 +61,11 @@ public sealed partial class DmArenaCommand : LocalizedCommands
 
         if (value == current)
         {
-            shell.WriteLine(LocalizationManager.GetString(current ? "cmd-dmarena-status-on" : "cmd-dmarena-status-off"));
+            shell.WriteLine(LocalizationManager.GetString(statusKey));
             return;
         }
 
-        _cfg.SetCVar(DmArenaCVars.DmArenaEnabled, value);
+        _cfg.SetCVar(DmArenaConfigVars.DmArenaEnabled, value);
 
         var who = shell.Player?.Name ?? "server";
         _adminLog.Add(LogType.AdminCommands,

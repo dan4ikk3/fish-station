@@ -4,16 +4,16 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Fish.DmArena;
 
 [Serializable, NetSerializable]
-public sealed class DmArenaLoadoutEuiState : EuiStateBase
+public sealed class DmArenaKitEuiState : EuiStateBase
 {
-    public List<DmArenaShopOption> Items { get; }
+    public List<DmArenaStoreOption> Items { get; }
     public int PlayerCount { get; }
     public int Budget { get; }
     public List<int>? Preset { get; }
     public string BaseGear { get; }
-    public List<DmArenaSetOption> Sets { get; }
+    public List<DmArenaStoreSetOption> Sets { get; }
 
-    public DmArenaLoadoutEuiState(List<DmArenaShopOption> items, List<DmArenaSetOption> sets, int playerCount, int budget, List<int>? preset, string baseGear)
+    public DmArenaKitEuiState(List<DmArenaStoreOption> items, List<DmArenaStoreSetOption> sets, int playerCount, int budget, List<int>? preset, string baseGear)
     {
         Sets = sets;
         BaseGear = baseGear;
@@ -25,7 +25,7 @@ public sealed class DmArenaLoadoutEuiState : EuiStateBase
 }
 
 [Serializable, NetSerializable]
-public sealed class DmArenaShopOption
+public sealed class DmArenaStoreOption
 {
     public int Index { get; set; }
     public string Name { get; set; } = string.Empty;
@@ -47,7 +47,7 @@ public sealed class DmArenaShopOption
 }
 
 [Serializable, NetSerializable]
-public sealed class DmArenaSetOption
+public sealed class DmArenaStoreSetOption
 {
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
@@ -56,22 +56,22 @@ public sealed class DmArenaSetOption
 }
 
 [Serializable, NetSerializable]
-public sealed class DmArenaLoadoutSelectedMessage : EuiMessageBase
+public sealed class DmArenaKitConfirmMessage : EuiMessageBase
 {
     public List<int> Items { get; }
 
-    public DmArenaLoadoutSelectedMessage(List<int> items)
+    public DmArenaKitConfirmMessage(List<int> items)
     {
         Items = items;
     }
 }
 
 [Serializable, NetSerializable]
-public sealed class DmArenaPresetSaveMessage : EuiMessageBase
+public sealed class DmArenaKitSaveMessage : EuiMessageBase
 {
     public List<int> Items { get; }
 
-    public DmArenaPresetSaveMessage(List<int> items)
+    public DmArenaKitSaveMessage(List<int> items)
     {
         Items = items;
     }

@@ -8,11 +8,11 @@ namespace Content.Client._Fish.DmArena;
 /// <summary>
 /// Рамка с моделью персонажа, масштаб зависит от размера рамки.
 /// </summary>
-public sealed class DmArenaPreviewHost : Control
+public sealed class DmArenaDollFrame : Control
 {
     public SpriteView View { get; }
 
-    public DmArenaPreviewHost()
+    public DmArenaDollFrame()
     {
         RectClipContent = true;
         HorizontalExpand = true;

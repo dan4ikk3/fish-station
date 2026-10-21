@@ -9,7 +9,7 @@ using Robust.Shared.Maths;
 namespace Content.Client._Fish.DmArena;
 
 [Virtual]
-public class DmArenaWindow : BaseWindow
+public class DmArenaFrameWindow : BaseWindow
 {
     private const float TitleBarHeight = 36;
     private const float BorderWidth = 2;
@@ -30,7 +30,7 @@ public class DmArenaWindow : BaseWindow
 
     public BoxContainer Contents => _contentBox;
 
-    public DmArenaWindow()
+    public DmArenaFrameWindow()
     {
         MouseFilter = MouseFilterMode.Stop;
         Resizable = true;
@@ -39,8 +39,8 @@ public class DmArenaWindow : BaseWindow
         {
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = DmArenaTheme.BodyBg,
-                BorderColor = DmArenaTheme.Border,
+                BackgroundColor = DmArenaPalette.BodyBg,
+                BorderColor = DmArenaPalette.Border,
                 BorderThickness = new Thickness(BorderWidth),
             },
         };
@@ -57,8 +57,8 @@ public class DmArenaWindow : BaseWindow
             MinHeight = TitleBarHeight,
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = DmArenaTheme.TitleBarBg,
-                BorderColor = DmArenaTheme.Accent,
+                BackgroundColor = DmArenaPalette.TitleBarBg,
+                BorderColor = DmArenaPalette.Accent,
                 BorderThickness = new Thickness(0, 0, 0, 1),
             },
         };
@@ -77,7 +77,7 @@ public class DmArenaWindow : BaseWindow
             Margin = new Thickness(0, 6, 8, 6),
             PanelOverride = new StyleBoxFlat
             {
-                BackgroundColor = DmArenaTheme.Accent,
+                BackgroundColor = DmArenaPalette.Accent,
             },
         };
         titleBarContent.AddChild(accentBar);
@@ -85,8 +85,8 @@ public class DmArenaWindow : BaseWindow
         _titleLabel = new Label
         {
             Text = string.Empty,
-            FontOverride = DmArenaTheme.GetFont(true, 17),
-            FontColorOverride = DmArenaTheme.ButtonText,
+            FontOverride = DmArenaPalette.GetFont(true, 17),
+            FontColorOverride = DmArenaPalette.ButtonText,
             VerticalAlignment = VAlignment.Center,
             HorizontalExpand = true,
         };

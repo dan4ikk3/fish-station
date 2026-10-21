@@ -6,16 +6,16 @@ using JetBrains.Annotations;
 namespace Content.Client._Fish.DmArena;
 
 [UsedImplicitly]
-public sealed class DmArenaLoadoutEui : BaseEui
+public sealed class DmArenaKitEui : BaseEui
 {
-    private readonly DmArenaLoadoutWindow _window;
+    private readonly DmArenaKitWindow _window;
 
-    public DmArenaLoadoutEui()
+    public DmArenaKitEui()
     {
-        _window = new DmArenaLoadoutWindow();
+        _window = new DmArenaKitWindow();
         _window.OnClose += () => SendMessage(new CloseEuiMessage());
-        _window.OnLoadoutConfirmed += items => SendMessage(new DmArenaLoadoutSelectedMessage(items));
-        _window.OnPresetSaved += items => SendMessage(new DmArenaPresetSaveMessage(items));
+        _window.OnLoadoutConfirmed += items => SendMessage(new DmArenaKitConfirmMessage(items));
+        _window.OnPresetSaved += items => SendMessage(new DmArenaKitSaveMessage(items));
     }
 
     public override void Opened()
@@ -34,7 +34,7 @@ public sealed class DmArenaLoadoutEui : BaseEui
     {
         base.HandleState(state);
 
-        if (state is not DmArenaLoadoutEuiState loadoutState)
+        if (state is not DmArenaKitEuiState loadoutState)
             return;
 
         _window.UpdateState(loadoutState);

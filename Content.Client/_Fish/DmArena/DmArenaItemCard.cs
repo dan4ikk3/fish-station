@@ -9,9 +9,9 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed class DmArenaWeaponCard : PanelContainer
+public sealed class DmArenaItemCard : PanelContainer
 {
-    public event Action<DmArenaWeaponCard, int>? OnCountChanged;
+    public event Action<DmArenaItemCard, int>? OnCountChanged;
 
     public int ItemIndex { get; }
     public int Cost { get; }
@@ -24,10 +24,10 @@ public sealed class DmArenaWeaponCard : PanelContainer
     private readonly Label _nameLabel;
     private readonly Label _costLabel;
     private readonly Label _countLabel;
-    private readonly DmArenaButton _minusButton;
-    private readonly DmArenaButton _plusButton;
+    private readonly DmArenaPillButton _minusButton;
+    private readonly DmArenaPillButton _plusButton;
 
-    public DmArenaWeaponCard(DmArenaShopOption option)
+    public DmArenaItemCard(DmArenaStoreOption option)
     {
         ItemIndex = option.Index;
         Cost = option.Cost;
@@ -40,18 +40,18 @@ public sealed class DmArenaWeaponCard : PanelContainer
             TooltipSupplier = _ =>
             {
                 var lockedAmmo = _locked && !string.IsNullOrEmpty(option.AmmoFor) && _count == 0;
-                var panel = new PanelContainer { PanelOverride = DmArenaTheme.Rounded(DmArenaTheme.TitleBarBg, 10, 5) };
+                var panel = new PanelContainer { PanelOverride = DmArenaPalette.Rounded(DmArenaPalette.TitleBarBg, 10, 5) };
                 panel.AddChild(new Label
                 {
                     Text = lockedAmmo ? Loc.GetString("dm-arena-ammo-locked") : description,
-                    FontOverride = DmArenaTheme.GetFont(false, 11),
-                    FontColorOverride = DmArenaTheme.ButtonText,
+                    FontOverride = DmArenaPalette.GetFont(false, 11),
+                    FontColorOverride = DmArenaPalette.ButtonText,
                 });
                 return panel;
             };
         }
 
-        _styleBox = DmArenaTheme.Rounded(DmArenaTheme.CardBg, 10, 5);
+        _styleBox = DmArenaPalette.Rounded(DmArenaPalette.CardBg, 10, 5);
         PanelOverride = _styleBox;
 
         HorizontalExpand = true;
@@ -82,8 +82,8 @@ public sealed class DmArenaWeaponCard : PanelContainer
         _nameLabel = new Label
         {
             Text = option.Name,
-            FontOverride = DmArenaTheme.GetFont(true, 13),
-            FontColorOverride = DmArenaTheme.ButtonText,
+            FontOverride = DmArenaPalette.GetFont(true, 13),
+            FontColorOverride = DmArenaPalette.ButtonText,
             VerticalAlignment = VAlignment.Center,
             HorizontalExpand = true,
             ClipText = true,
@@ -95,8 +95,8 @@ public sealed class DmArenaWeaponCard : PanelContainer
         _plusButton = MakeStepButton("+", 1);
         _countLabel = new Label
         {
-            FontOverride = DmArenaTheme.GetFont(true, 13),
-            FontColorOverride = DmArenaTheme.Accent,
+            FontOverride = DmArenaPalette.GetFont(true, 13),
+            FontColorOverride = DmArenaPalette.Accent,
             VerticalAlignment = VAlignment.Center,
             MinWidth = 26,
             Align = Label.AlignMode.Center,
@@ -112,15 +112,15 @@ public sealed class DmArenaWeaponCard : PanelContainer
         _costLabel = new Label
         {
             Text = Loc.GetString("dm-arena-shop-cost", ("cost", option.Cost)),
-            FontOverride = DmArenaTheme.GetFont(true, 12),
-            FontColorOverride = DmArenaTheme.Cost,
+            FontOverride = DmArenaPalette.GetFont(true, 12),
+            FontColorOverride = DmArenaPalette.Cost,
         };
 
         var costPill = new PanelContainer
         {
             VerticalAlignment = VAlignment.Center,
             MinWidth = 56,
-            PanelOverride = DmArenaTheme.Rounded(DmArenaTheme.TitleBarBg, 8, 2),
+            PanelOverride = DmArenaPalette.Rounded(DmArenaPalette.TitleBarBg, 8, 2),
         };
         costPill.AddChild(_costLabel);
         hbox.AddChild(costPill);
@@ -156,9 +156,9 @@ public sealed class DmArenaWeaponCard : PanelContainer
         UpdateVisual();
     }
 
-    private DmArenaButton MakeStepButton(string text, int delta)
+    private DmArenaPillButton MakeStepButton(string text, int delta)
     {
-        var button = new DmArenaButton
+        var button = new DmArenaPillButton
         {
             Text = text,
             HorizontalExpand = false,
@@ -183,12 +183,12 @@ public sealed class DmArenaWeaponCard : PanelContainer
         var dim = _locked && !selected;
 
         _styleBox.Modulate = selected
-            ? DmArenaTheme.CardSelectedBg
-            : dim ? DmArenaTheme.CardLockedBg
-            : _hovered ? DmArenaTheme.CardHoverBg : DmArenaTheme.CardBg;
+            ? DmArenaPalette.CardSelectedBg
+            : dim ? DmArenaPalette.CardLockedBg
+            : _hovered ? DmArenaPalette.CardHoverBg : DmArenaPalette.CardBg;
 
-        _nameLabel.FontColorOverride = dim ? DmArenaTheme.ButtonDisabledFg : DmArenaTheme.ButtonText;
-        _costLabel.FontColorOverride = dim ? DmArenaTheme.ButtonDisabledFg : DmArenaTheme.Cost;
+        _nameLabel.FontColorOverride = dim ? DmArenaPalette.ButtonDisabledFg : DmArenaPalette.ButtonText;
+        _costLabel.FontColorOverride = dim ? DmArenaPalette.ButtonDisabledFg : DmArenaPalette.Cost;
 
         _countLabel.Text = _count > 0 ? $"×{_count}" : string.Empty;
         _minusButton.Disabled = _count == 0;

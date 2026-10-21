@@ -114,7 +114,7 @@ public partial class MobStateSystem
         OnStateChanged(target, component, oldState, newState);
         RaiseLocalEvent(target, ev, true);
         // Fish-start
-        if (HasComp<DmArenaPlayerComponent>(target))
+        if (HasComp<DmArenaFighterComponent>(target))
         {
             Dirty(target, component);
             return;

@@ -2,10 +2,10 @@ using Content.Shared._Fish.DmArena;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed class DmArenaUISystem : EntitySystem
+public sealed class DmArenaPromptSystem : EntitySystem
 {
-    private DmArenaRevivalWindow? _revivalWindow;
-    private DmArenaExitWindow? _exitWindow;
+    private DmArenaReturnWindow? _revivalWindow;
+    private DmArenaLeaveWindow? _exitWindow;
 
     public override void Initialize()
     {
@@ -18,18 +18,15 @@ public sealed class DmArenaUISystem : EntitySystem
     private void OnRevivalOffer(DmArenaRevivalOfferEvent ev)
     {
         _revivalWindow?.Close();
-        _revivalWindow = new DmArenaRevivalWindow();
-        _revivalWindow.OnAccepted += () =>
-        {
-            RaiseNetworkEvent(new DmArenaRevivalAcceptEvent());
-        };
+        _revivalWindow = new DmArenaReturnWindow();
+        _revivalWindow.OnAccepted += () => RaiseNetworkEvent(new DmArenaRevivalAcceptEvent());
         _revivalWindow.OpenCentered();
     }
 
     private void OnExitOffer(DmArenaExitOfferEvent ev)
     {
         _exitWindow?.Close();
-        _exitWindow = new DmArenaExitWindow();
+        _exitWindow = new DmArenaLeaveWindow();
         _exitWindow.OnChoice += stay => RaiseNetworkEvent(new DmArenaExitChoiceEvent(stay));
         _exitWindow.OpenCentered();
     }

@@ -45,7 +45,7 @@ using Robust.Shared.Timing;
 
 namespace Content.Server._Fish.DmArena;
 
-public sealed partial class DmArenaRuleSystem : EntitySystem
+public sealed partial class DmArenaMatchSystem : EntitySystem
 {
     [Dependency] private IConfigurationManager _cfg = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
@@ -60,57 +60,57 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
     [Dependency] private StationSpawningSystem _stationSpawning = default!;
     [Dependency] private PopupSystem _popup = default!;
     [Dependency] private AudioSystem _audio = default!;
-    [Dependency] private TemporaryMindSystem _tempMind = default!;
-    [Dependency] private ILocalizationManager _loc = default!;
+    [Dependency] private DmArenaMindSwapSystem _mindSwap = default!;
     [Dependency] private GunSystem _gun = default!;
     [Dependency] private IPrototypeManager _prototype = default!;
     [Dependency] private InventorySystem _inventory = default!;
 
     private static readonly EntProtoId RulePrototype = "DmArenaRule";
     private static readonly ProtoId<LocalizedDatasetPrototype> DmArenaNameSuffixDataset = "NamesOperationPrefix";
+    private static readonly SoundPathSpecifier LeaveSound = new("/Audio/Effects/pop_high.ogg");
     private EntityUid? _ruleEntity;
     private bool _enabled = true;
 
     private bool _refillOnKill;
 
-    private readonly Dictionary<ICommonSession, DmArenaLoadoutEui> _activeEuis = new();
+    private readonly Dictionary<ICommonSession, DmArenaKitEui> _activeEuis = new();
 
     public override void Initialize()
     {
         base.Initialize();
 
-        Subs.CVar(_cfg, DmArenaCVars.DmArenaRefill, value => _refillOnKill = value, true);
-        Subs.CVar(_cfg, DmArenaCVars.DmArenaEnabled, OnEnabledChanged, true);
+        Subs.CVar(_cfg, DmArenaConfigVars.DmArenaRefill, value => _refillOnKill = value, true);
+        Subs.CVar(_cfg, DmArenaConfigVars.DmArenaEnabled, OnEnabledChanged, true);
 
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundEnding);
         SubscribeLocalEvent<DmArenaRuleComponent, RuleLoadedGridsEvent>(OnGridsLoaded);
         SubscribeNetworkEvent<DmArenaJoinRequestEvent>(OnJoinRequest);
         SubscribeNetworkEvent<DmArenaLeaveRequestEvent>(OnLeaveRequest);
-        SubscribeLocalEvent<DmArenaPlayerComponent, MobStateChangedEvent>(OnMobStateChanged);
-        SubscribeLocalEvent<DmArenaOriginalBodyComponent, MobStateChangedEvent>(OnOriginalBodyStateChanged);
+        SubscribeLocalEvent<DmArenaFighterComponent, MobStateChangedEvent>(OnMobStateChanged);
+        SubscribeLocalEvent<DmArenaDormantBodyComponent, MobStateChangedEvent>(OnOriginalBodyStateChanged);
         SubscribeNetworkEvent<DmArenaRevivalAcceptEvent>(OnRevivalAccept);
         SubscribeNetworkEvent<DmArenaExitChoiceEvent>(OnExitChoice);
-        SubscribeLocalEvent<DmArenaPlayerComponent, SuicideGhostEvent>(OnSuicideAttempt);
+        SubscribeLocalEvent<DmArenaFighterComponent, SuicideGhostEvent>(OnSuicideAttempt);
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
-        SubscribeLocalEvent<DmArenaProtectedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
+        SubscribeLocalEvent<DmArenaShieldedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
-        SubscribeLocalEvent<DmArenaOriginalBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
-        SubscribeLocalEvent<DmArenaPlayerComponent, PlayerDetachedEvent>(OnPlayerDetached);
+        SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
+        SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
     }
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
-        if (_ruleEntity != null && TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule) && rule.Active)
-        {
-            var now = _timing.CurTime;
-            if (now >= rule.NextCleanup)
-            {
-                rule.NextCleanup = now + rule.CleanupInterval;
-                SweepLooseItems(rule);
-            }
-        }
+        if (_ruleEntity == null || !TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule) || !rule.Active)
+            return;
+
+        var now = _timing.CurTime;
+        if (now < rule.NextCleanup)
+            return;
+
+        rule.NextCleanup = now + rule.CleanupInterval;
+        SweepLooseItems(rule);
     }
 
     private void EnsureRule()
@@ -127,7 +127,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         _ruleEntity = ruleEntity;
     }
 
-    public void OnEuiClosed(ICommonSession session, DmArenaLoadoutEui eui)
+    public void OnEuiClosed(ICommonSession session, DmArenaKitEui eui)
     {
         if (_activeEuis.TryGetValue(session, out var current) && current == eui)
             _activeEuis.Remove(session);
@@ -153,10 +153,10 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
         if (TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule))
         {
-            var query = EntityQueryEnumerator<DmArenaPlayerComponent>();
+            var query = EntityQueryEnumerator<DmArenaFighterComponent>();
             while (query.MoveNext(out var uid, out _))
             {
-                _tempMind.TryRestoreAsGhost(uid);
+                _mindSwap.TryRestoreAsGhost(uid);
                 QueueDel(uid);
             }
 
@@ -166,10 +166,10 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             BroadcastPlayerCount(rule);
         }
 
-        var bodyQuery = EntityQueryEnumerator<DmArenaOriginalBodyComponent>();
+        var bodyQuery = EntityQueryEnumerator<DmArenaDormantBodyComponent>();
         while (bodyQuery.MoveNext(out var uid, out _))
         {
-            RemComp<DmArenaOriginalBodyComponent>(uid);
+            RemComp<DmArenaDormantBodyComponent>(uid);
         }
 
         _ruleEntity = null;
@@ -180,21 +180,21 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         ent.Comp.ArenaMap = args.Map;
         ent.Comp.ArenaGrids.UnionWith(args.Grids);
         ent.Comp.Active = true;
-        WorldGuard(args.Map);
+        ShieldArenaEntities(args.Map);
         BroadcastPlayerCount(ent.Comp);
     }
 
-    private void WorldGuard(MapId map)
+    private void ShieldArenaEntities(MapId map)
     {
         var query = EntityQueryEnumerator<DamageableComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out _, out var xform))
         {
-            if (xform.MapID == map && !HasComp<DmArenaPlayerComponent>(uid))
-                EnsureComp<DmArenaProtectedComponent>(uid);
+            if (xform.MapID == map && !HasComp<DmArenaFighterComponent>(uid))
+                EnsureComp<DmArenaShieldedComponent>(uid);
         }
     }
 
-    private static void OnArenaEntityDamage(Entity<DmArenaProtectedComponent> ent, ref BeforeDamageChangedEvent args)
+    private static void OnArenaEntityDamage(Entity<DmArenaShieldedComponent> ent, ref BeforeDamageChangedEvent args)
     {
         args.Cancelled = true;
     }
@@ -225,7 +225,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
         if (session.AttachedEntity is not { Valid: true } ghostEntity
             || !HasComp<GhostComponent>(ghostEntity)
-            || HasComp<DmArenaPlayerComponent>(ghostEntity))
+            || HasComp<DmArenaFighterComponent>(ghostEntity))
         {
             Log.Warning($"DM arena join rejected for {session.Name}: {ToPrettyString(session.AttachedEntity)} is not a ghost or is already on the arena");
             return;
@@ -234,7 +234,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         if (_activeEuis.Remove(session, out var existingEui) && existingEui.Player.Status != SessionStatus.Disconnected)
             existingEui.Close();
 
-        var eui = new DmArenaLoadoutEui(this, _ruleEntity.Value, session);
+        var eui = new DmArenaKitEui(this, _ruleEntity.Value, session);
         _euiManager.OpenEui(eui, session);
         _activeEuis[session] = eui;
     }
@@ -245,7 +245,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
         if (session.AttachedEntity is not { Valid: true } ghost
             || !HasComp<GhostComponent>(ghost)
-            || HasComp<DmArenaPlayerComponent>(ghost))
+            || HasComp<DmArenaFighterComponent>(ghost))
             return;
 
         if (ev.Stay)
@@ -271,26 +271,26 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         var session = args.SenderSession;
 
         if (session.AttachedEntity is not { Valid: true } entity
-            || !TryComp<DmArenaPlayerComponent>(entity, out var tdPlayer))
+            || !TryComp<DmArenaFighterComponent>(entity, out var fighter))
             return;
 
-        LeaveDmArena((entity, tdPlayer));
+        LeaveDmArena((entity, fighter));
     }
 
-    private void OnMobStateChanged(Entity<DmArenaPlayerComponent> ent, ref MobStateChangedEvent args)
+    private void OnMobStateChanged(Entity<DmArenaFighterComponent> ent, ref MobStateChangedEvent args)
     {
         if (ent.Comp.RuleEntity == null
             || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
             return;
 
-        if (args.NewMobState == MobState.Critical && args.Origin is { } attacker && HasComp<DmArenaPlayerComponent>(attacker))
+        if (args.NewMobState == MobState.Critical && args.Origin is { } attacker && HasComp<DmArenaFighterComponent>(attacker))
             ent.Comp.LastAttacker = attacker;
 
         if (args.NewMobState != MobState.Dead)
             return;
 
-        CreditKill(ent, rule, args.Origin);
-        GhostDomePlayer(ent, rule, playSound: false);
+        RewardKill(ent, args.Origin);
+        RemoveFromArena(ent, rule, playSound: false);
     }
 
     public void SpawnPlayer(ICommonSession session, EntityUid ruleEntity, List<int> items)
@@ -313,7 +313,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             && prefs.SelectedCharacter is HumanoidCharacterProfile selectedProfile)
         {
             var dataset = _prototype.Index(DmArenaNameSuffixDataset);
-            var suffix = _loc.GetString(_random.Pick(dataset.Values));
+            var suffix = Loc.GetString(_random.Pick(dataset.Values));
             profile = selectedProfile.WithName($"{suffix} {selectedProfile.Name}");
         }
 
@@ -342,17 +342,17 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             return;
         }
 
-        var tdPlayer = EnsureComp<DmArenaPlayerComponent>(mob);
-        tdPlayer.RuleEntity = ruleEntity;
+        var fighter = EnsureComp<DmArenaFighterComponent>(mob);
+        fighter.RuleEntity = ruleEntity;
 
-        if (originalBody is { Valid: true } body && !HasComp<DmArenaOriginalBodyComponent>(body))
+        if (originalBody is { Valid: true } body && !HasComp<DmArenaDormantBodyComponent>(body))
         {
-            var marker = EnsureComp<DmArenaOriginalBodyComponent>(body);
+            var marker = EnsureComp<DmArenaDormantBodyComponent>(body);
             if (mindComp.UserId is { } ownerId)
                 marker.UserId = ownerId;
         }
 
-        if (!_tempMind.TrySwapTempMind(session, mob))
+        if (!_mindSwap.TrySwapTempMind(session, mob))
         {
             QueueDel(mob);
             return;
@@ -389,8 +389,8 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
         CloseEuis();
 
-        var query = EntityQueryEnumerator<DmArenaPlayerComponent>();
-        var players = new List<Entity<DmArenaPlayerComponent>>();
+        var query = EntityQueryEnumerator<DmArenaFighterComponent>();
+        var players = new List<Entity<DmArenaFighterComponent>>();
         while (query.MoveNext(out var uid, out var player))
         {
             players.Add((uid, player));
@@ -404,9 +404,9 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         BroadcastPlayerCount();
     }
 
-    private void CleanUpPlayer(Entity<DmArenaPlayerComponent> ent, DmArenaRuleComponent rule, bool playSound, SoundPathSpecifier sound)
+    private void RemoveFromArena(Entity<DmArenaFighterComponent> ent, DmArenaRuleComponent rule, bool playSound = true)
     {
-        rule.Players.Remove(GetNetEntity(ent));
+        TryComp<ActorComponent>(ent, out var actor);
 
         if (playSound && _transform.TryGetMapOrGridCoordinates(ent, out var deathCoords))
         {
@@ -415,22 +415,25 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
                 deathCoords.Value,
                 PopupType.LargeCaution);
             var filter = Filter.Pvs(deathCoords.Value, 1, EntityManager, _playerManager);
-            var audioParams = new AudioParams().WithVolume(3);
-            _audio.PlayStatic(sound, filter, deathCoords.Value, true, audioParams);
+            _audio.PlayStatic(LeaveSound, filter, deathCoords.Value, true, new AudioParams().WithVolume(3));
         }
 
-        TryComp<ActorComponent>(ent, out var actor);
-
-        ClearOriginalBodyMarker(ent);
-        _tempMind.TryRestoreAsGhost(ent);
-        QueueDel(ent);
-        BroadcastPlayerCount(rule);
+        ReleaseFighter(ent, rule);
 
         if (actor != null && _enabled)
             RaiseNetworkEvent(new DmArenaExitOfferEvent(), actor.PlayerSession.Channel);
     }
 
-    private void OnSuicideAttempt(Entity<DmArenaPlayerComponent> ent, ref SuicideGhostEvent args)
+    private void ReleaseFighter(Entity<DmArenaFighterComponent> ent, DmArenaRuleComponent rule)
+    {
+        rule.Players.Remove(GetNetEntity(ent));
+        ClearOriginalBodyMarker(ent);
+        _mindSwap.TryRestoreAsGhost(ent);
+        QueueDel(ent);
+        BroadcastPlayerCount(rule);
+    }
+
+    private void OnSuicideAttempt(Entity<DmArenaFighterComponent> ent, ref SuicideGhostEvent args)
     {
         if (ent.Comp.RuleEntity == null
             || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule)
@@ -438,78 +441,39 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             )
             return;
 
-        CreditKill(ent, rule);
-        GhostDomePlayer(ent, rule);
+        RewardKill(ent);
+        RemoveFromArena(ent, rule);
         args.Handled = true;
     }
 
     private void OnGhostAttempt(GhostAttemptHandleEvent args)
     {
         if (args.Mind.CurrentEntity is not { } entity
-            || !TryComp<DmArenaPlayerComponent>(entity, out var tdPlayer)
-            || tdPlayer.RuleEntity == null
-            || !TryComp<DmArenaRuleComponent>(tdPlayer.RuleEntity.Value, out var rule))
+            || !TryComp<DmArenaFighterComponent>(entity, out var fighter)
+            || fighter.RuleEntity == null
+            || !TryComp<DmArenaRuleComponent>(fighter.RuleEntity.Value, out var rule))
             return;
 
-        CreditKill((entity, tdPlayer), rule);
-        GhostDomePlayer((entity, tdPlayer), rule);
+        RewardKill((entity, fighter));
+        RemoveFromArena((entity, fighter), rule);
         args.Handled = true;
         args.Result = true;
     }
 
-    private void CreditKill(Entity<DmArenaPlayerComponent> victim, DmArenaRuleComponent rule, EntityUid? killer = null)
+    private void RewardKill(Entity<DmArenaFighterComponent> victim, EntityUid? killer = null)
     {
-        victim.Comp.Deaths++;
-
-        _mind.TryGetMind(victim, out _, out var deadMind);
-        if (deadMind?.UserId is { } deadUserId)
-        {
-            rule.Deaths.TryGetValue(deadUserId, out var existingDeaths);
-            rule.Deaths[deadUserId] = existingDeaths + 1;
-        }
-
         killer ??= victim.Comp.LastAttacker;
-        if (killer is not { } killerUid || !TryComp<DmArenaPlayerComponent>(killerUid, out var killerComp))
-            return;
-
-        killerComp.Kills++;
-
-        if (_mind.TryGetMind(killerUid, out _, out var killerMind) && killerMind.UserId is { } killerUserId)
-        {
-            rule.Kills.TryGetValue(killerUserId, out var existingKills);
-            rule.Kills[killerUserId] = existingKills + 1;
-        }
-
-        if (_refillOnKill)
+        if (_refillOnKill && killer is { } killerUid && HasComp<DmArenaFighterComponent>(killerUid))
             RefillAmmo(killerUid);
     }
 
-    private void GhostDomePlayer(
-        Entity<DmArenaPlayerComponent> ent,
-        DmArenaRuleComponent rule,
-        bool playSound = true,
-        SoundPathSpecifier? sound = null)
+    private void LeaveDmArena(Entity<DmArenaFighterComponent> ent)
     {
-        sound ??= new SoundPathSpecifier("/Audio/Effects/pop_high.ogg");
-        CleanUpPlayer(ent, rule, playSound, sound);
+        if (ent.Comp.RuleEntity != null && TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
+            ReleaseFighter(ent, rule);
     }
 
-
-    private void LeaveDmArena(Entity<DmArenaPlayerComponent> ent)
-    {
-        if (ent.Comp.RuleEntity == null
-            || !TryComp<DmArenaRuleComponent>(ent.Comp.RuleEntity.Value, out var rule))
-            return;
-
-        rule.Players.Remove(GetNetEntity(ent));
-        ClearOriginalBodyMarker(ent);
-        _tempMind.TryRestoreAsGhost(ent);
-        QueueDel(ent);
-
-        BroadcastPlayerCount(rule);
-    }
-
-    private void OnOriginalBodyStateChanged(Entity<DmArenaOriginalBodyComponent> ent, ref MobStateChangedEvent args)
+    private void OnOriginalBodyStateChanged(Entity<DmArenaDormantBodyComponent> ent, ref MobStateChangedEvent args)
     {
         if (args.NewMobState is MobState.Dead or MobState.Invalid || args.OldMobState == MobState.Alive)
             return;
@@ -526,8 +490,8 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         var session = args.SenderSession;
 
         if (session.AttachedEntity is not { Valid: true } currentEntity
-            || !TryComp<DmArenaPlayerComponent>(currentEntity, out var tdPlayer)
-            || !TryComp<TemporaryMindComponent>(currentEntity, out var tempMind))
+            || !TryComp<DmArenaFighterComponent>(currentEntity, out var fighter)
+            || !TryComp<DmArenaMindSwapComponent>(currentEntity, out var tempMind))
             return;
 
         if (!TryComp<MindComponent>(tempMind.OriginalMind, out var origMind))
@@ -539,15 +503,15 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             || mobState.CurrentState == MobState.Dead)
             return;
 
-        if (tdPlayer.RuleEntity != null
-            && TryComp<DmArenaRuleComponent>(tdPlayer.RuleEntity.Value, out var rule))
+        if (fighter.RuleEntity != null
+            && TryComp<DmArenaRuleComponent>(fighter.RuleEntity.Value, out var rule))
         {
             rule.Players.Remove(GetNetEntity(currentEntity));
             BroadcastPlayerCount(rule);
         }
 
-        _tempMind.TryRestoreToOriginalBody(currentEntity);
-        RemComp<DmArenaOriginalBodyComponent>(originalBody.Value);
+        _mindSwap.TryRestoreToOriginalBody(currentEntity);
+        RemComp<DmArenaDormantBodyComponent>(originalBody.Value);
         QueueDel(currentEntity);
     }
 
@@ -571,7 +535,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         }
     }
 
-    private void OnOriginalBodyExamined(Entity<DmArenaOriginalBodyComponent> ent, ref ExaminedEvent args)
+    private void OnOriginalBodyExamined(Entity<DmArenaDormantBodyComponent> ent, ref ExaminedEvent args)
     {
         if (!args.IsInDetailsRange)
             return;
@@ -582,18 +546,18 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
             args.PushMarkup($"[color=yellow]{Loc.GetString("comp-mind-examined-ssd", ("ent", ent))}[/color]");
     }
 
-    private void OnPlayerDetached(Entity<DmArenaPlayerComponent> ent, ref PlayerDetachedEvent args)
+    private void OnPlayerDetached(Entity<DmArenaFighterComponent> ent, ref PlayerDetachedEvent args)
     {
         if (args.Player.Status != SessionStatus.Disconnected)
             return;
 
         // Разум мог быть уже очищен, ищем по UserId
-        var query = EntityQueryEnumerator<DmArenaOriginalBodyComponent>();
+        var query = EntityQueryEnumerator<DmArenaDormantBodyComponent>();
         while (query.MoveNext(out var uid, out var comp))
         {
             if (comp.UserId == args.Player.UserId)
             {
-                RemComp<DmArenaOriginalBodyComponent>(uid);
+                RemComp<DmArenaDormantBodyComponent>(uid);
                 break;
             }
         }
@@ -609,15 +573,15 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
     private void ClearOriginalBodyMarker(EntityUid tempBody)
     {
-        if (TryComp<TemporaryMindComponent>(tempBody, out var temp)
+        if (TryComp<DmArenaMindSwapComponent>(tempBody, out var temp)
             && TryComp<MindComponent>(temp.OriginalMind, out var origMind)
             && origMind.OwnedEntity is { } originalBody)
-            RemComp<DmArenaOriginalBodyComponent>(originalBody);
+            RemComp<DmArenaDormantBodyComponent>(originalBody);
     }
 
     private void OnDespawnPickedUp(Entity<TimedDespawnComponent> ent, ref EntGotInsertedIntoContainerMessage args)
     {
-        if (HasComp<DmArenaPlayerComponent>(args.Container.Owner))
+        if (HasComp<DmArenaFighterComponent>(args.Container.Owner))
             RemComp<TimedDespawnComponent>(ent);
     }
 
@@ -665,37 +629,26 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         return spawns.Count > 0 ? _random.Pick(spawns) : null;
     }
 
-    private void BroadcastPlayerCount()
+    private void BroadcastPlayerCount(DmArenaRuleComponent? rule = null)
     {
-        if (_ruleEntity != null && TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out var rule))
-            BroadcastPlayerCount(rule);
-        else
-            BroadcastPlayerCount(0);
+        if (rule == null && _ruleEntity != null)
+            TryComp<DmArenaRuleComponent>(_ruleEntity.Value, out rule);
+
+        RaiseNetworkEvent(new DmArenaPlayerCountEvent(rule?.Players.Count ?? 0, _enabled), Filter.Broadcast());
     }
 
-    private void BroadcastPlayerCount(DmArenaRuleComponent rule)
+    public DmArenaKitEuiState GetLoadoutState(EntityUid ruleEntity, NetUserId userId)
     {
-        BroadcastPlayerCount(rule.Players.Count);
-    }
+        if (!TryComp<DmArenaRuleComponent>(ruleEntity, out var rule))
+            return new DmArenaKitEuiState(new List<DmArenaStoreOption>(), new List<DmArenaStoreSetOption>(), 0, 0, null, string.Empty);
 
-    private void BroadcastPlayerCount(int count)
-    {
-        var ev = new DmArenaPlayerCountEvent(count, _enabled);
-        foreach (var session in _playerManager.Sessions)
-        {
-            RaiseNetworkEvent(ev, session.Channel);
-        }
-    }
-
-    public DmArenaLoadoutEuiState GetLoadoutState(DmArenaRuleComponent rule, NetUserId userId)
-    {
-        var items = new List<DmArenaShopOption>();
-        var sets = new List<DmArenaSetOption>();
+        var items = new List<DmArenaStoreOption>();
+        var sets = new List<DmArenaStoreSetOption>();
         for (var i = 0; i < rule.ShopItems.Count; i++)
         {
             var item = rule.ShopItems[i];
             var gear = _prototype.Index(item.Gear);
-            items.Add(new DmArenaShopOption
+            items.Add(new DmArenaStoreOption
             {
                 Index = i,
                 Name = Loc.GetString(item.Name),
@@ -717,7 +670,7 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
 
         foreach (var set in rule.Sets)
         {
-            var option = new DmArenaSetOption
+            var option = new DmArenaStoreSetOption
             {
                 Name = Loc.GetString(set.Name),
                 Description = set.Description is { } setDescription ? Loc.GetString(setDescription) : string.Empty,
@@ -738,18 +691,18 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
         }
 
         rule.Presets.TryGetValue(userId, out var preset);
-        return new DmArenaLoadoutEuiState(items, sets, rule.Players.Count, rule.Budget, preset, rule.Gear);
+        return new DmArenaKitEuiState(items, sets, rule.Players.Count, rule.Budget, preset, rule.Gear);
     }
 
-    public void SavePreset(DmArenaRuleComponent rule, NetUserId userId, List<int> items)
+    public void SavePreset(EntityUid ruleEntity, NetUserId userId, List<int> items)
     {
-        if (TryGetValidItems(rule, items, out _))
+        if (TryComp<DmArenaRuleComponent>(ruleEntity, out var rule) && TryGetValidItems(rule, items, out _))
             rule.Presets[userId] = new List<int>(items);
     }
 
-    private bool TryGetValidItems(DmArenaRuleComponent rule, List<int> indexes, out List<(DmArenaShopItem Item, int Count)> items)
+    private bool TryGetValidItems(DmArenaRuleComponent rule, List<int> indexes, out List<(DmArenaStoreItem Item, int Count)> items)
     {
-        items = new List<(DmArenaShopItem, int)>();
+        items = new List<(DmArenaStoreItem, int)>();
         var total = 0;
         var slots = new HashSet<string>();
         var ammoTypes = new HashSet<string>();
@@ -814,22 +767,20 @@ public sealed partial class DmArenaRuleSystem : EntitySystem
                 {
                     toCheck.Enqueue(contained);
 
-                    if (!inGun && TryComp<BallisticAmmoProviderComponent>(contained, out var ballistic))
-                        RefillBallistic((contained, ballistic));
+                    if (inGun)
+                        continue;
 
-                    if (!inGun && (HasComp<BatteryAmmoProviderComponent>(contained)))
+                    if (TryComp<BallisticAmmoProviderComponent>(contained, out var ballistic))
+                        _gun.RefillBallisticAmmo((contained, ballistic));
+
+                    if (HasComp<BatteryAmmoProviderComponent>(contained))
                         RefillBattery(contained);
 
-                    if (!inGun && TryComp<RevolverAmmoProviderComponent>(contained, out var revolver))
+                    if (TryComp<RevolverAmmoProviderComponent>(contained, out var revolver))
                         RefillRevolver((contained, revolver));
                 }
             }
         }
-    }
-
-    private void RefillBallistic(Entity<BallisticAmmoProviderComponent> ent)
-    {
-        _gun.RefillBallisticAmmo(ent);
     }
 
     private void RefillBattery(EntityUid uid)

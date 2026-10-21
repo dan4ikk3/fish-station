@@ -6,7 +6,7 @@ namespace Content.Shared._Fish.DmArena;
 /// Нужен, когда разуму надо побыть в другом теле, не затрагивая основной разум и не наследуя его знания.
 /// </summary>
 [RegisterComponent]
-public sealed partial class TemporaryMindComponent : Component
+public sealed partial class DmArenaMindSwapComponent : Component
 {
     /// <summary>
     /// Настоящий разум игрока, отложенный на время подмены.

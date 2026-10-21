@@ -3,11 +3,11 @@ using Robust.Client.UserInterface.Controls;
 
 namespace Content.Client._Fish.DmArena;
 
-public sealed class DmArenaRevivalWindow : DmArenaWindow
+public sealed class DmArenaReturnWindow : DmArenaFrameWindow
 {
     public event Action? OnAccepted;
 
-    public DmArenaRevivalWindow()
+    public DmArenaReturnWindow()
     {
         WindowTitle = Loc.GetString("dm-arena-revival-title");
         SetSize = new Vector2(350, 160);
@@ -30,7 +30,7 @@ public sealed class DmArenaRevivalWindow : DmArenaWindow
             Margin = new Thickness(8, 4),
         };
 
-        var acceptButton = new DmArenaButton
+        var acceptButton = new DmArenaPillButton
         {
             Text = Loc.GetString("dm-arena-revival-accept"),
         };
@@ -41,7 +41,7 @@ public sealed class DmArenaRevivalWindow : DmArenaWindow
         };
         buttons.AddChild(acceptButton);
 
-        var declineButton = new DmArenaButton
+        var declineButton = new DmArenaPillButton
         {
             Text = Loc.GetString("dm-arena-revival-decline"),
         };
