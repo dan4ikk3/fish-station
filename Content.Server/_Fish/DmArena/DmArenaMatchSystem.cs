@@ -703,6 +703,11 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     private bool TryGetValidItems(DmArenaRuleComponent rule, List<int> indexes, out List<(DmArenaStoreItem Item, int Count)> items)
     {
         items = new List<(DmArenaStoreItem, int)>();
+
+        // Каждый предмет стоит минимум 1 очко, длиннее бюджета список быть не может
+        if (indexes.Count > rule.Budget)
+            return false;
+
         var total = 0;
         var slots = new HashSet<string>();
         var ammoTypes = new HashSet<string>();
@@ -761,13 +766,13 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
             foreach (var container in _container.GetAllContainers(current, containerManager))
             {
-                var inGun = container.ID is "gun_magazine" or "gun_chamber" or "revolver-ammo";
+                var spentAmmo = container.ID is "gun_chamber" or "revolver-ammo";
 
                 foreach (var contained in container.ContainedEntities)
                 {
                     toCheck.Enqueue(contained);
 
-                    if (inGun)
+                    if (spentAmmo)
                         continue;
 
                     if (TryComp<BallisticAmmoProviderComponent>(contained, out var ballistic))

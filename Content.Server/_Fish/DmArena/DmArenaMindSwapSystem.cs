@@ -1,3 +1,4 @@
+using System;
 using Content.Server.Ghost;
 using Content.Server.Mind;
 using Content.Shared._Fish.DmArena;
@@ -55,8 +56,19 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
         _mind.SetUserId(origMindId, null, origMind);
 
         var newMind = _mind.CreateMind(userId, origMind.CharacterName);
-        _mind.TransferTo(newMind, newBody);
-        _playerManager.SetAttachedEntity(session, newBody);
+
+        try
+        {
+            _mind.TransferTo(newMind, newBody);
+            _playerManager.SetAttachedEntity(session, newBody);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to swap mind of {session.Name} into {ToPrettyString(newBody)}: {e}");
+            QueueDel(newMind);
+            _mind.SetUserId(origMindId, userId, origMind);
+            return false;
+        }
 
         var comp = EnsureComp<DmArenaMindSwapComponent>(newBody);
         comp.OriginalMind = origMindId;

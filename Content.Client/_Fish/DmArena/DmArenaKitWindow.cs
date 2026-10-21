@@ -372,7 +372,7 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
 
         if (delta > 0)
         {
-            if (count >= card.MaxCount || !AmmoAvailable(_options[index]))
+            if (!_options.TryGetValue(index, out var option) || count >= card.MaxCount || !AmmoAvailable(option))
                 return;
 
             var conflicts = count == 0 ? GetConflicts(index) : new List<int>();
@@ -535,7 +535,10 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
 
         HumanoidCharacterProfile? profile = _prefs.Preferences?.SelectedCharacter as HumanoidCharacterProfile;
         var species = profile?.Species ?? HumanoidCharacterProfile.DefaultSpecies;
-        _dummy = _entMan.SpawnEntity(_prototype.Index(species).DollPrototype, MapCoordinates.Nullspace);
+        if (!_prototype.TryIndex(species, out var speciesProto))
+            return;
+
+        _dummy = _entMan.SpawnEntity(speciesProto.DollPrototype, MapCoordinates.Nullspace);
 
         if (profile != null)
             _entMan.System<SharedVisualBodySystem>().ApplyProfileTo(_dummy, profile);
