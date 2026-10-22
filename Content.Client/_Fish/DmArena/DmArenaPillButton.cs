@@ -62,29 +62,27 @@ public sealed class DmArenaPillButton : PanelContainer
         };
         AddChild(_label);
 
-        OnKeyBindDown += args =>
-        {
-            if (args.Function != EngineKeyFunctions.UIClick)
-                return;
+        OnKeyBindDown += OnClicked;
+        OnMouseEntered += _ => SetHovered(true);
+        OnMouseExited += _ => SetHovered(false);
 
-            if (!_disabled)
-                OnPressed?.Invoke();
+        UpdateVisual();
+    }
 
-            args.Handle();
-        };
+    private void OnClicked(GUIBoundKeyEventArgs args)
+    {
+        if (args.Function != EngineKeyFunctions.UIClick)
+            return;
 
-        OnMouseEntered += _ =>
-        {
-            _hovered = true;
-            UpdateVisual();
-        };
+        if (!_disabled)
+            OnPressed?.Invoke();
 
-        OnMouseExited += _ =>
-        {
-            _hovered = false;
-            UpdateVisual();
-        };
+        args.Handle();
+    }
 
+    private void SetHovered(bool hovered)
+    {
+        _hovered = hovered;
         UpdateVisual();
     }
 

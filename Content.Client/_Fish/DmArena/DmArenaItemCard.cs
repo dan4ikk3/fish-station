@@ -34,22 +34,8 @@ public sealed class DmArenaItemCard : PanelContainer
         MaxCount = Math.Max(1, option.MaxCount);
         MouseFilter = MouseFilterMode.Stop;
 
-        var description = option.Description;
-        if (!string.IsNullOrEmpty(description) || !string.IsNullOrEmpty(option.AmmoFor))
-        {
-            TooltipSupplier = _ =>
-            {
-                var lockedAmmo = _locked && !string.IsNullOrEmpty(option.AmmoFor) && _count == 0;
-                var panel = new PanelContainer { PanelOverride = DmArenaPalette.Rounded(DmArenaPalette.TitleBarBg, 10, 5) };
-                panel.AddChild(new Label
-                {
-                    Text = lockedAmmo ? Loc.GetString("dm-arena-ammo-locked") : description,
-                    FontOverride = DmArenaPalette.GetFont(false, 11),
-                    FontColorOverride = DmArenaPalette.ButtonText,
-                });
-                return panel;
-            };
-        }
+        if (!string.IsNullOrEmpty(option.Description) || !string.IsNullOrEmpty(option.AmmoFor))
+            TooltipSupplier = _ => BuildTooltip(option);
 
         _styleBox = DmArenaPalette.Rounded(DmArenaPalette.CardBg, 10, 5);
         PanelOverride = _styleBox;
@@ -127,32 +113,44 @@ public sealed class DmArenaItemCard : PanelContainer
 
         AddChild(hbox);
 
-        OnKeyBindDown += args =>
+        OnKeyBindDown += OnClicked;
+        OnMouseEntered += _ => SetHovered(true);
+        OnMouseExited += _ => SetHovered(false);
+
+        UpdateVisual();
+    }
+
+    private Control BuildTooltip(DmArenaStoreOption option)
+    {
+        var ammoLocked = _locked && _count == 0 && !string.IsNullOrEmpty(option.AmmoFor);
+
+        var panel = new PanelContainer { PanelOverride = DmArenaPalette.Rounded(DmArenaPalette.TitleBarBg, 10, 5) };
+        panel.AddChild(new Label
         {
-            if (args.Function != EngineKeyFunctions.UIClick)
-                return;
+            Text = ammoLocked ? Loc.GetString("dm-arena-ammo-locked") : option.Description,
+            FontOverride = DmArenaPalette.GetFont(false, 11),
+            FontColorOverride = DmArenaPalette.ButtonText,
+        });
+        return panel;
+    }
 
-            // Одиночные предметы включаются кликом, расходники через +/−
-            if (MaxCount == 1)
-                OnCountChanged?.Invoke(this, _count > 0 ? -1 : 1);
-            else if (_count < MaxCount && !_locked)
-                OnCountChanged?.Invoke(this, 1);
+    private void OnClicked(GUIBoundKeyEventArgs args)
+    {
+        if (args.Function != EngineKeyFunctions.UIClick)
+            return;
 
-            args.Handle();
-        };
+        // Одиночные предметы включаются кликом, расходники через +/−
+        if (MaxCount == 1)
+            OnCountChanged?.Invoke(this, _count > 0 ? -1 : 1);
+        else if (_count < MaxCount && !_locked)
+            OnCountChanged?.Invoke(this, 1);
 
-        OnMouseEntered += _ =>
-        {
-            _hovered = true;
-            UpdateVisual();
-        };
+        args.Handle();
+    }
 
-        OnMouseExited += _ =>
-        {
-            _hovered = false;
-            UpdateVisual();
-        };
-
+    private void SetHovered(bool hovered)
+    {
+        _hovered = hovered;
         UpdateVisual();
     }
 

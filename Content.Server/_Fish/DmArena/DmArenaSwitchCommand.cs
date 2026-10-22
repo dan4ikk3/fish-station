@@ -37,40 +37,40 @@ public sealed partial class DmArenaSwitchCommand : LocalizedCommands
             return;
         }
 
-        var current = _cfg.GetCVar(DmArenaConfigVars.DmArenaEnabled);
-        var statusKey = current ? "cmd-dmarena-status-on" : "cmd-dmarena-status-off";
+        var enabled = _cfg.GetCVar(DmArenaConfigVars.DmArenaEnabled);
+        var action = args.Length == 0 ? "status" : args[0].ToLowerInvariant();
 
-        if (args.Length == 0 || args[0].Equals("status", StringComparison.OrdinalIgnoreCase))
+        switch (action)
         {
-            shell.WriteLine(LocalizationManager.GetString(statusKey));
-            return;
+            case "status":
+                WriteStatus(shell, enabled);
+                break;
+            case "on" or "off":
+                SetEnabled(shell, enabled, action == "on");
+                break;
+            default:
+                shell.WriteError(LocalizationManager.GetString("cmd-dmarena-bad-argument"));
+                break;
         }
+    }
 
-        bool? requested = args[0].ToLowerInvariant() switch
-        {
-            "on" => true,
-            "off" => false,
-            _ => null,
-        };
+    private void WriteStatus(IConsoleShell shell, bool enabled)
+    {
+        shell.WriteLine(LocalizationManager.GetString(enabled ? "cmd-dmarena-status-on" : "cmd-dmarena-status-off"));
+    }
 
-        if (requested is not { } value)
-        {
-            shell.WriteError(LocalizationManager.GetString("cmd-dmarena-bad-argument"));
-            return;
-        }
-
+    private void SetEnabled(IConsoleShell shell, bool current, bool value)
+    {
         if (value == current)
         {
-            shell.WriteLine(LocalizationManager.GetString(statusKey));
+            WriteStatus(shell, current);
             return;
         }
 
         _cfg.SetCVar(DmArenaConfigVars.DmArenaEnabled, value);
 
         var who = shell.Player?.Name ?? "server";
-        _adminLog.Add(LogType.AdminCommands,
-            LogImpact.High,
-            $"{who} {(value ? "enabled" : "disabled")} the DM arena");
+        _adminLog.Add(LogType.AdminCommands, LogImpact.High, $"{who} {(value ? "enabled" : "disabled")} the DM arena");
 
         shell.WriteLine(LocalizationManager.GetString(value ? "cmd-dmarena-enabled" : "cmd-dmarena-disabled"));
     }

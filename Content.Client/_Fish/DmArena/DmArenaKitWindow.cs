@@ -197,16 +197,7 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
 
     private List<int> Expand()
     {
-        var result = new List<int>();
-        foreach (var (index, count) in _selected)
-        {
-            for (var i = 0; i < count; i++)
-            {
-                result.Add(index);
-            }
-        }
-
-        return result;
+        return _selected.SelectMany(pair => Enumerable.Repeat(pair.Key, pair.Value)).ToList();
     }
 
     private void SwitchTab(bool sets)
@@ -232,14 +223,11 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
         _playerCountLabel.Text = Loc.GetString("dm-arena-loadout-players", ("count", state.PlayerCount));
 
         _options.Clear();
-        foreach (var item in state.Items)
-        {
-            _options[item.Index] = item;
-        }
+        state.Items.ForEach(item => _options[item.Index] = item);
 
-        foreach (var index in _selected.Keys.Where(index => !_options.ContainsKey(index)).ToList())
+        foreach (var stale in _selected.Keys.Except(_options.Keys).ToList())
         {
-            _selected.Remove(index);
+            _selected.Remove(stale);
         }
 
         _heldCategory = state.Items.Count > 0 ? state.Items[0].Category : null;
@@ -375,28 +363,30 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
             if (!_options.TryGetValue(index, out var option) || count >= card.MaxCount || !AmmoAvailable(option))
                 return;
 
+            // Первый экземпляр вытесняет предметы, занимающие те же слоты или руки
             var conflicts = count == 0 ? GetConflicts(index) : new List<int>();
-            var refund = conflicts.Sum(conflict => _options[conflict].Cost * _selected[conflict]);
-            if (Spent() - refund + card.Cost > _state!.Budget)
+            if (Spent() - RefundFor(conflicts) + card.Cost > _state!.Budget)
                 return;
 
-            foreach (var conflict in conflicts)
-            {
-                _selected.Remove(conflict);
-            }
-
+            conflicts.ForEach(conflict => _selected.Remove(conflict));
             _selected[index] = count + 1;
         }
-        else if (count > 0)
+        else if (count > 1)
         {
-            if (count == 1)
-                _selected.Remove(index);
-            else
-                _selected[index] = count - 1;
+            _selected[index] = count - 1;
+        }
+        else
+        {
+            _selected.Remove(index);
         }
 
         PruneAmmo();
         Refresh();
+    }
+
+    private int RefundFor(IEnumerable<int> indexes)
+    {
+        return indexes.Sum(index => _options.TryGetValue(index, out var option) ? option.Cost * _selected.GetValueOrDefault(index) : 0);
     }
 
     private bool AmmoAvailable(DmArenaStoreOption option)
@@ -407,21 +397,24 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
         return _selected.Keys.Any(index => _options.TryGetValue(index, out var other) && other.AmmoType == option.AmmoFor);
     }
 
+    // Убранное оружие тянет за собой боеприпасы, а те могли держать следующие
     private void PruneAmmo()
     {
-        var changed = true;
-        while (changed)
+        while (FindUnsupportedAmmo() is { } index)
         {
-            changed = false;
-            foreach (var index in _selected.Keys.ToList())
-            {
-                if (AmmoAvailable(_options[index]))
-                    continue;
-
-                _selected.Remove(index);
-                changed = true;
-            }
+            _selected.Remove(index);
         }
+    }
+
+    private int? FindUnsupportedAmmo()
+    {
+        foreach (var index in _selected.Keys)
+        {
+            if (!_options.TryGetValue(index, out var option) || !AmmoAvailable(option))
+                return index;
+        }
+
+        return null;
     }
 
     private List<int> GetConflicts(int index)
@@ -430,34 +423,23 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
         if (!_options.TryGetValue(index, out var option))
             return result;
 
-        var hands = option.Hands;
-        foreach (var other in _selected.Keys)
-        {
-            if (other == index)
-                continue;
+        var others = _selected.Keys.Where(other => other != index && _options.ContainsKey(other)).ToList();
 
-            var otherOption = _options[other];
-            if (otherOption.Slots.Any(option.Slots.Contains))
-                result.Add(other);
-            else
-                hands += otherOption.Hands;
-        }
+        result.AddRange(others.Where(other => _options[other].Slots.Any(option.Slots.Contains)));
 
         // В руках максимум два предмета
-        if (hands > 2)
+        var hands = option.Hands + others.Where(other => !result.Contains(other)).Sum(other => _options[other].Hands);
+        foreach (var other in others)
         {
-            foreach (var other in _selected.Keys)
-            {
-                if (hands <= 2)
-                    break;
+            if (hands <= 2)
+                break;
 
-                var otherOption = _options[other];
-                if (other == index || result.Contains(other) || otherOption.Hands == 0)
-                    continue;
+            var otherHands = _options[other].Hands;
+            if (result.Contains(other) || otherHands == 0)
+                continue;
 
-                result.Add(other);
-                hands -= otherOption.Hands;
-            }
+            result.Add(other);
+            hands -= otherHands;
         }
 
         return result;
@@ -469,10 +451,9 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
             return;
 
         _selected.Clear();
-        foreach (var index in preset)
+        foreach (var index in preset.Where(_options.ContainsKey))
         {
-            if (_options.ContainsKey(index))
-                _selected[index] = _selected.GetValueOrDefault(index) + 1;
+            _selected[index] = _selected.GetValueOrDefault(index) + 1;
         }
 
         PruneAmmo();
@@ -481,14 +462,7 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
 
     private int Spent()
     {
-        var total = 0;
-        foreach (var (index, count) in _selected)
-        {
-            if (_options.TryGetValue(index, out var option))
-                total += option.Cost * count;
-        }
-
-        return total;
+        return _selected.Sum(pair => _options.TryGetValue(pair.Key, out var option) ? option.Cost * pair.Value : 0);
     }
 
     private void Refresh()
@@ -500,17 +474,11 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
         foreach (var (index, card) in _cards)
         {
             var count = _selected.GetValueOrDefault(index);
-            bool locked;
 
-            if (count > 0)
-            {
-                locked = spent + card.Cost > _state.Budget;
-            }
-            else
-            {
-                var refund = GetConflicts(index).Sum(conflict => _options[conflict].Cost * _selected[conflict]);
-                locked = spent - refund + card.Cost > _state.Budget || !AmmoAvailable(_options[index]);
-            }
+            // Уже выбранный предмет можно только добирать, новый может вытеснить прежний
+            var locked = count > 0
+                ? spent + card.Cost > _state.Budget
+                : spent - RefundFor(GetConflicts(index)) + card.Cost > _state.Budget || !AmmoAvailable(_options[index]);
 
             card.SetState(count, locked);
         }
@@ -533,47 +501,55 @@ public sealed partial class DmArenaKitWindow : DmArenaFrameWindow
 
         DeleteDummy();
 
-        HumanoidCharacterProfile? profile = _prefs.Preferences?.SelectedCharacter as HumanoidCharacterProfile;
-        var species = profile?.Species ?? HumanoidCharacterProfile.DefaultSpecies;
-        if (!_prototype.TryIndex(species, out var speciesProto))
+        var profile = _prefs.Preferences?.SelectedCharacter as HumanoidCharacterProfile;
+        if (!_prototype.TryIndex(profile?.Species ?? HumanoidCharacterProfile.DefaultSpecies, out var species))
             return;
 
-        _dummy = _entMan.SpawnEntity(speciesProto.DollPrototype, MapCoordinates.Nullspace);
+        _dummy = _entMan.SpawnEntity(species.DollPrototype, MapCoordinates.Nullspace);
 
         if (profile != null)
             _entMan.System<SharedVisualBodySystem>().ApplyProfileTo(_dummy, profile);
 
-        var spawning = _entMan.System<StationSpawningSystem>();
-        spawning.EquipStartingGear(_dummy, _state.BaseGear);
+        _entMan.System<StationSpawningSystem>().EquipStartingGear(_dummy, _state.BaseGear);
 
-        var chosen = _state.Items.Where(item => _selected.ContainsKey(item.Index)).OrderByDescending(item => item.EquipFirst);
-        var hands = _entMan.System<SharedHandsSystem>();
-        var inventory = _entMan.System<InventorySystem>();
+        var chosen = _state.Items
+            .Where(item => _selected.ContainsKey(item.Index))
+            .OrderByDescending(item => item.EquipFirst);
 
         foreach (var item in chosen)
         {
-            // Старую одежду удаляем, чтобы не лежала рядом
-            foreach (var slot in item.Slots)
-            {
-                if (!inventory.TryGetSlotEntity(_dummy, slot, out var old))
-                    continue;
-
-                inventory.TryUnequip(_dummy, slot, silent: true, force: true);
-                _entMan.DeleteEntity(old);
-            }
-
-            spawning.EquipStartingGear(_dummy, item.GearPrototype);
-
-            if (item.InHand || item.Category != _heldCategory || !_entMan.TryGetComponent(_dummy, out HandsComponent? handsComp))
-                continue;
-
-            var held = _entMan.SpawnEntity(item.SpritePrototype, MapCoordinates.Nullspace);
-            if (!hands.TryGetEmptyHand((_dummy, handsComp), out var emptyHand)
-                || !hands.TryPickup(_dummy, held, emptyHand, checkActionBlocker: false, handsComp: handsComp))
-                _entMan.DeleteEntity(held);
+            DressPreview(item);
         }
 
         _preview.View.SetEntity(_dummy);
+    }
+
+    private void DressPreview(DmArenaStoreOption item)
+    {
+        var inventory = _entMan.System<InventorySystem>();
+
+        // Старую одежду удаляем, чтобы не лежала рядом
+        foreach (var slot in item.Slots)
+        {
+            if (!inventory.TryGetSlotEntity(_dummy, slot, out var old))
+                continue;
+
+            inventory.TryUnequip(_dummy, slot, silent: true, force: true);
+            _entMan.DeleteEntity(old);
+        }
+
+        _entMan.System<StationSpawningSystem>().EquipStartingGear(_dummy, item.GearPrototype);
+
+        // В руку кладём только оружие основной категории
+        if (item.InHand || item.Category != _heldCategory || !_entMan.TryGetComponent(_dummy, out HandsComponent? handsComp))
+            return;
+
+        var hands = _entMan.System<SharedHandsSystem>();
+        var held = _entMan.SpawnEntity(item.SpritePrototype, MapCoordinates.Nullspace);
+
+        if (!hands.TryGetEmptyHand((_dummy, handsComp), out var emptyHand)
+            || !hands.TryPickup(_dummy, held, emptyHand, checkActionBlocker: false, handsComp: handsComp))
+            _entMan.DeleteEntity(held);
     }
 
     private void DeleteDummy()

@@ -43,10 +43,8 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
 
     public bool TrySwapTempMind(ICommonSession session, EntityUid newBody)
     {
-        if (session.AttachedEntity is not { Valid: true } currentEntity)
-            return false;
-
-        if (!_mind.TryGetMind(currentEntity, out var origMindId, out var origMind))
+        if (session.AttachedEntity is not { Valid: true } currentEntity
+            || !_mind.TryGetMind(currentEntity, out var origMindId, out var origMind))
             return false;
 
         var userId = origMind.UserId;
@@ -70,9 +68,9 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
             return false;
         }
 
-        var comp = EnsureComp<DmArenaMindSwapComponent>(newBody);
-        comp.OriginalMind = origMindId;
-        comp.DisposableMind = newMind;
+        var swap = EnsureComp<DmArenaMindSwapComponent>(newBody);
+        swap.OriginalMind = origMindId;
+        swap.DisposableMind = newMind;
 
         return true;
     }
@@ -93,13 +91,21 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
         if (TryComp<GhostComponent>(ghost, out var ghostComp))
             _ghost.SetCanReturnToBody((ghost, ghostComp), origMind.OwnedEntity is { } owned && Exists(owned));
 
-        if (!string.IsNullOrWhiteSpace(origMind.CharacterName))
-            _meta.SetEntityName(ghost, FormattedMessage.EscapeText(origMind.CharacterName));
-        else if (origMind.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session))
-            _meta.SetEntityName(ghost, FormattedMessage.EscapeText(session.Name));
+        if (GetGhostName(origMind) is { } name)
+            _meta.SetEntityName(ghost, FormattedMessage.EscapeText(name));
 
         RemComp<DmArenaMindSwapComponent>(temporaryBody);
         return ghost;
+    }
+
+    private string? GetGhostName(MindComponent mind)
+    {
+        if (!string.IsNullOrWhiteSpace(mind.CharacterName))
+            return mind.CharacterName;
+
+        return mind.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session)
+            ? session.Name
+            : null;
     }
 
     public bool TryRestoreToOriginalBody(EntityUid temporaryBody)
