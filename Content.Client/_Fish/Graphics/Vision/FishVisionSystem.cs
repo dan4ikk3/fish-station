@@ -5,7 +5,7 @@ using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Timing;
-using LegacyNightVisionSystem = Content.Client._Sunrise.Overlays.NightVisionSystem;
+using LegacyNightVisionSystem = Content.Client.NightVision.NightVisionSystem;
 using LegacyThermalVisionSystem = Content.Client._Sunrise.ThermalVision.ThermalVisionSystem;
 
 namespace Content.Client._Fish.Graphics.Vision;

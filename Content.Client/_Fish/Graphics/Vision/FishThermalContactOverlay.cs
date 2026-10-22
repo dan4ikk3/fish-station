@@ -62,9 +62,14 @@ internal sealed partial class FishThermalContactOverlay : Overlay
             return false;
 
         // Не обходим маскирующий постшейдер. Обычная обводка не скрывает исходный спрайт.
-        return ent.Comp.PostShader == null ||
-            _entityManager.TryGetComponent<InteractionOutlineComponent>(ent, out var outline) &&
-            ReferenceEquals(ent.Comp.PostShader, outline.FishVisionOutlineShader);
+        var postShaders = _sprite.GetPostShaders(ent.Comp);
+        if (postShaders.Count == 0)
+            return true;
+
+        return postShaders.Count == 1 &&
+               _entityManager.TryGetComponent<InteractionOutlineComponent>(ent, out var outline) &&
+               outline.Active &&
+               postShaders[0].Id == ContentPostShaderIds.InteractionOutline;
     }
 
     protected override void Draw(in OverlayDrawArgs args)

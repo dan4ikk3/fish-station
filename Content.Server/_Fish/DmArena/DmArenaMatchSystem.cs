@@ -16,7 +16,7 @@ using Content.Shared.Dataset;
 using Content.Shared.Examine;
 using Content.Shared.Fluids.Components;
 using Content.Shared.GameTicking;
-using Content.Shared.Ghost;
+using Content.Shared.Ghost.Components;
 using Content.Shared.IdentityManagement;
 using Content.Shared.Inventory;
 using Content.Shared.Interaction.Events;

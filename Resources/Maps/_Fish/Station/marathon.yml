@@ -145794,7 +145794,7 @@ entities:
     - type: Transform
       pos: -18.452793,-49.289062
       parent: 2
-- proto: MagicalLamp
+- proto: GuardianDeck
   entities:
   - uid: 18207
     components:

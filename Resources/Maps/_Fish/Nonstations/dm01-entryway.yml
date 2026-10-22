@@ -6403,7 +6403,7 @@ entities:
     - type: Transform
       pos: 29.5,44.5
       parent: 2
-- proto: WindoorSecure
+- proto: Windoor
   entities:
   - uid: 854
     components:
@@ -6427,7 +6427,7 @@ entities:
     - type: Transform
       pos: 29.5,48.5
       parent: 2
-- proto: WindoorSecureCommandLocked
+- proto: WindoorCommandLocked
   entities:
   - uid: 870
     components:

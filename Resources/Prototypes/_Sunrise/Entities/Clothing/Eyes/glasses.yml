@@ -281,5 +281,5 @@
     sprite: _Sunrise/Clothing/Eyes/Glasses/stuttering_glasses.rsi
   - type: Clothing
     sprite: _Sunrise/Clothing/Eyes/Glasses/stuttering_glasses.rsi
-  - type: AddAccentClothing
-    accent: StutteringAccent
+  - type: StutteringAccent
+    relayAccent: true

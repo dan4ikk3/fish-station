@@ -3,6 +3,8 @@ using Content.Shared.CombatMode;
 using Content.Shared.Interaction.Components;
 using Content.Shared.Mech.Components;
 using Content.Shared.Silicons.Borgs.Components;
+using Content.Shared.Vehicle;
+using Content.Shared.Vehicle.Components;
 
 namespace Content.Server._Fish.Mech;
 
@@ -14,16 +16,16 @@ public sealed partial class MechBrainCombatSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<MechPilotComponent, ComponentStartup>(OnPilotStartup);
-        SubscribeLocalEvent<MechPilotComponent, ComponentShutdown>(OnPilotShutdown);
+        SubscribeLocalEvent<BorgBrainComponent, OnVehicleEnteredEvent>(OnPilotEntered);
+        SubscribeLocalEvent<MechBrainCombatComponent, ComponentShutdown>(OnPilotShutdown);
     }
 
-    private void OnPilotStartup(Entity<MechPilotComponent> ent, ref ComponentStartup args)
+    private void OnPilotEntered(Entity<BorgBrainComponent> ent, ref OnVehicleEnteredEvent args)
     {
-        var uid = ent.Owner;
-        if (!HasComp<BorgBrainComponent>(uid))
+        if (!HasComp<MechComponent>(args.Vehicle))
             return;
 
+        var uid = ent.Owner;
         var hadCombatMode = HasComp<CombatModeComponent>(uid);
         var hadBlockMovement = TryComp<BlockMovementComponent>(uid, out var existingBlockMovement);
         var brainCombat = EnsureComp<MechBrainCombatComponent>(uid);
@@ -40,10 +42,18 @@ public sealed partial class MechBrainCombatSystem : EntitySystem
         brainCombat.InitialCombatMode = hadCombatMode && combatMode.IsInCombatMode;
     }
 
-    private void OnPilotShutdown(Entity<MechPilotComponent> ent, ref ComponentShutdown args)
+
+    private void OnPilotShutdown(Entity<MechBrainCombatComponent> ent, ref ComponentShutdown args)
     {
-        var uid = ent.Owner;
-        if (!TryComp<MechBrainCombatComponent>(uid, out var brainCombat))
+        RestoreBrainState(ent.Owner, ent.Comp, removeCombatComponent: false);
+    }
+
+    public void RestoreBrainState(EntityUid uid, MechBrainCombatComponent? brainCombat = null, bool removeCombatComponent = true)
+    {
+        if (LifeStage(uid) >= EntityLifeStage.Terminating)
+            return;
+
+        if (!Resolve(uid, ref brainCombat, false))
             return;
 
         if (TryComp<CombatModeComponent>(uid, out var combat))
@@ -62,7 +72,9 @@ public sealed partial class MechBrainCombatSystem : EntitySystem
             Dirty(uid, blockMovement);
         }
 
-        RemComp<MechBrainCombatComponent>(uid);
+        if (removeCombatComponent)
+            RemComp<MechBrainCombatComponent>(uid);
+
         _actionBlocker.UpdateCanMove(uid);
     }
 }

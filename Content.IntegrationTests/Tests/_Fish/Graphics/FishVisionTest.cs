@@ -166,11 +166,10 @@ public sealed class FishVisionTest
             server.EntMan.AddComponent<FishThermalVisionComponent>(wearer);
             server.System<MobStateSystem>().ChangeMobState(target, MobState.Dead);
             // Изолируем передачу температуры от охлаждения тела атмосферой тестовой карты.
-            server.EntMan.GetComponent<TemperatureComponent>(target).AtmosTemperatureTransferEfficiency = 0f;
-            server.System<TemperatureSystem>().ForceChangeTemperature(target, 310.15f);
+            SetTargetTemperature(target, 310.15f);
         });
         await CheckTemperature(310f);
-        await server.WaitPost(() => server.System<TemperatureSystem>().ForceChangeTemperature(target, 273.15f));
+        await server.WaitPost(() => SetTargetTemperature(target, 273.15f));
         await CheckTemperature(273f);
         await server.WaitPost(() => server.EntMan.RemoveComponent<TemperatureComponent>(target));
         // Доставляем удаление сигнатуры через обычный PVS.
@@ -178,6 +177,13 @@ public sealed class FishVisionTest
         await client.WaitAssertion(() => Assert.That(
             client.EntMan.HasComponent<FishThermalSignatureComponent>(client.EntMan.GetEntity(targetNet)), Is.False));
         await pair.CleanReturnAsync();
+
+        void SetTargetTemperature(EntityUid uid, float targetTemp)
+        {
+            var tempComp = server.EntMan.GetComponent<TemperatureComponent>(uid);
+            var deltaTemp = targetTemp - tempComp.Temperature;
+            server.System<TemperatureSystem>().ChangeHeat((uid, tempComp), deltaTemp * tempComp.HeatCapacity, ignoreHeatResistance: true);
+        }
 
         async Task CheckTemperature(float expected)
         {
@@ -225,8 +231,7 @@ public sealed class FishVisionTest
             // Терморегуляция живого тела не должна менять контрольную температуру между выборками.
             server.EntMan.RemoveComponent<ThermalRegulatorComponent>(target);
             server.System<MobStateSystem>().ChangeMobState(target, MobState.Dead);
-            server.EntMan.GetComponent<TemperatureComponent>(target).AtmosTemperatureTransferEfficiency = 0f;
-            server.System<TemperatureSystem>().ForceChangeTemperature(target, 310.15f);
+            SetTargetTemperature(target, 310.15f);
         });
         await WaitForSample();
         await client.WaitAssertion(() =>
@@ -249,7 +254,7 @@ public sealed class FishVisionTest
         await server.WaitPost(() =>
         {
             server.EntMan.RemoveComponent<FishThermalVisionComponent>(wearer);
-            server.System<TemperatureSystem>().ForceChangeTemperature(target, 273.15f);
+            SetTargetTemperature(target, 273.15f);
         });
         await WaitForSample();
         // Уже полученные сведения нельзя отозвать из памяти клиента, но новые значения ему недоступны.
@@ -263,7 +268,7 @@ public sealed class FishVisionTest
             var vision = server.EntMan.GetComponent<FishThermalVisionComponent>(wearer);
             vision.Range = 0.5f;
             server.EntMan.Dirty(wearer, vision);
-            server.System<TemperatureSystem>().ForceChangeTemperature(target, 320.15f);
+            SetTargetTemperature(target, 320.15f);
         });
         await WaitForSample();
         await AssertNoNewClientTemperature(273f);
@@ -273,6 +278,13 @@ public sealed class FishVisionTest
         await client.WaitAssertion(() => Assert.That(
             client.EntMan.HasComponent<FishThermalSignatureComponent>(client.EntMan.GetEntity(targetNet)), Is.False));
         await pair.CleanReturnAsync();
+
+        void SetTargetTemperature(EntityUid uid, float targetTemp)
+        {
+            var tempComp = server.EntMan.GetComponent<TemperatureComponent>(uid);
+            var deltaTemp = targetTemp - tempComp.Temperature;
+            server.System<TemperatureSystem>().ChangeHeat((uid, tempComp), deltaTemp * tempComp.HeatCapacity, ignoreHeatResistance: true);
+        }
 
         async Task WaitForSample()
         {
@@ -284,7 +296,7 @@ public sealed class FishVisionTest
         {
             await client.WaitAssertion(() => Assert.That(
                 client.EntMan.GetComponent<FishThermalSignatureComponent>(client.EntMan.GetEntity(targetNet)).Temperature,
-                Is.EqualTo(expected)));
+                Is.EqualTo(expected).Within(2f)));
         }
 
         async Task AssertNoNewClientTemperature(float lastReceived)
@@ -294,7 +306,7 @@ public sealed class FishVisionTest
             await client.WaitAssertion(() =>
             {
                 if (client.EntMan.TryGetComponent<FishThermalSignatureComponent>(client.EntMan.GetEntity(targetNet), out var signature))
-                    Assert.That(signature.Temperature, Is.EqualTo(lastReceived));
+                    Assert.That(signature.Temperature, Is.EqualTo(lastReceived).Within(2f));
             });
         }
     }

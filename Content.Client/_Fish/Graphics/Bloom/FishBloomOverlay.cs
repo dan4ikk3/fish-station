@@ -301,8 +301,14 @@ internal sealed partial class FishBloomOverlay : Overlay
             return false;
 
         // Не восстанавливаем скрытые постшейдером пиксели. Обычная обводка сохраняет исходный спрайт.
-        return sprite.PostShader == null ||
-               _outlineQuery.TryComp(entity, out var outline) && ReferenceEquals(sprite.PostShader, outline.FishOutlineShader);
+        var postShaders = _sprite.GetPostShaders(sprite);
+        if (postShaders.Count == 0)
+            return true;
+
+        return postShaders.Count == 1 &&
+               _outlineQuery.TryComp(entity, out var outline) &&
+               outline.Active &&
+               postShaders[0].Id == ContentPostShaderIds.InteractionOutline;
     }
 
     private static bool HasBloomLayer(SpriteComponent sprite)

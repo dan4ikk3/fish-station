@@ -64,7 +64,7 @@ public sealed partial class FishThermalVisionSystem : EntitySystem
                     TerminatingOrDeleted(candidate))
                     continue;
 
-                var value = candidate.Comp.CurrentTemperature;
+                var value = candidate.Comp.Temperature;
                 if (!float.IsFinite(value) || value < 0f)
                 {
                     RemCompDeferred<FishThermalSignatureComponent>(candidate);

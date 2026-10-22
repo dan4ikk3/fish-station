@@ -1,6 +1,6 @@
-using Content.Shared._Sunrise.NightVision.Components;
+using Content.Shared.Overlays;
 
-namespace Content.Client._Sunrise.Overlays;
+namespace Content.Client.NightVision;
 
 public sealed partial class NightVisionSystem
 {
@@ -16,12 +16,11 @@ public sealed partial class NightVisionSystem
         _fishVisionOverride = active;
         if (active)
         {
-            if (_effect != null)
-                AttemptRemoveVision(_effect.Value, true);
+            Deactivate(_player.LocalSession?.AttachedEntity);
         }
-        else if (_player.LocalEntity is { } viewer && TryComp<NightVisionComponent>(viewer, out var vision))
+        else if (_player.LocalSession?.AttachedEntity is { } viewer)
         {
-            AttemptAddVision(viewer, vision);
+            RefreshOverlay(viewer);
         }
     }
 }

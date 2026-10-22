@@ -54,11 +54,11 @@
       path: /Audio/_Sunrise/Items/Goggles/deactivate.ogg
     soundFailToActivate:
       path: /Audio/Machines/button.ogg
+  - type: FishVisionDevice
   - type: ComponentToggler
     parent: true
     components:
-    - type: NightVision
-      effect: EffectNightVision
+    - type: FishNightVision
   - type: ToggleClothing
     action: NVDToggleAction
     mustEquip: true
@@ -75,8 +75,17 @@
   components:
   - type: Sprite
     sprite: _Fish/Clothing/Head/Hardsuits/centcom_officer_black.rsi
+    layers:
+    - state: icon
+    - state: icon-flash
+      visible: false
+      map: [ light ]
   - type: Clothing
     sprite: _Fish/Clothing/Head/Hardsuits/centcom_officer_black.rsi
+  - type: ToggleableVisuals
+    spriteLayer: light
+    clothingVisuals:
+      head: []
   - type: PointLight
     color: '#4ac4ff'
     radius: 6

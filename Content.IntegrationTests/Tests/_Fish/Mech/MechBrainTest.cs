@@ -10,6 +10,8 @@ using Content.Shared.Interaction.Components;
 using Content.Shared.Light.Components;
 using Content.Shared.Mech.Components;
 using Content.Shared.Movement.Components;
+using Content.Shared.Vehicle.Components;
+using Content.Shared.Vehicle.Systems;
 using Content.Shared.Verbs;
 using Content.Shared.Whitelist;
 using Robust.Shared.GameObjects;
@@ -51,8 +53,8 @@ public sealed class MechBrainTest
             entMan.System<SharedInteractionSystem>().InteractUsing(user, brain, mech, map.GridCoords));
         await server.WaitAssertion(() =>
         {
-            Assert.That(entMan.GetComponent<MechComponent>(mech).PilotSlot.ContainedEntity, Is.Null);
-            Assert.That(entMan.HasComponent<MechPilotComponent>(brain), Is.False);
+            Assert.That(entMan.System<VehicleSystem>().GetOperatorOrNull(mech), Is.Null);
+            Assert.That(entMan.HasComponent<VehicleOperatorComponent>(brain), Is.False);
             Assert.That(entMan.HasComponent<RelayInputMoverComponent>(brain), Is.False);
             Assert.That(entMan.System<SharedHandsSystem>().IsHolding(user, brain), Is.True);
         });
@@ -143,7 +145,7 @@ public sealed class MechBrainTest
                 var verbs = new GetVerbsEvent<AlternativeVerb>(user, mech, brain, hands, true, true, true, []);
                 entMan.EventBus.RaiseLocalEvent(mech, verbs);
 
-                var enterText = server.ResolveDependency<ILocalizationManager>().GetString("mech-verb-enter");
+                var enterText = server.ResolveDependency<ILocalizationManager>().GetString("container-vehicle-verb-enter");
                 hasEnterVerb = verbs.Verbs.Any(verb => verb.Text == enterText);
             }
         });
@@ -187,11 +189,27 @@ public sealed class MechBrainTest
         await server.WaitPost(() =>
             entMan.System<SharedInteractionSystem>().InteractUsing(user, brain, mech, map.GridCoords));
 
+        // До завершения DoAfter мозг ещё не установлен в мех.
         await server.WaitAssertion(() =>
         {
-            var pilot = entMan.GetComponent<MechComponent>(mech).PilotSlot.ContainedEntity;
+            Assert.That(entMan.System<VehicleSystem>().GetOperatorOrNull(mech), Is.Null);
+            Assert.That(entMan.HasComponent<VehicleOperatorComponent>(brain), Is.False);
+        });
+
+        // Ждём 5 секунд DoAfter установки мозга.
+        var gameTiming = server.ResolveDependency<IGameTiming>();
+        var ticksToWait = (int) Math.Ceiling(5f * gameTiming.TickRate) + 5;
+        await pair.RunTicksSync(ticksToWait);
+
+        await server.WaitAssertion(() =>
+        {
+            var pilot = entMan.System<VehicleSystem>().GetOperatorOrNull(mech);
             Assert.That(pilot, blacklisted ? Is.Null : Is.EqualTo(brain));
-            Assert.That(entMan.HasComponent<MechPilotComponent>(brain), Is.EqualTo(!blacklisted));
+            Assert.That(entMan.HasComponent<VehicleOperatorComponent>(brain), Is.EqualTo(!blacklisted));
+            if (!blacklisted)
+            {
+                Assert.That(entMan.System<ActionBlockerSystem>().CanMove(mech), Is.False);
+            }
         });
 
         await server.WaitPost(() => entMan.System<MechSystem>().TryEject(mech));
@@ -239,6 +257,7 @@ public sealed class MechBrainTest
             await server.WaitPost(() => entMan.System<SharedCombatModeSystem>().SetInCombatMode(brain, true));
             var ejected = false;
             await server.WaitPost(() => ejected = entMan.System<MechSystem>().TryEject(mech));
+            await pair.RunTicksSync(1);
             await server.WaitAssertion(() =>
             {
                 Assert.That(ejected, Is.True);
@@ -249,7 +268,7 @@ public sealed class MechBrainTest
                 if (hadCombatMode)
                     Assert.That(entMan.GetComponent<CombatModeComponent>(brain).IsInCombatMode, Is.False);
                 Assert.That(entMan.System<ActionBlockerSystem>().CanMove(brain), Is.EqualTo(!hadBlockMovement));
-                Assert.That(entMan.HasComponent<MechPilotComponent>(brain), Is.False);
+                Assert.That(entMan.HasComponent<VehicleOperatorComponent>(brain), Is.False);
                 Assert.That(entMan.HasComponent<RelayInputMoverComponent>(brain), Is.False);
             });
         }

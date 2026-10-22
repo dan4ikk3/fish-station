@@ -994,3 +994,26 @@
     message: Зимняя куртка капитана стала бронированной (0.6/0.6/0.6 и 0.35 от термического урона) и даёт 25% сопротивления стамине.
   id: 97
   url: https://github.com/makura-games/fish-station/pull/517
+- author: TiFeRi
+  time: '2026-10-21T08:04:06.0000000+00:00'
+  changes:
+  - type: Add
+    message: Новые шаттлы сб.
+  - type: Tweak
+    message: Активация рандома шаттлов сб.
+  id: 98
+  url: https://github.com/makura-games/fish-station/pull/526
+- author: TiFeRi
+  time: '2026-10-21T08:03:22.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Фикс 2-3 шлюзов
+  id: 99
+  url: https://github.com/makura-games/fish-station/pull/527
+- author: TiFeRi
+  time: '2026-10-22T09:11:33.0000000+00:00'
+  changes:
+  - type: Add
+    message: Включение шаттлов stellar stories в ротацию шаттлов сб.
+  id: 100
+  url: https://github.com/makura-games/fish-station/pull/533
