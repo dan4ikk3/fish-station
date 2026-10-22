@@ -10,12 +10,12 @@ namespace Content.Shared.Paper;
 
 public sealed partial class PaperSystem
 {
-    [Dependency] private readonly SharedIdCardSystem _idCard = default!;
-    [Dependency] private readonly SharedHandsSystem _hands = default!;
+    [Dependency] private SharedIdCardSystem _idCard = default!;
+    [Dependency] private SharedHandsSystem _hands = default!;
 
     private static readonly Vector2 DefaultImageScale = new(1f, 1f);
 
-    partial void InitializeTemplateFieldSupport()
+    private void InitializeTemplateFieldSupport()
     {
         SubscribeLocalEvent<PaperComponent, PaperComponent.PaperTemplateRequestMessage>(OnTemplateRequest);
     }

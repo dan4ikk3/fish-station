@@ -708,3 +708,312 @@
   url: https://github.com/makura-games/fish-station/pull/471
   media:
   - url: https://github.com/user-attachments/assets/5779808e-b0c3-4145-9d47-02ce3e365af7
+- author: dan4ikk3
+  time: '2026-09-29T07:35:39.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлен продвинутый голопад, работающий отдельно от обычной сети голопадов. Позвонив с него, напрямую видно и слышно всё происходящее вокруг приёмника в реальном времени.
+  id: 70
+  url: https://github.com/makura-games/fish-station/pull/469
+  media:
+  - url: https://github.com/user-attachments/assets/d725c3e1-bb75-47d4-8f0e-8a66d3226313
+- author: TiFeRi
+  time: '2026-09-29T20:21:04.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Вместимость базового батарейного магазина ИК увеличена с 12 до 18 патронов, а большого магазина с 24 до 36 патронов.
+  - type: Tweak
+    message: Уменьшен урон выстрела картриджа ИК с 20 до 13.
+  - type: Tweak
+    message: Стёкла теперь блокируют выстрелы картриджа ИК.
+  id: 71
+  url: https://github.com/makura-games/fish-station/pull/479
+- author: NekutGit
+  time: '2026-09-29T21:03:32.0000000+00:00'
+  changes:
+  - type: Add
+    message: 'Добавлены медицинские подсумки для баночек: обычный, парамеда, НаноТрейзен, бригмеда, блюспейс и Синдиката. Содержимое получает на 99% меньше урона от взрыва.'
+  - type: Add
+    message: Добавлена технология создания обычного подсумка в Т2 биохимии с уникальным рецептом.
+  - type: Add
+    message: В технологию "Блюспейс химия" добавлен рецепт создания блюспейс подсумок.
+  - type: Add
+    message: В аплинк Синдиката добавлен мед-подсумок Синдиката.
+  - type: Add
+    message: В комплект врачей ОБР добавлены мед-подсумки.
+  id: 72
+  url: https://github.com/makura-games/fish-station/pull/477
+- author: deathframe
+  time: '2026-09-30T20:21:13.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: У Нианов добавлена способность полета схожая с той, что у Милир.
+  id: 73
+  url: https://github.com/makura-games/fish-station/pull/481
+- author: Endennsss
+  time: '2026-10-01T20:57:54.0000000+00:00'
+  changes:
+  - type: Add
+    message: Новый UI хирургии
+  id: 74
+  url: https://github.com/makura-games/fish-station/pull/434
+  media:
+  - url: https://github.com/user-attachments/assets/1caaa3e4-8e52-401f-bf89-f3675ef81f23
+    description: image
+- author: Kaiten
+  time: '2026-10-01T21:19:12.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Порог для запуска голосования за перезапуск раунда повышен с 55% до 70% по количеству игроков-призраков.
+  id: 75
+  url: https://github.com/makura-games/fish-station/pull/458
+- author: Endennsss
+  time: '2026-10-02T22:25:15.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Вместимость золотой мензурки повышена до 180
+  id: 76
+  url: https://github.com/makura-games/fish-station/pull/480
+- author: KrytoiChuvaaak
+  time: '2026-10-05T22:26:03.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Вещи ведущих ролей (береты, халаты, КПК, пояс ведущего врача) теперь доступны обычным сотрудникам отдела после открытия ведущей роли.
+  id: 77
+  url: https://github.com/makura-games/fish-station/pull/482
+- author: Kaiten
+  time: '2026-10-06T07:33:03.0000000+00:00'
+  changes:
+  - type: Add
+    message: Костюм клоуна для ивента.
+  id: 78
+  url: https://github.com/makura-games/fish-station/pull/484
+- author: dan4ikk3
+  time: '2026-10-06T12:23:13.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Исправлена возможность стрелять из своего оружия находясь в мехе
+  id: 79
+  url: https://github.com/makura-games/fish-station/pull/485
+- author: Kaiten
+  time: '2026-10-06T21:46:32.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Не смотря на великую лень Феликса скинуть адекватно спрайты, был подготовлен и вырезан спрайт для иконок костюма джагаклоуна для ивента.
+  id: 80
+  url: https://github.com/makura-games/fish-station/pull/487
+- author: TiFeRi
+  time: '2026-10-10T07:53:48.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Различные обновления и улучшения шаттлов.
+  id: 81
+  url: https://github.com/makura-games/fish-station/pull/486
+- author: Kaiten
+  time: '2026-10-12T15:09:23.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Время для открытия золотого дигла у ГСБ уменьшено с 1984 часов до 198 часов и 4 минут.
+  id: 82
+  url: https://github.com/makura-games/fish-station/pull/492
+- author: TiFeRi
+  time: '2026-10-12T15:09:03.0000000+00:00'
+  changes:
+  - type: Remove
+    message: Убран доступ тех.обслуживания у пассажиров
+  id: 83
+  url: https://github.com/makura-games/fish-station/pull/494
+- author: Kaiten
+  time: '2026-10-12T19:36:08.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Переработан рассказчик, теперь классический и безумный рассказчик заготавлиают крупную угрозу к часу раунда, при условии что станция не развивается слишком сильно. Если станция слишком слаба для принятия угрозы, то рассказчик дает события с бонусами для станции и минимизирует угрозы до наращивания силы.
+  - type: Tweak
+    message: Теперь Ядерные оперативники (включая одинокого) не могут появиться в рассказчике вместе с Диверсионным отрядом. Только одни из них - либо ядеры, либо ДО.
+  - type: Tweak
+    message: Ребаланс стоимости угроз у рассказчика. Слабые угрозы по типу абдукторов, ниндзи стали дешевле, а одиночный оперативник и дракон с пиратами - дороже. Крупные антагонисты теперь имеют одинаковую стоимость кроме ДО и Ксеноборгов - они дешевле других ввиду их специфики.
+  - type: Tweak
+    message: 'Немного переработана система бюджета рассказчика: теперь 20% от поступающих очков угрозы сохраняются в банк крупной угрозы (мажорка), что замедляет наступление других событий, но гарантирует крупную угрозу в поздних стадиях раунда.'
+  id: 84
+  url: https://github.com/makura-games/fish-station/pull/490
+- author: Kaiten
+  time: '2026-10-12T20:00:48.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: У ЦК синих щитов теперь есть броня синего щита по умолчанию.
+  - type: Tweak
+    message: Тактическая модификация брони синего щита получила изменения по защите до уровня тактика синдиката (с её слабостью к тепловому урону).
+  id: 85
+  url: https://github.com/makura-games/fish-station/pull/491
+- author: Endennsss
+  time: '2026-10-15T22:17:33.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Отображение рук и ног в меню
+  - type: Fix
+    message: Если волосы цветные то они не обесцвечиваются
+  - type: Fix
+    message: Можно вылечить дефект речи
+  - type: Fix
+    message: Ноги после ампутации корректно обновляются
+  id: 86
+  url: https://github.com/makura-games/fish-station/pull/503
+- author: sakurochka
+  time: '2026-10-15T22:34:07.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлен плащ для ПНТ
+  id: 87
+  url: https://github.com/makura-games/fish-station/pull/501
+- author: Kaiten
+  time: '2026-10-16T09:53:10.0000000+00:00'
+  changes:
+  - type: Add
+    message: Взрыв 240mm фугасом с мгновенным подрывом.
+  - type: Tweak
+    message: Локализация для пары других взрывов админ панели.
+  id: 88
+  url: https://github.com/makura-games/fish-station/pull/497
+- author: TiFeRi
+  time: '2026-10-17T06:24:53.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Доработка нового шаттла лон-опера.
+  id: 89
+  url: https://github.com/makura-games/fish-station/pull/506
+- author: dan4ikk3
+  time: '2026-10-17T07:27:53.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Теперь ЛЦУ ОБР слышно только на мапе, где он был вызван.
+  id: 90
+  url: https://github.com/makura-games/fish-station/pull/508
+- author: KrytoiChuvaaak
+  time: '2026-10-18T09:31:35.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Ксено снова могут носить очки — экипировка на слот глаз отображается на спрайте.
+  id: 91
+  url: https://github.com/makura-games/fish-station/pull/515
+- author: KrytoiChuvaaak
+  time: '2026-10-18T12:02:06.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Новые газы снова вдыхаются и корректно действуют
+  - type: Fix
+    message: Клеменнон и Нитрий снова снимают стан, нокдаун и сон
+  - type: Fix
+    message: Баратрий больше не вызывает ошибок и даёт иммунитет к давлению
+  - type: Fix
+    message: Хаосон снова превращает в ящерицу при высокой концентрации
+  - type: Fix
+    message: Пожары плазмы и трития больше не перегревают замкнутые отсеки до 100 000+ градусов
+  - type: Fix
+    message: Газы при варке расходуются постепенно, а не превращаются целиком за один шаг
+  - type: Tweak
+    message: Синтез гародина проходит при 1000–2000 K вместо 10 000–20 000 K
+  - type: Tweak
+    message: Крипиум даёт иммунитет к радиации вместо лечения уже полученной
+  - type: Fix
+    message: Голопроектор снова проницаем для РСУ и не разбивается предметами
+  id: 92
+  url: https://github.com/makura-games/fish-station/pull/510
+- author: Endennsss
+  time: '2026-10-18T16:28:00.0000000+00:00'
+  changes:
+  - type: Add
+    message: Новый блум
+  id: 93
+  url: https://github.com/makura-games/fish-station/pull/512
+  media:
+  - url: https://github.com/user-attachments/assets/6ba3379a-b5e0-48bb-aa6a-6468da53b508
+    description: изображение
+  - url: https://github.com/user-attachments/assets/e8025082-9cd0-42cc-a837-9ac4df3e2b5e
+    description: изображение
+- author: Endennsss
+  time: '2026-10-18T20:39:58.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлена возможность вставить ПИИ или роботический мозг в меха
+  - type: Add
+    message: Сканер масс добавлен в кларка и шахтерский под
+  id: 94
+  url: https://github.com/makura-games/fish-station/pull/488
+- author: Kaiten
+  time: '2026-10-18T20:40:20.0000000+00:00'
+  changes:
+  - type: Add
+    message: 'Добавлено снаряжение Офицера Специальных Операций: полевая броня ОСО, бронированная шинель, модифицированный РИГ-рюкзак с возможностью развёртывания скафандра C-115M и шлема.'
+  - type: Add
+    message: ОСО теперь имеет D1984, Пустотный Орёл и его золотой вариант как свое офицерское табельное оружие.
+  - type: Add
+    message: Добавлены обновленные очки Синего Щита в выборе очков ОСО.
+  - type: Tweak
+    message: Новые материалы НТ позволяют ботинкам ОСО не подскальзываться.
+  id: 95
+  url: https://github.com/makura-games/fish-station/pull/496
+  media:
+  - url: https://github.com/user-attachments/assets/3dfa6e8f-1d4b-4c14-b35c-a46d825d3e77
+    description: image
+  - url: https://github.com/user-attachments/assets/140e0fc7-ec35-46d4-ba10-39039f5f5c04
+    description: image
+  - url: https://github.com/user-attachments/assets/862389db-c85a-436b-b45a-87e5cee706fd
+    description: image
+  - url: https://github.com/user-attachments/assets/38e39a8f-6bbb-4585-935b-1511bf473174
+    description: image
+  - url: https://github.com/user-attachments/assets/ff70290d-d193-40e8-a8f6-73aee40b4bc2
+    description: image
+  - url: https://github.com/user-attachments/assets/7ed94cd5-a5b3-4cab-a3be-b11dcbb68d4a
+    description: image
+  - url: https://github.com/user-attachments/assets/0f742748-2829-46a4-ba3e-7657023abe81
+    description: image
+- author: Endennsss
+  time: '2026-10-18T20:41:15.0000000+00:00'
+  changes:
+  - type: Add
+    message: Новая система ПНВ и термалов
+  id: 96
+  url: https://github.com/makura-games/fish-station/pull/511
+  media:
+  - url: https://github.com/user-attachments/assets/45de0afb-2ce1-4359-bfa4-f734ecaf7502
+    description: изображение
+  - url: https://github.com/user-attachments/assets/8b255181-a505-42b1-bb23-4aec26e92b69
+    description: изображение
+  - url: https://github.com/user-attachments/assets/b7d7f7cb-02f1-4829-b473-a05e4509dbb1
+    description: изображение
+  - url: https://github.com/user-attachments/assets/1e0406a2-1544-4eb1-8871-3c7db1768004
+    description: изображение
+  - url: https://github.com/user-attachments/assets/efbe42ca-34b8-45b7-a636-ab40c71f322a
+    description: изображение
+- author: KrytoiChuvaaak
+  time: '2026-10-18T20:49:09.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Карапас капитана, белый/чёрный нагрудники и капитанская шинель теперь дают 25% сопротивления стамине (стандубинкам).
+  - type: Tweak
+    message: Зимняя куртка капитана стала бронированной (0.6/0.6/0.6 и 0.35 от термического урона) и даёт 25% сопротивления стамине.
+  id: 97
+  url: https://github.com/makura-games/fish-station/pull/517
+- author: TiFeRi
+  time: '2026-10-21T08:04:06.0000000+00:00'
+  changes:
+  - type: Add
+    message: Новые шаттлы сб.
+  - type: Tweak
+    message: Активация рандома шаттлов сб.
+  id: 98
+  url: https://github.com/makura-games/fish-station/pull/526
+- author: TiFeRi
+  time: '2026-10-21T08:03:22.0000000+00:00'
+  changes:
+  - type: Fix
+    message: Фикс 2-3 шлюзов
+  id: 99
+  url: https://github.com/makura-games/fish-station/pull/527
+- author: TiFeRi
+  time: '2026-10-22T09:11:33.0000000+00:00'
+  changes:
+  - type: Add
+    message: Включение шаттлов stellar stories в ротацию шаттлов сб.
+  id: 100
+  url: https://github.com/makura-games/fish-station/pull/533

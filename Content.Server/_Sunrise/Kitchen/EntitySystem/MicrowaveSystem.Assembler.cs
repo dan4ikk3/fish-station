@@ -3,7 +3,6 @@ using System.Linq;
 using Content.Server.Kitchen.Components;
 using Content.Server.Power.Components;
 using Content.Shared._Sunrise.Kitchen.Components;
-using Content.Shared.Chemistry.Components.SolutionManager;
 using Content.Shared.FixedPoint;
 using Content.Shared.Kitchen;
 using Content.Shared.Stacks;
@@ -34,7 +33,7 @@ public sealed partial class MicrowaveSystem : EntitySystem
             // If a microwave recipe uses a stacked item, use the default stack prototype id instead of prototype id
             if (TryComp<StackComponent>(item, out var stackComp))
             {
-                solidID = _prototype.Index<StackPrototype>(stackComp.StackTypeId).Spawn;
+                solidID = ProtoMan.Index<StackPrototype>(stackComp.StackTypeId).Spawn;
                 amountToAdd = stackComp.Count;
             }
             else
@@ -59,10 +58,7 @@ public sealed partial class MicrowaveSystem : EntitySystem
                 solidsDict.Add(solidID, amountToAdd);
             }
 
-            if (!TryComp<SolutionContainerManagerComponent>(item, out var solMan))
-                continue;
-
-            foreach (var (_, soln) in _solutionContainer.EnumerateSolutions((item, solMan)))
+            foreach (var (_, soln) in _solutionContainer.EnumerateSolutions(item))
             {
                 var solution = soln.Comp.Solution;
                 foreach (var (reagent, quantity) in solution.Contents)
@@ -141,7 +137,7 @@ public sealed partial class MicrowaveSystem : EntitySystem
         var portions = 0;
 
         // Frontier: microwave recipe machine types
-        if ((recipe.RecipeType & component.ValidRecipeTypes) == 0)
+        if ((recipe.RecipeType & component.ValidRecipeTypes) == MicrowaveRecipeType.None)
         {
             return (recipe, 0);
         }

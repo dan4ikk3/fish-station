@@ -22,13 +22,8 @@ public sealed partial class ShuttleSystem
      */
     private const float SunriseFtlThrowForce = 20f;
     private const float SunriseArrivalsFtlOffset = 10000f;
+    [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
 
-    private EntityQuery<MovedByPressureComponent> _movedByPressureQuery;
-
-    private void InitializeSunriseFtl()
-    {
-        _movedByPressureQuery = GetEntityQuery<MovedByPressureComponent>();
-    }
 
     private void ClearSunriseFtlReservations(Entity<FTLComponent> ent)
     {
@@ -271,7 +266,6 @@ public sealed partial class ShuttleSystem
                     throwDirection * SunriseFtlThrowForce,
                     physics,
                     Transform(child),
-                    _projQuery,
                     SunriseFtlThrowForce,
                     playSound: false);
             }
@@ -325,7 +319,7 @@ public sealed partial class ShuttleSystem
             var aabb = fixture.Shape.ComputeAABB(transform, 0)
                 .Translated(-shuttleGrid.TileSizeHalfVector);
             grids.Clear();
-            _mapManager.FindGridsIntersecting(shuttle.Comp.MapID, aabb, ref grids, includeMap: false);
+            _mapSystem.FindGridsIntersecting(shuttle.Comp.MapID, aabb, ref grids, includeMap: false);
 
             foreach (var grid in grids)
             {

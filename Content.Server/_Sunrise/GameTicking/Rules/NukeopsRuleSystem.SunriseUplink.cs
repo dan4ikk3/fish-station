@@ -5,6 +5,7 @@ using Content.Server.Traitor.Uplink;
 using Content.Shared.FixedPoint;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Components;
+using Content.Shared.Store;
 using Content.Shared.Store.Components;
 using Robust.Shared.Prototypes;
 
@@ -14,10 +15,9 @@ namespace Content.Server.GameTicking.Rules;
 public sealed partial class NukeopsRuleSystem
 {
     // Handles Sunrise-specific NukeOps uplink setup and commander TC distribution hooks.
-    [Dependency] private readonly UplinkSystem _uplinkSystem = default!;
+    [Dependency] private UplinkSystem _uplinkSystem = default!;
 
-    [ValidatePrototypeId<AntagPrototype>]
-    private const string CommanderAntagProto = "NukeopsCommander";
+    private static readonly ProtoId<AntagPrototype> CommanderAntagProto = "NukeopsCommander";
     private const int FighterUplinkTc = 30;
 
     private bool TryDistributeExtraTcSunrise(Entity<NukeopsRuleComponent> nukieRule)
@@ -57,7 +57,10 @@ public sealed partial class NukeopsRuleSystem
             var totalTc = GetCommanderStartupTc(fightersAlreadySelected);
             var store = EnsureComp<StoreComponent>(uplink.Value);
             _store.TryAddCurrency(
-                new Dictionary<string, FixedPoint2> { { TelecrystalCurrencyPrototype, totalTc } },
+                new Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2>
+                {
+                    { TelecrystalCurrencyPrototype, totalTc },
+                },
                 uplink.Value,
                 store);
             return;
@@ -71,7 +74,10 @@ public sealed partial class NukeopsRuleSystem
         var giveTcCount = GetCommanderTcPerFighter();
         var commanderStore = EnsureComp<StoreComponent>(ent.Comp.UplinkEnt.Value);
         _store.TryAddCurrency(
-            new Dictionary<string, FixedPoint2> { { TelecrystalCurrencyPrototype, giveTcCount } },
+            new Dictionary<ProtoId<CurrencyPrototype>, FixedPoint2>
+            {
+                { TelecrystalCurrencyPrototype, giveTcCount },
+            },
             ent.Comp.UplinkEnt.Value,
             commanderStore);
     }
@@ -82,7 +88,7 @@ public sealed partial class NukeopsRuleSystem
         if (uplink == null)
             return null;
 
-        _uplinkSystem.SetUplink(user, uplink.Value, balance, giveDiscounts);
+        _uplinkSystem.SetSunriseUplink(user, uplink.Value, balance, giveDiscounts);
         return uplink;
     }
 }

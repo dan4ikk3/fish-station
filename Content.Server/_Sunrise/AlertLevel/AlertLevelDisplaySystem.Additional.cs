@@ -1,4 +1,3 @@
-using Content.Server.Power.Components;
 using Content.Shared.AlertLevel;
 
 #pragma warning disable IDE0130 // Пространство имён соответствует расширяемой upstream-системе.
@@ -10,9 +9,9 @@ public sealed partial class AlertLevelDisplaySystem
      * Display updates for simultaneously active alert levels.
      */
 
-    [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
+    [Dependency] private AlertLevelSystem _alertLevel = default!;
 
-    private void OnAdditionalAlertChanged(AdditionalAlertLevelChangedEvent args)
+    private void OnAdditionalAlertChanged(ref AdditionalAlertLevelChangedEvent args)
     {
         UpdateDisplays(args.Station);
     }

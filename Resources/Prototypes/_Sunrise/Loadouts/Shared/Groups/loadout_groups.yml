@@ -185,6 +185,15 @@
   - CommonSatchel
   - CommonDuffel
   - NanoTrasenRepresentativeModsuit
+# Fish-start
+- type: loadoutGroup
+  id: NanoTrasenRepresentativeNeck
+  name: loadout-group-nanotrasenrepresentative-neck
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - NTRepresentativeCloak
+  # Fish-end
 
 - type: loadoutGroup
   id: BlueShieldHead
@@ -194,6 +203,15 @@
   - BlueShieldBeret
   - BlueShieldSwatHelmet
   - BlueShieldTSFMarineHelmet
+
+- type: loadoutGroup
+  id: SunriseLoadoutGroupBlueShieldMask
+  name: loadout-group-blueshield-mask
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - SunriseLoadoutClothingMaskGasBlueShieldHalf
+  - SunriseLoadoutClothingMaskGasBlueShield
 
 - type: loadoutGroup
   id: BlueShieldBackpack
@@ -367,7 +385,6 @@
   - BlueshieldLecterMk2
   - BlueshieldWT550
   - BlueshieldWT550Blue
-  - BlueshieldLecterMk3
   - BlueshieldAsh12
   - BlueshieldLecterXL8
 
@@ -530,7 +547,6 @@
   loadouts:
   - HeadofSecurityWeapon
   - HeadofSecurityWeapon50h
-  - HeadofSecurityWeapon1984h
 
 # Medical
 - type: loadoutGroup
@@ -722,6 +738,7 @@
   - SunriseHatOrangesoft
   - SunriseHatCyansoft
   - MedicalHeadMirror
+  - BeretSeniorPhysician # Fish-edit
 
 - type: loadoutGroup
   id: SunriseChemistNeck
@@ -1306,6 +1323,7 @@
   - SunriseHatRedsoft
   - SunriseHatOrangesoft
   - SunriseHatYellowsoft
+  - SeniorEngineerBeret # Fish-edit
 
 - type: loadoutGroup
   id: SunriseAtmosMask

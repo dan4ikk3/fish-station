@@ -1,6 +1,5 @@
 using System.Numerics;
 using Content.Client._Sunrise.MarkingEffectsClient;
-using Content.Client.DisplacementMap;
 using Content.Shared._Sunrise.MarkingEffects;
 using Content.Shared.Body;
 using Content.Shared.DisplacementMap;
@@ -17,8 +16,6 @@ namespace Content.Client.Body;
 
 public sealed partial class VisualBodySystem
 {
-    [Dependency] private readonly DisplacementMapSystem _displacement = default!;
-
     public void ApplySunriseMarkingEffects(Entity<VisualOrganMarkingsComponent> ent, EntityUid target)
     {
         if (!TryComp<SpriteComponent>(target, out var spriteComp))
@@ -173,7 +170,7 @@ public sealed partial class VisualBodySystem
         };
 
         if (shaderPrototype is null ||
-            !_prototype.TryIndex<ShaderPrototype>(shaderPrototype, out var shader))
+            !ProtoMan.TryIndex<ShaderPrototype>(shaderPrototype, out var shader))
         {
             return null;
         }

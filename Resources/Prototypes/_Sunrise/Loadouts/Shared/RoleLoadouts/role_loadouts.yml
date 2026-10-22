@@ -110,6 +110,7 @@
   id: JobBlueShieldOfficer
   groups:
   - BlueShieldHead
+  - SunriseLoadoutGroupBlueShieldMask
   - BlueShieldNeck
   - BlueShieldOuterClothing # Fish-add
   - BlueShieldJumpsuit
@@ -443,6 +444,7 @@
   - NanoTrasenRepresentativeJumpsuit
   - NanoTrasenRepresentativeOuterClothing
   - NanoTrasenRepresentativeBackpack
+  - NanoTrasenRepresentativeNeck #  Fish-edit
   - SunriseSurvival
   - SunriseTrinkets
   - GroupSpeciesBreathTool

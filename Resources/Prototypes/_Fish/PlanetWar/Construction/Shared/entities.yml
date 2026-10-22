@@ -496,6 +496,7 @@
     anchored: true
   - type: Physics
   - type: Damageable
+  - type: Injurable
     damageContainer: Inorganic
   #- type: Slippery
    # launchForwardsMultiplier: 0.1
@@ -740,6 +741,7 @@
     sprite: Objects/Tools/fulton.rsi
     state: extraction_pack
   - type: Damageable
+  - type: Injurable
     damageContainer: Inorganic
   - type: Destructible
     thresholds:
@@ -1335,8 +1337,7 @@
       whitelist:
         components:
           - HumanoidProfile
-          - Thirst
-          - Hunger
+          - Satiation
           - Item
         tags:
           - Structure
@@ -1474,14 +1475,14 @@
   id: EmergencyMedipenWM
   components:
   - type: Label
-    currentLabel: эпинефрин
-  - type: SolutionContainerManager
-    solutions:
-      pen:
-        maxVol: 20
-        reagents:
-        - ReagentId: EpinephrinePW
-          Quantity: 20
+    localizedLabel: reagent-name-epinephrine
+  - type: Solution
+    id: pen
+    solution:
+      maxVol: 20
+      reagents:
+      - ReagentId: EpinephrinePW
+        Quantity: 20
   - type: DeleteOnSolutionEmpty
     solution: pen
 
@@ -1494,14 +1495,13 @@
   - type: Item
     size: Tiny
   - type: Label
-    currentLabel: эфедрин
-  - type: SolutionContainerManager
-    solutions:
-      injector:
-        maxVol: 30
-        reagents:
-        - ReagentId: EphedrinePW
-          Quantity: 30
+    localizedLabel: reagent-name-ephedrine
+  - type: Solution
+    solution:
+      maxVol: 30
+      reagents:
+      - ReagentId: EphedrinePW
+        Quantity: 30
   - type: DeleteOnSolutionEmpty
     solution: injector
 
@@ -1512,18 +1512,16 @@
   id: DrinkMREFlaskWM
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: WaterPW
         Quantity: 1
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 100
-        reagents:
-        - ReagentId: WaterPW
-          Quantity: 100
+  - type: Solution
+    solution:
+      maxVol: 100
+      reagents:
+      - ReagentId: WaterPW
+        Quantity: 100
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 200
@@ -1535,18 +1533,16 @@
   id: BucketWM
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: WaterPW
         Quantity: 0.1
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 2000
-        reagents:
-        - ReagentId: WaterPW
-          Quantity: 2000
+  - type: Solution
+    solution:
+      maxVol: 2000
+      reagents:
+      - ReagentId: WaterPW
+        Quantity: 2000
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 200
@@ -1838,13 +1834,12 @@
     pillType: 2
   - type: Sprite
     state: pill3
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 26
-        reagents:
-        - ReagentId: TricordrazinePW
-          Quantity: 25
+  - type: Solution
+    solution:
+      maxVol: 26
+      reagents:
+      - ReagentId: TricordrazinePW
+        Quantity: 25
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 10
@@ -1858,13 +1853,12 @@
     pillType: 15
   - type: Sprite
     state: pill16
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 26
-        reagents:
-        - ReagentId: EpinephrinePW
-          Quantity: 10
+  - type: Solution
+    solution:
+      maxVol: 26
+      reagents:
+      - ReagentId: EpinephrinePW
+        Quantity: 10
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 10
@@ -1878,13 +1872,12 @@
     pillType: 17
   - type: Sprite
     state: pill18
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 26
-        reagents:
-        - ReagentId: EphedrinePW
-          Quantity: 19
+  - type: Solution
+    solution:
+      maxVol: 26
+      reagents:
+      - ReagentId: EphedrinePW
+        Quantity: 19
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 10
@@ -1898,13 +1891,12 @@
     pillType: 3
   - type: Sprite
     state: pill4
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 20
-        reagents:
-        - ReagentId: BicaridinePW
-          Quantity: 10
+  - type: Solution
+    solution:
+      maxVol: 20
+      reagents:
+      - ReagentId: BicaridinePW
+        Quantity: 10
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 100
@@ -1918,13 +1910,12 @@
     pillType: 4
   - type: Sprite
     state: pill5
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 20
-        reagents:
-        - ReagentId: KelotanePW
-          Quantity: 10
+  - type: Solution
+    solution:
+      maxVol: 20
+      reagents:
+      - ReagentId: KelotanePW
+        Quantity: 10
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 100
@@ -1938,13 +1929,12 @@
     pillType: 9
   - type: Sprite
     state: pill10
-  - type: SolutionContainerManager
-    solutions:
-      food:
-        maxVol: 20
-        reagents:
-        - ReagentId: DylovenePW
-          Quantity: 10
+  - type: Solution
+    solution:
+      maxVol: 20
+      reagents:
+      - ReagentId: DylovenePW
+        Quantity: 10
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 100
@@ -2306,10 +2296,9 @@
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 200
-  - type: SolutionContainerManager
-    solutions:
-      hypospray:
-        maxVol: 20
+  - type: Solution
+    solution:
+      maxVol: 20
 
 
 - type: entity
@@ -2320,10 +2309,9 @@
   - type: PhysicalComposition
     materialComposition:
       MoneyWarMizMaterial: 200
-  - type: SolutionContainerManager
-    solutions:
-      hypospray:
-        maxVol: 20
+  - type: Solution
+    solution:
+      maxVol: 20
 
 
 - type: entity
@@ -2915,7 +2903,6 @@
   parent: BaseChemistryBottleFilled
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: EpinephrinePW
@@ -2923,14 +2910,13 @@
   - type: ExplosionResistance
     damageCoefficient: 0.00001
   - type: Label
-    currentLabel: Эпинефрен
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 80
-        reagents:
-        - ReagentId: EpinephrinePW
-          Quantity: 80
+    localizedLabel: reagent-name-epinephrine
+  - type: Solution
+    solution:
+      maxVol: 80
+      reagents:
+      - ReagentId: EpinephrinePW
+        Quantity: 80
   - type: Destructible
     thresholds:
     - trigger:
@@ -2953,7 +2939,6 @@
   parent: ChemistryBottlePuncturaseWM
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: BicaridinePW
@@ -2963,16 +2948,15 @@
   - type: ExplosionResistance
     damageCoefficient: 0.00001
   - type: Label
-    currentLabel: Бикаридин-Пункта
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 200
-        reagents:
-        - ReagentId: BicaridinePW
-          Quantity: 150
-        - ReagentId: PuncturasePW
-          Quantity: 50
+    localizedLabel: label-reagent-bicaridine-puncturase
+  - type: Solution
+    solution:
+      maxVol: 200
+      reagents:
+      - ReagentId: BicaridinePW
+        Quantity: 150
+      - ReagentId: PuncturasePW
+        Quantity: 50
 
 
 - type: entity
@@ -2981,7 +2965,6 @@
   parent: ChemistryBottlePuncturaseWM
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: TricordrazinePW
@@ -2991,16 +2974,15 @@
   - type: ExplosionResistance
     damageCoefficient: 0.00001
   - type: Label
-    currentLabel: Трикомет
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 200
-        reagents:
-        - ReagentId: TricordrazinePW
-          Quantity: 50
-        - ReagentId: StimulantsPW
-          Quantity: 50
+    localizedLabel: label-reagent-tricomet
+  - type: Solution
+    solution:
+      maxVol: 200
+      reagents:
+      - ReagentId: TricordrazinePW
+        Quantity: 50
+      - ReagentId: StimulantsPW
+        Quantity: 50
 
 
 - type: entity
@@ -3009,7 +2991,6 @@
   parent: ChemistryBottlePuncturaseWM
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: DermalinePW
@@ -3017,14 +2998,13 @@
   - type: ExplosionResistance
     damageCoefficient: 0.00001
   - type: Label
-    currentLabel: Дермалин
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 100
-        reagents:
-        - ReagentId: DermalinePW
-          Quantity: 100
+    localizedLabel: reagent-name-dermaline
+  - type: Solution
+    solution:
+      maxVol: 100
+      reagents:
+      - ReagentId: DermalinePW
+        Quantity: 100
 
 
 - type: entity
@@ -3033,7 +3013,6 @@
   parent: ChemistryBottlePuncturaseWM
   components:
   - type: SolutionRegeneration
-    solution: drink
     generated:
       reagents:
       - ReagentId: EZNutrientPW
@@ -3041,14 +3020,13 @@
   - type: ExplosionResistance
     damageCoefficient: 0.00001
   - type: Label
-    currentLabel: EZNutrient
-  - type: SolutionContainerManager
-    solutions:
-      drink:
-        maxVol: 100
-        reagents:
-        - ReagentId: EZNutrientPW
-          Quantity: 100
+    localizedLabel: reagent-name-e-z-nutrient
+  - type: Solution
+    solution:
+      maxVol: 100
+      reagents:
+      - ReagentId: EZNutrientPW
+        Quantity: 100
 
 
 - type: entity
@@ -3094,10 +3072,10 @@
     - type: Transform
     - type: CanJump
       isOnlyEmotion: true
-    - type: Thirst
-      baseDecayRate: 0
-    - type: Hunger
-      baseDecayRate: 0
+    # - type: Thirst
+    #   baseDecayRate: 0
+    # - type: Hunger
+    #   baseDecayRate: 0
    # - type: RandomHumanoidAppearance
    #   randomizeName: false
     - type: MovementIgnoreGravity
@@ -3217,17 +3195,20 @@
     materialComposition:
       MoneyWarMizMaterial: 100
   - type: SelfUnremovableClothing
-  - type: StorageFill
-    contents: 
-    - id: DrinkMREFlaskWM
-    - id: PinpointerCoreWM
-    - id: CombatKnifeWM
-    - id: MedkitFilledWM
-    - id: GrenadeFlashBangWM
-    - id: TearGasGrenadeWM
-    - id: BoxGlowstickBlueWM
-    - id: MoneyWarMiz500
-    - id: BinocularsWM
+  - type: EntityTableContainerFill
+    containers:
+      storagebase: !type:AllSelector
+        children:
+        - id: PouchBackpackPockets
+        - id: DrinkMREFlaskWM
+        - id: PinpointerCoreWM
+        - id: CombatKnifeWM
+        - id: MedkitFilledWM
+        - id: GrenadeFlashBangWM
+        - id: TearGasGrenadeWM
+        - id: BoxGlowstickBlueWM
+        - id: MoneyWarMiz500
+        - id: BinocularsWM
   - type: ExplosionResistance
     damageCoefficient: 0
 
@@ -3336,17 +3317,20 @@
     materialComposition:
       MoneyWarMizMaterial: 100
   - type: SelfUnremovableClothing
-  - type: StorageFill
-    contents:
-    - id: DrinkMREFlaskWM
-    - id: PinpointerArmWM
-    - id: KukriKnifeWM
-    - id: MedkitFilledWM
-    - id: GrenadeFlashBangWM
-    - id: TearGasGrenadeWM
-    - id: BoxGlowstickRedWM
-    - id: MoneyWarMiz500
-    - id: BinocularsWM
+  - type: EntityTableContainerFill
+    containers:
+      storagebase: !type:AllSelector
+        children:
+        - id: PouchBackpackPockets
+        - id: DrinkMREFlaskWM
+        - id: PinpointerArmWM
+        - id: KukriKnifeWM
+        - id: MedkitFilledWM
+        - id: GrenadeFlashBangWM
+        - id: TearGasGrenadeWM
+        - id: BoxGlowstickRedWM
+        - id: MoneyWarMiz500
+        - id: BinocularsWM
   - type: ExplosionResistance
     damageCoefficient: 0
 
@@ -3457,8 +3441,9 @@
  #   shape: Square
  #   requireInSpace: false
   - type: Damageable
-    damageContainer: RockdamageContainer
     damageModifierSet: RockWM
+  - type: Injurable
+    damageContainer: RockdamageContainer
   - type: Pierceable
     level: HardenedMetal
   - type: Ricochetable
@@ -3483,8 +3468,9 @@
   parent: WallRockSnow
   components:
   - type: Damageable
-    damageContainer: StructuralInorganic
     damageModifierSet: RockWM
+  - type: Injurable
+    damageContainer: StructuralInorganic
   - type: Pierceable
     level: HardenedMetal
   - type: Ricochetable
@@ -3498,8 +3484,9 @@
   abstract: true
   components:
   - type: Damageable
-    damageContainer: StructuralInorganic
     damageModifierSet: TreeWM
+  - type: Injurable
+    damageContainer: StructuralInorganic
   - type: Pierceable
     level: HardenedMetal
   - type: Ricochetable
@@ -3781,6 +3768,8 @@
        - SellTagWM
        - TehfabTagWM
     blacklist:
+      components:
+       - Material
       tags:
        - TehfabTagMaterialWM
     sound:
@@ -3796,10 +3785,10 @@
       active-material-reclaimer-container: !type:Container
       machine_board: !type:Container
       machine_parts: !type:Container
-  - type: SolutionContainerManager
-    solutions:
-      output:
-        maxVol: 100
+  - type: Solution
+    id: output
+    solution:
+      maxVol: 100
   - type: DrainableSolution
     solution: output
   - type: ExaminableSolution
@@ -3875,7 +3864,7 @@
 
 - type: entity
   categories: [ HideSpawnMenu, Debug ]
-  parent: BaseGateway
+  parent: Gateway
   id: BaseGatewayWM
   components:
   #  - type: RadarBlip
@@ -3914,6 +3903,7 @@
         enum.ResearchClientUiKey.Key:
           type: ResearchClientBoundUserInterface
     - type: Damageable
+    - type: Injurable
       damageContainer: Inorganic
     - type: TimedSpawner
       chance: 1
@@ -3994,6 +3984,8 @@
        - SellTagWM
        - TehfabTagWM
     blacklist:
+      components:
+       - Material
       tags:
        - TehfabTagMaterialWM
     sound:
@@ -4009,10 +4001,10 @@
       active-material-reclaimer-container: !type:Container
       machine_board: !type:Container
       machine_parts: !type:Container
-  - type: SolutionContainerManager
-    solutions:
-      output:
-        maxVol: 100
+  - type: Solution
+    id: output
+    solution:
+      maxVol: 100
   - type: DrainableSolution
     solution: output
   - type: ExaminableSolution

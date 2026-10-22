@@ -1,7 +1,7 @@
 using Content.Server._Sunrise.Research.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.GameTicking;
-using Content.Shared.Ghost;
+using Content.Shared.Ghost.Components;
 using Content.Shared.Mind;
 using Content.Shared._Sunrise.Research.Prototypes;
 using Content.Shared._Sunrise.SunriseCCVars;
@@ -21,11 +21,10 @@ namespace Content.Server.Research.Systems;
 /// </summary>
 public sealed partial class ResearchSystem
 {
-    [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly SharedJobSystem _jobs = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly IPrototypeManager _prototype = default!;
+    [Dependency] private IConfigurationManager _cfg = default!;
+    [Dependency] private SharedJobSystem _jobs = default!;
+    [Dependency] private SharedMindSystem _mind = default!;
+    [Dependency] private IPlayerManager _player = default!;
 
     private const int PopulationDeadzone = 4;
     private static readonly ProtoId<ResearchPopulationWeightsPrototype> PopulationWeightsPrototypeId = "SunriseResearchPopulationWeights";
@@ -38,7 +37,7 @@ public sealed partial class ResearchSystem
     private float? _roundPopulationModifier;
     private TimeSpan? _populationScalingRoundStartedAt;
     private TimeSpan? _populationModifierCalculateAt;
-    private EntityQuery<GhostComponent> _ghostQuery;
+    [Dependency] private EntityQuery<GhostComponent> _ghostQuery = default!;
 
     private void InitializePopulationScaling()
     {
@@ -47,8 +46,6 @@ public sealed partial class ResearchSystem
         _cfg.OnValueChanged(SunriseCCVars.ResearchPointScalingMinModifier, value => _minimumPopulationModifier = value, true);
         _cfg.OnValueChanged(SunriseCCVars.ResearchPointScalingMaxModifier, value => _maximumPopulationModifier = value, true);
         _cfg.OnValueChanged(SunriseCCVars.ResearchPointScalingMultiplier, value => _populationScalingMultiplier = value, true);
-
-        _ghostQuery = GetEntityQuery<GhostComponent>();
 
         SubscribeLocalEvent<RoundStartedEvent>(OnRoundStarted);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
@@ -187,7 +184,7 @@ public sealed partial class ResearchSystem
         if (jobId == null)
             return 0.4f;
 
-        if (!_prototype.TryIndex(PopulationWeightsPrototypeId, out var prototype))
+        if (!ProtoMan.TryIndex(PopulationWeightsPrototypeId, out var prototype))
             return 0.4f;
 
         return prototype.Weights.GetValueOrDefault(jobId.Value, 0.4f);

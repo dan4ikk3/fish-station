@@ -195,6 +195,7 @@
   minLimit: 0
   loadouts:
   - ParamedicHead
+  - SeniorPhysicianBeret # Fish-edit
 
 - type: loadoutGroup
   id: ParamedicJumpsuit
@@ -221,6 +222,7 @@
   - SunriseWinterColorCyan
   - SunriseWinterColorBlue
   - ClothingOuterHardsuitVoidParamedFish
+  - SeniorPhysicianLabCoat
 # Fish-end
 
 - type: loadoutGroup

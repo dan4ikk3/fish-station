@@ -1,7 +1,5 @@
 ent-DiseaseSpawn = { ent-BaseGameRule }
     .desc = { ent-BaseGameRule.desc }
-ent-TerminatorSpawn = { ent-BaseGameRule }
-    .desc = { ent-BaseGameRule.desc }
 ent-VentbullMigration = { ent-BaseGameRule }
     .desc = { ent-BaseGameRule.desc }
 ent-AbductorsSpawn = { ent-BaseGameRule }
@@ -9,8 +7,6 @@ ent-AbductorsSpawn = { ent-BaseGameRule }
 ent-AbductorVictim = { ent-BaseGameRule }
     .desc = { ent-BaseGameRule.desc }
 ent-EpsilonDeathSquadLawset = { ent-BaseGameRule }
-    .desc = { ent-BaseGameRule.desc }
-ent-DerelictSyndicateReaperCyborgSpawn = { ent-BaseGameRule }
     .desc = { ent-BaseGameRule.desc }
 ent-DerelictSyndicateSaboteurCyborgSpawn = { ent-BaseGameRule }
     .desc = { ent-BaseGameRule.desc }

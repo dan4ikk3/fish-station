@@ -12,9 +12,9 @@ namespace Content.Server.Instruments;
 
 public sealed partial class InstrumentSystem
 {
-    [Dependency] private readonly ActionBlockerSystem _actionBlocker = default!;
-    [Dependency] private readonly InteractionSystem _interaction = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private ActionBlockerSystem _actionBlocker = default!;
+    [Dependency] private InteractionSystem _interaction = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
 
     // Надеюсь у нас не будет раундов по 100000000 часов
     private readonly Dictionary<NetUserId, SessionMidiRateLimitData> _sessionMidiRateLimits = [];
@@ -49,7 +49,7 @@ public sealed partial class InstrumentSystem
         if (args.SenderSession.AttachedEntity is not { Valid: true } attached)
             return false;
 
-        if (instrument.InstrumentPlayer != attached)
+        if (GetInstrumentPlayer(resolvedUid) != attached)
             return false;
 
         if (requireActiveInstrument && !HasComp<ActiveInstrumentComponent>(resolvedUid))
@@ -93,7 +93,7 @@ public sealed partial class InstrumentSystem
             return false;
         }
 
-        if (masterInstrument.InstrumentPlayer is not { } masterPlayer)
+        if (GetInstrumentPlayer(master) is not { } masterPlayer)
             return false;
 
         return _examineSystem.InRangeUnOccluded(uid,

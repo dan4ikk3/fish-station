@@ -11,8 +11,8 @@
   startingGear: DoctorGear
   icon: "JobIconCentcommMedicalDoctor"
   supervisors: job-supervisors-centcom
-  displayWeight: 20  # Sunrise
-  canBeAntag: false
+  # displayWeight: 20  # Sunrise
+  # canBeAntag: false # Fish-edit
   alwaysUseSpawner: true
   access:
   - Medical

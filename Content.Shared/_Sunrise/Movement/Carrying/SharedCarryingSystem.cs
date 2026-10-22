@@ -24,9 +24,9 @@ namespace Content.Shared._Sunrise.Movement.Carrying;
 
 public abstract partial class SharedCarryingSystem : EntitySystem
 {
-    [Dependency] private readonly SharedDoAfterSystem _doAfter = default!;
-    [Dependency] private readonly ThrowingSystem _throwing = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
+    [Dependency] private SharedDoAfterSystem _doAfter = default!;
+    [Dependency] private ThrowingSystem _throwing = default!;
+    [Dependency] private IGameTiming _timing = default!;
 
     /// <inheritdoc/>
     public override void Initialize()
@@ -261,7 +261,7 @@ public abstract partial class SharedCarryingSystem : EntitySystem
             return;
 
         var target = ent.Comp.Target.Value;
-        _popup.PopupClient(Loc.GetString("carry-lying-cancel"), target, ent.Owner, PopupType.MediumCaution);
+        _popup.PopupEntity(Loc.GetString("carry-lying-cancel"), target, ent.Owner, PopupType.MediumCaution);
         DropCarried(ent.Owner, target);
     }
 
@@ -346,7 +346,7 @@ public abstract partial class SharedCarryingSystem : EntitySystem
 
         if (length >= carrier.Comp.MaxPickupTime)
         {
-            _popup.PopupPredicted(Loc.GetString("carry-too-heavy"), carried, carrier, PopupType.SmallCaution);
+            _popup.PopupEntity(Loc.GetString("carry-too-heavy"), carried, PopupType.SmallCaution);
             return;
         }
 
