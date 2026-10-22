@@ -51,7 +51,8 @@ public sealed class RattleOnTriggerSystem : EntitySystem
 
         // Sunrise-Start
         var sentToMessenger = false;
-        if (_messenger.GetServerEntity(_station.GetOwningStation(ent.Owner)) is var (server, _) &&
+        if (ent.Comp.SendToMessenger && // Fish-edit
+            _messenger.GetServerEntity(_station.GetOwningStation(ent.Owner)) is var (server, _) &&
             _messenger.GetGroupIdByRadioChannel(ent.Comp.RadioChannel) is { } groupId)
         {
             _messenger.SendSystemMessageToGroup(server, groupId, message);
