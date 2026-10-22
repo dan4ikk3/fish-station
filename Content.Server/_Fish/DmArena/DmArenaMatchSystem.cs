@@ -97,6 +97,23 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
+
+        _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
+    }
+
+    public override void Shutdown()
+    {
+        base.Shutdown();
+        _playerManager.PlayerStatusChanged -= OnPlayerStatusChanged;
+    }
+
+    // Новый игрок не видел прошлых рассылок, отправляем ему текущее состояние
+    private void OnPlayerStatusChanged(object? sender, SessionStatusEventArgs args)
+    {
+        if (args.NewStatus != SessionStatus.InGame)
+            return;
+
+        RaiseNetworkEvent(new DmArenaPlayerCountEvent(CurrentRule?.Players.Count ?? 0, _enabled), args.Session.Channel);
     }
 
     public override void Update(float frameTime)
@@ -295,7 +312,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         }
     }
 
-    public void SpawnPlayer(ICommonSession session, EntityUid ruleEntity, List<int> items)
+    public bool SpawnPlayer(ICommonSession session, EntityUid ruleEntity, List<int> items)
     {
         if (!_enabled
             || !TryComp<DmArenaRuleComponent>(ruleEntity, out var rule)
@@ -305,7 +322,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             || !TryGetValidItems(rule, items, out var chosen)
             || GetRandomSpawnPoint(rule) is not { } spawnCoords
             || !_mind.TryGetMind(ghost, out _, out var mind))
-            return;
+            return false;
 
         var originalBody = mind.OwnedEntity != ghost ? mind.OwnedEntity : null;
         var mob = _stationSpawning.SpawnPlayerMob(spawnCoords, null, BuildArenaProfile(mind), null);
@@ -314,7 +331,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (!TryEquipLoadout(mob, rule, chosen, session))
         {
             QueueDel(mob);
-            return;
+            return false;
         }
 
         EnsureComp<DmArenaFighterComponent>(mob).RuleEntity = ruleEntity;
@@ -329,12 +346,13 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (!_mindSwap.TrySwapTempMind(session, mob))
         {
             QueueDel(mob);
-            return;
+            return false;
         }
 
         rule.Players.Add(GetNetEntity(mob));
         _activeEuis.Remove(session);
         BroadcastPlayerCount(rule);
+        return true;
     }
 
     private HumanoidCharacterProfile? BuildArenaProfile(MindComponent mind)

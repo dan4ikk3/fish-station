@@ -189,6 +189,7 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
         Gui.TargetWindow.OnWarpToRandomClicked += OnWarpToRandomClicked;
 
         UpdateGui();
+        Gui.UpdateDmArena(_dmArenaCount, _dmArenaEnabled); // Fish-edit
     }
 
     public void UnloadGui()
@@ -208,6 +209,10 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
     }
 
     // Fish-start
+    // Состояние хранится, чтобы применить его после пересоздания GUI
+    private int _dmArenaCount;
+    private bool _dmArenaEnabled = true;
+
     private void DmArenaPressed()
     {
         _net.SendSystemNetworkMessage(new DmArenaJoinRequestEvent());
@@ -215,6 +220,8 @@ public sealed partial class GhostUIController : UIController, IOnSystemChanged<G
 
     private void OnDmArenaPlayerCount(DmArenaPlayerCountEvent ev)
     {
+        _dmArenaCount = ev.Count;
+        _dmArenaEnabled = ev.Enabled;
         Gui?.UpdateDmArena(ev.Count, ev.Enabled);
     }
     // Fish-end

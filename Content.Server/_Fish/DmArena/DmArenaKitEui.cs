@@ -30,8 +30,10 @@ public sealed class DmArenaKitEui : BaseEui
         switch (msg)
         {
             case DmArenaKitConfirmMessage selected:
-                _arena.SpawnPlayer(_session, _ruleEntity, selected.Items);
-                Close();
+                if (_arena.SpawnPlayer(_session, _ruleEntity, selected.Items))
+                    Close();
+                else
+                    StateDirty();
                 break;
             case DmArenaKitSaveMessage preset:
                 _arena.SavePreset(_ruleEntity, _session.UserId, preset.Items);

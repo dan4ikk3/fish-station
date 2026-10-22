@@ -13,9 +13,14 @@ public sealed class DmArenaKitEui : BaseEui
     public DmArenaKitEui()
     {
         _window = new DmArenaKitWindow();
-        _window.OnClose += () => SendMessage(new CloseEuiMessage());
+        _window.OnClose += OnWindowClosed;
         _window.OnLoadoutConfirmed += items => SendMessage(new DmArenaKitConfirmMessage(items));
         _window.OnPresetSaved += items => SendMessage(new DmArenaKitSaveMessage(items));
+    }
+
+    private void OnWindowClosed()
+    {
+        SendMessage(new CloseEuiMessage());
     }
 
     public override void Opened()
@@ -27,6 +32,9 @@ public sealed class DmArenaKitEui : BaseEui
     public override void Closed()
     {
         base.Closed();
+
+        // Сервер уже закрыл EUI, повторно ему писать не нужно
+        _window.OnClose -= OnWindowClosed;
         _window.Close();
     }
 
