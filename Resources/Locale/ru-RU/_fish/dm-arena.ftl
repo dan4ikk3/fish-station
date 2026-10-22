@@ -5,7 +5,7 @@ dm-arena-ghost-button-default = ДМ Арена (0)
 
 # Окно выбора снаряжения
 dm-arena-loadout-title = ДМ Арена
-dm-arena-loadout-players = игроков на арене: { $count }
+dm-arena-loadout-players = Игроков на арене: { $count }
 dm-arena-loadout-confirm = Зайти на арену
 
 # Вкладки и наборы
@@ -244,7 +244,7 @@ dm-arena-exit-stay = Вернуться в бой
 dm-arena-exit-return = В своё тело
 
 # Воскрешение тела
-dm-arena-revival-title = Тело Воскрешено
+dm-arena-revival-title = Тело воскрешено
 dm-arena-revival-offer = Ваше первоначальное тело восстановлено! Вернётесь в него?
 dm-arena-revival-accept = Вернуться в тело
 dm-arena-revival-decline = Остаться на арене

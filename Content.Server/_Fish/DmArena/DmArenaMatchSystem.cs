@@ -233,29 +233,46 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         TryOpenLoadout(args.SenderSession);
     }
 
-    private void TryOpenLoadout(ICommonSession session)
+    private bool TryOpenLoadout(ICommonSession session)
     {
         if (!_enabled)
         {
             // Клиент мог не знать, что арена выключена
             RaiseNetworkEvent(new DmArenaPlayerCountEvent(0, false), session.Channel);
-            return;
+            return false;
         }
 
         EnsureRule();
 
-        if (_ruleEntity is not { } ruleUid || CurrentRule is not { Active: true })
+        if (!CanOpenLoadout(session, out var ruleUid))
+            return false;
+
+        OpenLoadout(session, ruleUid);
+        return true;
+    }
+
+    private bool CanOpenLoadout(ICommonSession session, out EntityUid ruleUid)
+    {
+        ruleUid = default;
+
+        if (_ruleEntity is not { } rule || CurrentRule is not { Active: true })
         {
             Log.Warning($"DM arena join rejected: rule {ToPrettyString(_ruleEntity)} is not active or the map is not loaded");
-            return;
+            return false;
         }
 
         if (!IsIdleGhost(session.AttachedEntity))
         {
             Log.Warning($"DM arena join rejected for {session.Name}: {ToPrettyString(session.AttachedEntity)} is not a ghost or is already on the arena");
-            return;
+            return false;
         }
 
+        ruleUid = rule;
+        return true;
+    }
+
+    private void OpenLoadout(ICommonSession session, EntityUid ruleUid)
+    {
         if (_activeEuis.Remove(session, out var previous) && previous.Player.Status != SessionStatus.Disconnected)
             previous.Close();
 
@@ -375,9 +392,11 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             foreach (var (item, count) in chosen.OrderByDescending(x => x.Item.EquipFirst))
             {
                 // Старую одежду удаляем, иначе она упадёт на пол
-                ClearReplacedSlots(mob, item.Gear);
+                var kept = ClearReplacedSlots(mob, item.Gear);
                 for (var i = 0; i < count; i++)
                     _stationSpawning.EquipStartingGear(mob, item.Gear);
+
+                RestoreDependentSlots(mob, kept);
             }
 
             return true;
@@ -389,15 +408,39 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         }
     }
 
-    private void ClearReplacedSlots(EntityUid mob, ProtoId<StartingGearPrototype> gear)
+    private List<(string Slot, EntityUid Item)> ClearReplacedSlots(EntityUid mob, ProtoId<StartingGearPrototype> gear)
     {
+        var kept = new List<(string Slot, EntityUid Item)>();
+        if (!_inventory.TryGetSlots(mob, out var definitions))
+            return kept;
+
         foreach (var slot in _prototype.Index(gear).Equipment.Keys)
         {
             if (!_inventory.TryGetSlotEntity(mob, slot, out var old))
                 continue;
 
+            // Слоты, зависящие от одежды (карманы), снимаются вместе с ней: сохраняем их содержимое
+            foreach (var dependent in definitions.Where(x => x.DependsOn == slot))
+            {
+                if (_inventory.TryGetSlotEntity(mob, dependent.Name, out var content)
+                    && _inventory.TryUnequip(mob, dependent.Name, silent: true, force: true))
+                    kept.Add((dependent.Name, content.Value));
+            }
+
             _inventory.TryUnequip(mob, slot, silent: true, force: true);
             QueueDel(old);
+        }
+
+        return kept;
+    }
+
+    private void RestoreDependentSlots(EntityUid mob, List<(string Slot, EntityUid Item)> kept)
+    {
+        foreach (var (slot, item) in kept)
+        {
+            // Новая одежда может не иметь таких слотов, тогда предмет не нужен
+            if (!_inventory.TryEquip(mob, item, slot, silent: true, force: true))
+                QueueDel(item);
         }
     }
 
@@ -498,15 +541,14 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private void OnRevivalAccept(DmArenaRevivalAcceptEvent ev, EntitySessionEventArgs args)
     {
-        if (args.SenderSession.AttachedEntity is not { Valid: true } current
-            || !TryComp<DmArenaFighterComponent>(current, out var fighter)
-            || !TryComp<DmArenaMindSwapComponent>(current, out var swap)
-            || !TryComp<MindComponent>(swap.OriginalMind, out var origMind)
-            || origMind.OwnedEntity is not { } originalBody
-            || !Exists(originalBody)
-            || !TryComp<MobStateComponent>(originalBody, out var mobState)
-            || mobState.CurrentState == MobState.Dead)
-            return;
+        if (args.SenderSession.AttachedEntity is { Valid: true } current)
+            TryReturnToBody(current);
+    }
+
+    private bool TryReturnToBody(EntityUid current)
+    {
+        if (!CanReturnToBody(current, out var fighter, out var originalBody))
+            return false;
 
         if (TryGetFighterRule((current, fighter), out var rule))
         {
@@ -517,6 +559,25 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         _mindSwap.TryRestoreToOriginalBody(current);
         RemComp<DmArenaDormantBodyComponent>(originalBody);
         QueueDel(current);
+        return true;
+    }
+
+    // Вернуться можно только в живое прежнее тело
+    private bool CanReturnToBody(EntityUid current, [NotNullWhen(true)] out DmArenaFighterComponent? fighter, out EntityUid originalBody)
+    {
+        originalBody = default;
+
+        if (!TryComp<DmArenaFighterComponent>(current, out fighter)
+            || !TryComp<DmArenaMindSwapComponent>(current, out var swap)
+            || !TryComp<MindComponent>(swap.OriginalMind, out var origMind)
+            || origMind.OwnedEntity is not { } body
+            || !Exists(body)
+            || !TryComp<MobStateComponent>(body, out var mobState)
+            || mobState.CurrentState == MobState.Dead)
+            return false;
+
+        originalBody = body;
+        return true;
     }
 
     private void SweepLooseItems(DmArenaRuleComponent rule)
