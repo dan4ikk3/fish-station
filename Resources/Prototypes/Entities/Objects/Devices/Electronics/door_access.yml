@@ -528,7 +528,8 @@
   suffix: CentralCommand, Locked
   components:
   - type: AccessReader
-    access: [["CentralCommand"]]
+  # Fish-edit
+    access: [["CentralCommand"], ["Command"]]
 
 - type: entity
   parent: DoorElectronics
