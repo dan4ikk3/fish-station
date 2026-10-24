@@ -268,3 +268,6 @@ cmd-dmarena-disabled = The DM arena is disabled and all fighters have been retur
 # Точка появления бойцов
 ent-DmArenaSpawnPoint = DM arena spawn point
     .desc = A fighter appears here when entering the DM arena.
+
+# Неразрушимые вещи
+dm-arena-indestructible = This is indestructible.

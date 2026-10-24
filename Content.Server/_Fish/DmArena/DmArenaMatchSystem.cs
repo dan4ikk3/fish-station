@@ -28,6 +28,7 @@ using Content.Shared.Popups;
 using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
+using Content.Shared.Tools.Components;
 using Content.Shared.Weapons.Ranged.Components;
 using Robust.Shared.Network;
 using Robust.Server.Audio;
@@ -94,6 +95,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
         SubscribeLocalEvent<DmArenaShieldedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
         SubscribeLocalEvent<DamageableComponent, ComponentStartup>(OnDamageableStartup);
+        SubscribeLocalEvent<DmArenaShieldedComponent, ToolUseAttemptEvent>(OnArenaEntityToolUse);
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
@@ -233,6 +235,16 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         // Бойцы и другие существа получают урон как обычно
         if (!HasComp<MobStateComponent>(uid))
             EnsureComp<DmArenaShieldedComponent>(uid);
+    }
+
+    // Событие приходит и инструменту, и цели: сами инструменты не блокируем
+    private void OnArenaEntityToolUse(Entity<DmArenaShieldedComponent> ent, ToolUseAttemptEvent args)
+    {
+        if (HasComp<ToolComponent>(ent))
+            return;
+
+        _popup.PopupEntity(Loc.GetString("dm-arena-indestructible"), ent, args.User);
+        args.Cancel();
     }
 
     private static void OnArenaEntityDamage(Entity<DmArenaShieldedComponent> ent, ref BeforeDamageChangedEvent args)
