@@ -5,10 +5,10 @@
   playTimeTracker: JobCentcommChef
   requirements:
     - !type:OverallPlaytimeRequirement
-      time: 720000
+      time: 920000
     - !type:DepartmentTimeRequirement
       department: Civilian
-      time: 60400 #16,8 hrs # Sunrise-RoleTime
+      time: 72000 #20 hrs # Sunrise-RoleTime
   startingGear: ChefGear
   icon: "JobIconCentcommChef"
   overrideConsoleVisibility: false
