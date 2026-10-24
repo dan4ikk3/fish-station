@@ -5,7 +5,7 @@
   playTimeTracker: JobCentCommMaid
   requirements:
   - !type:DiscordRoleRequirement
-  weight: 100
+  # weight: 100
   setPreference: true
   startingGear: ComMaidGear
   icon: JobIconComMaid
@@ -13,11 +13,12 @@
   supervisors: job-supervisors-centcom
   radioBold: true
   alwaysUseSpawner: true
-  accessGroups:
-  - AllAccess
   access:
-  - Command
   - Service
+  - Maintenance
+  - Bar
+  - Kitchen
+  - Hydroponics
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, DeathRattleImplantCentcomm ]
