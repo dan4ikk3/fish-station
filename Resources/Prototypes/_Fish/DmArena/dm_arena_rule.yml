@@ -770,5 +770,5 @@
       - DmArenaBrutepack
       - DmArenaBrutepack
   - type: LoadMapRule
-    mapPath: /Maps/_Fish/Nonstations/dm01-entryway.yml
+    mapPath: /Maps/_Fish/Nonstations/dm_arena.yml
   - type: RuleGrids

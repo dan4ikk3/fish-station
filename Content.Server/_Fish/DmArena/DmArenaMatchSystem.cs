@@ -93,6 +93,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaFighterComponent, SuicideGhostEvent>(OnSuicideAttempt);
         SubscribeLocalEvent<GhostAttemptHandleEvent>(OnGhostAttempt);
         SubscribeLocalEvent<DmArenaShieldedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
+        SubscribeLocalEvent<DamageableComponent, ComponentStartup>(OnDamageableStartup);
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
@@ -215,11 +216,23 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         var query = EntityQueryEnumerator<DamageableComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out _, out var xform))
         {
-            if (xform.MapID != map || HasComp<DmArenaFighterComponent>(uid))
-                continue;
-
-            EnsureComp<DmArenaShieldedComponent>(uid);
+            if (xform.MapID == map)
+                ShieldEntity(uid);
         }
+    }
+
+    // Вещи, появившиеся на арене после загрузки карты, тоже неразрушимы
+    private void OnDamageableStartup(Entity<DamageableComponent> ent, ref ComponentStartup args)
+    {
+        if (CurrentRule?.ArenaMap is { } map && Transform(ent).MapID == map)
+            ShieldEntity(ent);
+    }
+
+    private void ShieldEntity(EntityUid uid)
+    {
+        // Бойцы и другие существа получают урон как обычно
+        if (!HasComp<MobStateComponent>(uid))
+            EnsureComp<DmArenaShieldedComponent>(uid);
     }
 
     private static void OnArenaEntityDamage(Entity<DmArenaShieldedComponent> ent, ref BeforeDamageChangedEvent args)
