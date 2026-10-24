@@ -238,12 +238,12 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     }
 
     // Событие приходит и инструменту, и цели: сами инструменты не блокируем
-    private void OnArenaEntityToolUse(Entity<DmArenaShieldedComponent> ent, ToolUseAttemptEvent args)
+    private void OnArenaEntityToolUse(EntityUid uid, DmArenaShieldedComponent component, ToolUseAttemptEvent args)
     {
-        if (HasComp<ToolComponent>(ent))
+        if (HasComp<ToolComponent>(uid))
             return;
 
-        _popup.PopupEntity(Loc.GetString("dm-arena-indestructible"), ent, args.User);
+        _popup.PopupEntity(Loc.GetString("dm-arena-indestructible"), uid, args.User);
         args.Cancel();
     }
 
