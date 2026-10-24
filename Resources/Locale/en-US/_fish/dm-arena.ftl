@@ -264,3 +264,7 @@ cmd-dmarena-status-on = The DM arena is enabled.
 cmd-dmarena-status-off = The DM arena is disabled.
 cmd-dmarena-enabled = The DM arena is enabled.
 cmd-dmarena-disabled = The DM arena is disabled and all fighters have been returned.
+
+# Точка появления бойцов
+ent-DmArenaSpawnPoint = DM arena spawn point
+    .desc = A fighter appears here when entering the DM arena.

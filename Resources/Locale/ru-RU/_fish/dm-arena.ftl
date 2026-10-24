@@ -264,3 +264,7 @@ cmd-dmarena-status-on = ДМ арена включена.
 cmd-dmarena-status-off = ДМ арена выключена.
 cmd-dmarena-enabled = ДМ арена включена.
 cmd-dmarena-disabled = ДМ арена выключена, все бойцы возвращены.
+
+# Точка появления бойцов
+ent-DmArenaSpawnPoint = точка появления ДМ арены
+    .desc = Здесь появляется боец, вошедший на ДМ арену.

@@ -4330,7 +4330,7 @@ entities:
       parent: 2
     - type: Fixtures
       fixtures: {}
-- proto: SpawnPointLatejoin
+- proto: DmArenaSpawnPoint
   entities:
   - uid: 401
     components:

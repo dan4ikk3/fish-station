@@ -7,7 +7,6 @@ using Content.Server.Ghost;
 using Content.Server.Mind;
 using Content.Server.Popups;
 using Content.Server.Preferences.Managers;
-using Content.Server.Spawners.Components;
 using Content.Server.Station.Systems;
 using Content.Server.Weapons.Ranged.Systems;
 using Content.Shared._Fish.DmArena;
@@ -658,26 +657,16 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private EntityCoordinates? GetRandomSpawnPoint(DmArenaRuleComponent rule)
     {
-        if (rule.ArenaMap == null)
-            return null;
+        var points = new List<EntityCoordinates>();
 
-        // Точки позднего входа в приоритете, любая точка арены как запасной вариант
-        var lateJoin = new List<EntityCoordinates>();
-        var anySpawn = new List<EntityCoordinates>();
-
-        var query = EntityQueryEnumerator<SpawnPointComponent, TransformComponent>();
-        while (query.MoveNext(out _, out var spawn, out var xform))
+        var query = EntityQueryEnumerator<DmArenaSpawnPointComponent, TransformComponent>();
+        while (query.MoveNext(out _, out _, out var xform))
         {
-            if (xform.GridUid is not { } grid || !rule.ArenaGrids.Contains(grid))
-                continue;
-
-            anySpawn.Add(xform.Coordinates);
-            if (spawn.SpawnType == SpawnPointType.LateJoin)
-                lateJoin.Add(xform.Coordinates);
+            if (xform.GridUid is { } grid && rule.ArenaGrids.Contains(grid))
+                points.Add(xform.Coordinates);
         }
 
-        var pool = lateJoin.Count > 0 ? lateJoin : anySpawn;
-        return pool.Count > 0 ? _random.Pick(pool) : null;
+        return points.Count > 0 ? _random.Pick(points) : null;
     }
 
     private void BroadcastPlayerCount(DmArenaRuleComponent? rule = null)
