@@ -18,6 +18,7 @@ using Content.Shared.Fluids.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost.Components;
 using Content.Shared.IdentityManagement;
+using Content.Shared.Interaction;
 using Content.Shared.Inventory;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
@@ -29,6 +30,7 @@ using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.Tools.Components;
+using Content.Shared.Tools.Systems;
 using Content.Shared.Weapons.Ranged.Components;
 using Robust.Shared.Network;
 using Robust.Server.Audio;
@@ -96,6 +98,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaShieldedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
         SubscribeLocalEvent<DamageableComponent, ComponentStartup>(OnDamageableStartup);
         SubscribeLocalEvent<DmArenaShieldedComponent, ToolUseAttemptEvent>(OnArenaEntityToolUse);
+        SubscribeLocalEvent<ToolTileCompatibleComponent, AfterInteractEvent>(OnToolTileInteract, before: new[] { typeof(SharedToolSystem) });
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
@@ -210,6 +213,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         ent.Comp.ArenaGrids.UnionWith(args.Grids);
         ent.Comp.Active = true;
         ShieldArenaEntities(args.Map);
+        MarkMapItems(args.Map);
         BroadcastPlayerCount(ent.Comp);
     }
 
@@ -220,6 +224,24 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         {
             if (xform.MapID == map)
                 ShieldEntity(uid);
+        }
+    }
+
+    // Что лежало на карте с самого начала, очистка не трогает
+    private void MarkMapItems(MapId map)
+    {
+        var items = EntityQueryEnumerator<ItemComponent, TransformComponent>();
+        while (items.MoveNext(out var uid, out _, out var xform))
+        {
+            if (xform.MapID == map)
+                EnsureComp<DmArenaMapItemComponent>(uid);
+        }
+
+        var puddles = EntityQueryEnumerator<PuddleComponent, TransformComponent>();
+        while (puddles.MoveNext(out var uid, out _, out var xform))
+        {
+            if (xform.MapID == map)
+                EnsureComp<DmArenaMapItemComponent>(uid);
         }
     }
 
@@ -235,6 +257,19 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         // Бойцы и другие существа получают урон как обычно
         if (!HasComp<MobStateComponent>(uid))
             EnsureComp<DmArenaShieldedComponent>(uid);
+    }
+
+    // Пол арены нельзя вскрывать ломом и подобными инструментами
+    private void OnToolTileInteract(Entity<ToolTileCompatibleComponent> ent, ref AfterInteractEvent args)
+    {
+        if (args.Handled
+            || CurrentRule is not { } rule
+            || _transform.GetGrid(args.ClickLocation) is not { } grid
+            || !rule.ArenaGrids.Contains(grid))
+            return;
+
+        _popup.PopupEntity(Loc.GetString("dm-arena-indestructible"), ent, args.User);
+        args.Handled = true;
     }
 
     // Событие приходит и инструменту, и цели: сами инструменты не блокируем
@@ -612,14 +647,14 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         var items = EntityQueryEnumerator<ItemComponent, TransformComponent>();
         while (items.MoveNext(out var uid, out _, out var xform))
         {
-            if (xform.MapID == map)
+            if (xform.MapID == map && !HasComp<DmArenaMapItemComponent>(uid))
                 MarkForDespawn(uid, rule.SweepDespawnTime, checkContainer: true);
         }
 
         var puddles = EntityQueryEnumerator<PuddleComponent, TransformComponent>();
         while (puddles.MoveNext(out var uid, out _, out var xform))
         {
-            if (xform.MapID == map)
+            if (xform.MapID == map && !HasComp<DmArenaMapItemComponent>(uid))
                 MarkForDespawn(uid, rule.SweepDespawnTime);
         }
     }
