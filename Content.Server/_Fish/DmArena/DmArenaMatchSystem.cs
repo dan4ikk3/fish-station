@@ -18,7 +18,6 @@ using Content.Shared.Fluids.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost.Components;
 using Content.Shared.IdentityManagement;
-using Content.Shared.Interaction;
 using Content.Shared.Inventory;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
@@ -30,7 +29,6 @@ using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.Tools.Components;
-using Content.Shared.Tools.Systems;
 using Content.Shared.Weapons.Ranged.Components;
 using Robust.Shared.Network;
 using Robust.Server.Audio;
@@ -98,7 +96,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaShieldedComponent, BeforeDamageChangedEvent>(OnArenaEntityDamage);
         SubscribeLocalEvent<DamageableComponent, ComponentStartup>(OnDamageableStartup);
         SubscribeLocalEvent<DmArenaShieldedComponent, ToolUseAttemptEvent>(OnArenaEntityToolUse);
-        SubscribeLocalEvent<ToolTileCompatibleComponent, AfterInteractEvent>(OnToolTileInteract, before: new[] { typeof(SharedToolSystem) });
+        SubscribeLocalEvent<DmArenaFighterComponent, ToolUserAttemptUseEvent>(OnFighterToolUse);
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
@@ -259,17 +257,14 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             EnsureComp<DmArenaShieldedComponent>(uid);
     }
 
-    // Пол арены нельзя вскрывать ломом и подобными инструментами
-    private void OnToolTileInteract(Entity<ToolTileCompatibleComponent> ent, ref AfterInteractEvent args)
+    // Вскрытие пола идёт с целью-инструментом, у остальных работ цель другая
+    private void OnFighterToolUse(Entity<DmArenaFighterComponent> ent, ref ToolUserAttemptUseEvent args)
     {
-        if (args.Handled
-            || CurrentRule is not { } rule
-            || _transform.GetGrid(args.ClickLocation) is not { } grid
-            || !rule.ArenaGrids.Contains(grid))
+        if (args.Target is not { } target || !HasComp<ToolTileCompatibleComponent>(target))
             return;
 
-        _popup.PopupEntity(Loc.GetString("dm-arena-indestructible"), ent, args.User);
-        args.Handled = true;
+        _popup.PopupEntity(Loc.GetString("dm-arena-indestructible"), ent.Owner, ent.Owner);
+        args.Cancelled = true;
     }
 
     // Событие приходит и инструменту, и цели: сами инструменты не блокируем
