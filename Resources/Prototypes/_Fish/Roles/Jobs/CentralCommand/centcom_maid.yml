@@ -4,11 +4,7 @@
   description: job-description-centcom-maid
   playTimeTracker: JobCentCommMaid
   requirements:
-  - !type:OverallPlaytimeRequirement
-    time: 720000
-  - !type:RoleTimeRequirement
-    role: JobComMaid
-    time: 50400
+  - !type:DiscordRoleRequirement
   weight: 100
   setPreference: true
   startingGear: ComMaidGear
@@ -20,7 +16,8 @@
   accessGroups:
   - AllAccess
   access:
-  - CentralCommand
+  - Command
+  - Service
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, DeathRattleImplantCentcomm ]

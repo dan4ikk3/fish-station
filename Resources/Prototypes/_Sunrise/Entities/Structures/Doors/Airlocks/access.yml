@@ -130,8 +130,10 @@
   id: DoubleGlassAirlockBasicCentralCommandLocked
   suffix: Central Command, Locked
   components:
+  # Fish-start
   - type: AccessReader
-    access: [["CentralCommand"]]
+    access: [["CentralCommand"], ["Command"]]
+  # Fish-end
 
 - type: entity
   parent: DoubleGlassAirlock
