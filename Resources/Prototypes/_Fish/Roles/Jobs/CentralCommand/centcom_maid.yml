@@ -16,7 +16,8 @@
   accessGroups:
   - AllAccess
   access:
-  - CentralCommand
+  - Command
+  - Service
   special:
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant, DeathRattleImplantCentcomm ]
