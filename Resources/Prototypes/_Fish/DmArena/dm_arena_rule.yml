@@ -13,8 +13,8 @@
       description: dm-arena-desc-spear
       category: dm-arena-category-weapons
       group: dm-arena-group-melee
-      sprite: Spear
-      cost: 5
+      sprite: SpearUranium
+      cost: 13
       inHand: true
     - gear: FishDmArenaCrowbar
       name: dm-arena-item-crowbar
@@ -30,7 +30,7 @@
       category: dm-arena-category-weapons
       group: dm-arena-group-melee
       sprite: CombatKnife
-      cost: 7
+      cost: 10
       inHand: true
     - gear: FishDmArenaBat
       name: dm-arena-item-bat
@@ -39,14 +39,6 @@
       group: dm-arena-group-melee
       sprite: BaseBallBat
       cost: 9
-      inHand: true
-    - gear: FishDmArenaMachete
-      name: dm-arena-item-machete
-      description: dm-arena-desc-machete
-      category: dm-arena-category-weapons
-      group: dm-arena-group-melee
-      sprite: Machete
-      cost: 10
       inHand: true
     - gear: FishDmArenaCleaver
       name: dm-arena-item-cleaver
@@ -80,14 +72,6 @@
       sprite: Sledgehammer
       cost: 14
       inHand: true
-    - gear: FishDmArenaClaymore
-      name: dm-arena-item-claymore
-      description: dm-arena-desc-claymore
-      category: dm-arena-category-weapons
-      group: dm-arena-group-melee
-      sprite: Claymore
-      cost: 15
-      inHand: true
     - gear: FishDmArenaSabre
       name: dm-arena-item-sabre
       description: dm-arena-desc-sabre
@@ -103,6 +87,13 @@
       group: dm-arena-group-melee
       sprite: EnergySword
       cost: 27
+    - gear: FishDmArenaGlovesPolar
+      name: dm-arena-item-gloves-polar
+      description: dm-arena-desc-gloves-polar
+      category: dm-arena-category-weapons
+      group: dm-arena-group-melee
+      sprite: ClothingHandsGlovesNorthStar
+      cost: 18
     - gear: FishDmArenaSvalinn
       name: dm-arena-item-svalinn
       description: dm-arena-desc-svalinn
@@ -126,14 +117,6 @@
       sprite: WeaponPistolCobra
       cost: 32
       ammoType: cobra
-    - gear: FishDmArenaMateba
-      name: dm-arena-item-mateba
-      description: dm-arena-desc-mateba
-      category: dm-arena-category-weapons
-      group: dm-arena-group-pistols
-      sprite: WeaponRevolverMateba
-      cost: 34
-      ammoType: revolver
     - gear: FishDmArenaViper
       name: dm-arena-item-viper
       description: dm-arena-desc-viper
@@ -148,8 +131,16 @@
       category: dm-arena-category-weapons
       group: dm-arena-group-pistols
       sprite: WeaponRevolverPython
-      cost: 41
+      cost: 39
       ammoType: revolver
+    - gear: FishDmArenaDeagle
+      name: dm-arena-item-deagle
+      description: dm-arena-desc-deagle
+      category: dm-arena-category-weapons
+      group: dm-arena-group-pistols
+      sprite: WeaponPistolDeagle
+      cost: 52
+      ammoType: deagle
     - gear: FishDmArenaN1984
       name: dm-arena-item-n1984
       description: dm-arena-desc-n1984
@@ -173,6 +164,14 @@
       group: dm-arena-group-shotguns
       sprite: WeaponShotgunEnforcer
       cost: 24
+      ammoType: shotgun
+    - gear: FishDmArenaSawn
+      name: dm-arena-item-sawn
+      description: dm-arena-desc-sawn
+      category: dm-arena-category-weapons
+      group: dm-arena-group-shotguns
+      sprite: WeaponShotgunSawn
+      cost: 22
       ammoType: shotgun
     - gear: FishDmArenaKammerer
       name: dm-arena-item-kammerer
@@ -198,6 +197,22 @@
       sprite: WeaponSubMachineGunWt550
       cost: 46
       ammoType: wt550
+    - gear: FishDmArenaUzi
+      name: dm-arena-item-uzi
+      description: dm-arena-desc-uzi
+      category: dm-arena-category-weapons
+      group: dm-arena-group-shotguns
+      sprite: SunriseWeaponSubMachineGunUzi
+      cost: 66
+      ammoType: uzi
+    - gear: FishDmArenaSiar
+      name: dm-arena-item-siar
+      description: dm-arena-desc-siar
+      category: dm-arena-category-weapons
+      group: dm-arena-group-shotguns
+      sprite: WeaponSIAR52
+      cost: 70
+      ammoType: siar
     - gear: FishDmArenaDrozd
       name: dm-arena-item-drozd
       description: dm-arena-desc-drozd
@@ -229,6 +244,14 @@
       sprite: WeaponRifleAk
       cost: 51
       ammoType: akms
+    - gear: FishDmArenaM16
+      name: dm-arena-item-m16
+      description: dm-arena-desc-m16
+      category: dm-arena-category-weapons
+      group: dm-arena-group-rifles
+      sprite: WeaponRifleM16A4
+      cost: 54
+      ammoType: rifle
     - gear: FishDmArenaEstoc
       name: dm-arena-item-estoc
       description: dm-arena-desc-estoc
@@ -285,6 +308,13 @@
       sprite: ClothingOuterArmorHeavy
       cost: 37
       equipFirst: true
+    - gear: FishDmArenaVestElite
+      name: dm-arena-item-vest-elite
+      description: dm-arena-desc-vest-elite
+      category: dm-arena-category-armor
+      group: dm-arena-group-suits
+      sprite: ClothingOuterVestWebElite
+      cost: 45
     - gear: FishDmArenaHelmRiot
       name: dm-arena-item-helm-riot
       description: dm-arena-desc-helm-riot
@@ -301,6 +331,13 @@
       sprite: ClothingHeadHelmetSwat
       cost: 15
       equipFirst: true
+    - gear: FishDmArenaHelmAltyn
+      name: dm-arena-item-helm-altyn
+      description: dm-arena-desc-helm-altyn
+      category: dm-arena-category-armor
+      group: dm-arena-group-helmets
+      sprite: FishClothingHeadHelmetPubgBlack
+      cost: 5
     - gear: FishDmArenaShield
       name: dm-arena-item-shield
       description: dm-arena-desc-shield
@@ -309,6 +346,37 @@
       sprite: RiotShield
       cost: 15
       inHand: true
+    - gear: FishDmArenaShieldBullet
+      name: dm-arena-item-shield-bullet
+      description: dm-arena-desc-shield-bullet
+      category: dm-arena-category-armor
+      group: dm-arena-group-extras
+      sprite: RiotBulletShield
+      cost: 25
+      inHand: true
+    - gear: FishDmArenaShieldLaser
+      name: dm-arena-item-shield-laser
+      description: dm-arena-desc-shield-laser
+      category: dm-arena-category-armor
+      group: dm-arena-group-extras
+      sprite: RiotLaserShield
+      cost: 15
+      inHand: true
+    - gear: FishDmArenaShieldEnergy
+      name: dm-arena-item-shield-energy
+      description: dm-arena-desc-shield-energy
+      category: dm-arena-category-armor
+      group: dm-arena-group-extras
+      sprite: EnergyShield
+      cost: 18
+      inHand: true
+    - gear: FishDmArenaDomeBelt
+      name: dm-arena-item-dome-belt
+      description: dm-arena-desc-dome-belt
+      category: dm-arena-category-armor
+      group: dm-arena-group-extras
+      sprite: FishEnergyDomeGeneratorMicroreactor
+      cost: 40
     - gear: FishDmArenaAmPistol
       name: dm-arena-item-am-pistol
       description: dm-arena-desc-am-pistol
@@ -363,6 +431,15 @@
       cost: 7
       maxCount: 3
       ammoFor: n1984
+    - gear: FishDmArenaAmDeagle
+      name: dm-arena-item-am-deagle
+      description: dm-arena-desc-am-deagle
+      category: dm-arena-category-gear
+      group: dm-arena-group-ammo
+      sprite: MagazineMagnum
+      cost: 7
+      maxCount: 3
+      ammoFor: deagle
     - gear: FishDmArenaAmRevolver
       name: dm-arena-item-am-revolver
       description: dm-arena-desc-am-revolver
@@ -390,6 +467,15 @@
       cost: 8
       maxCount: 3
       ammoFor: bulldog
+    - gear: FishDmArenaAmBulldogSlug
+      name: dm-arena-item-am-bulldog-slug
+      description: dm-arena-desc-am-bulldog-slug
+      category: dm-arena-category-gear
+      group: dm-arena-group-ammo
+      sprite: MagazineShotgunSlug
+      cost: 8
+      maxCount: 3
+      ammoFor: bulldog
     - gear: FishDmArenaAmDrozd
       name: dm-arena-item-am-drozd
       description: dm-arena-desc-am-drozd
@@ -399,6 +485,24 @@
       cost: 8
       maxCount: 3
       ammoFor: drozd
+    - gear: FishDmArenaAmUzi
+      name: dm-arena-item-am-uzi
+      description: dm-arena-desc-am-uzi
+      category: dm-arena-category-gear
+      group: dm-arena-group-ammo
+      sprite: MagazinePistolSubMachineGun
+      cost: 8
+      maxCount: 3
+      ammoFor: uzi
+    - gear: FishDmArenaAmSiar
+      name: dm-arena-item-am-siar
+      description: dm-arena-desc-am-siar
+      category: dm-arena-category-gear
+      group: dm-arena-group-ammo
+      sprite: MagazinePistolSubMachineGunCaselessExtended
+      cost: 10
+      maxCount: 3
+      ammoFor: siar
     - gear: FishDmArenaAmWt550
       name: dm-arena-item-am-wt550
       description: dm-arena-desc-am-wt550
@@ -439,7 +543,7 @@
       name: dm-arena-item-smoke
       description: dm-arena-desc-smoke
       category: dm-arena-category-gear
-      group: dm-arena-group-extras
+      group: dm-arena-group-equipment
       sprite: SmokeGrenade
       cost: 8
       maxCount: 2
@@ -506,13 +610,6 @@
       group: dm-arena-group-kits
       sprite: MedkitCombatFilled
       cost: 26
-    - gear: FishDmArenaKitAdvanced
-      name: dm-arena-item-kit-advanced
-      description: dm-arena-desc-kit-advanced
-      category: dm-arena-category-medicine
-      group: dm-arena-group-kits
-      sprite: MedkitAdvancedFilled
-      cost: 30
     - gear: FishDmArenaKitUniversal
       name: dm-arena-item-kit-universal
       description: dm-arena-desc-kit-universal
@@ -664,7 +761,7 @@
     - name: dm-arena-set-butcher
       description: dm-arena-set-desc-butcher
       items:
-      - FishDmArenaMachete
+      - FishDmArenaCleaver
       - FishDmArenaVestRiot
       - FishDmArenaHelmRiot
       - FishDmArenaShield
@@ -683,7 +780,7 @@
       description: dm-arena-set-desc-breacher
       items:
       - FishDmArenaBulldog
-      - FishDmArenaMachete
+      - FishDmArenaKnife
       - FishDmArenaVestRiot
       - FishDmArenaHelmRiot
       - FishDmArenaKitCombat
@@ -703,7 +800,7 @@
       - FishDmArenaEsword
       - FishDmArenaVestRefl
       - FishDmArenaHelmSwat
-      - FishDmArenaKitAdvanced
+      - FishDmArenaKitCombat
       - FishDmArenaPenEmergency
     - name: dm-arena-set-joker
       description: dm-arena-set-desc-joker
@@ -717,13 +814,13 @@
       - FishDmArenaGlow
       - FishDmArenaGlow
       - FishDmArenaGlow
-      - FishDmArenaMateba
+      - FishDmArenaInspector
       - FishDmArenaVestRiot
       - FishDmArenaKitBasic
     - name: dm-arena-set-knight
       description: dm-arena-set-desc-knight
       items:
-      - FishDmArenaClaymore
+      - FishDmArenaSabre
       - FishDmArenaShield
       - FishDmArenaVestCarapace
       - FishDmArenaHelmRiot
@@ -803,3 +900,13 @@
         whitelist:
           tags:
           - CartridgePistol
+
+- type: entity
+  id: FishEnergyDomeGeneratorMicroreactor
+  suffix: Fish
+  parent: EnergyDomeGeneratorPersonalSyndie
+  components:
+  - type: ItemSlots
+    slots:
+      cell_slot:
+        startingItem: PowerCellMicroreactor

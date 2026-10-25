@@ -19,7 +19,7 @@
 - type: startingGear
   id: FishDmArenaSpear
   inhand:
-  - Spear
+  - SpearUranium
 
 - type: startingGear
   id: FishDmArenaCrowbar
@@ -35,11 +35,6 @@
   id: FishDmArenaBat
   inhand:
   - BaseBallBat
-
-- type: startingGear
-  id: FishDmArenaMachete
-  inhand:
-  - Machete
 
 - type: startingGear
   id: FishDmArenaCleaver
@@ -60,11 +55,6 @@
   id: FishDmArenaSledge
   inhand:
   - Sledgehammer
-
-- type: startingGear
-  id: FishDmArenaClaymore
-  inhand:
-  - Claymore
 
 - type: startingGear
   id: FishDmArenaSabre
@@ -98,15 +88,6 @@
     back:
     - MagazinePistolCaselessRifle
     - MagazinePistolCaselessRifle
-
-- type: startingGear
-  id: FishDmArenaMateba
-  equipment:
-    suitstorage: WeaponRevolverMateba
-  storage:
-    back:
-    - SpeedLoaderMagnumSP
-    - SpeedLoaderMagnumSP
 
 - type: startingGear
   id: FishDmArenaViper
@@ -422,12 +403,6 @@
     - MedkitCombatFilled
 
 - type: startingGear
-  id: FishDmArenaKitAdvanced
-  storage:
-    back:
-    - MedkitAdvancedFilled
-
-- type: startingGear
   id: FishDmArenaKitUniversal
   storage:
     back:
@@ -537,3 +512,111 @@
   storage:
     back:
     - BikeHorn
+
+- type: startingGear
+  id: FishDmArenaGlovesPolar
+  equipment:
+    gloves: ClothingHandsGlovesNorthStar
+
+- type: startingGear
+  id: FishDmArenaDeagle
+  equipment:
+    suitstorage: WeaponPistolDeagle
+  storage:
+    back:
+    - MagazineMagnum
+    - MagazineMagnum
+
+- type: startingGear
+  id: FishDmArenaSawn
+  equipment:
+    suitstorage: WeaponShotgunSawn
+  storage:
+    back:
+    - BoxLethalshot
+    - BoxLethalshot
+
+- type: startingGear
+  id: FishDmArenaUzi
+  equipment:
+    suitstorage: SunriseWeaponSubMachineGunUzi
+  storage:
+    back:
+    - MagazinePistolSubMachineGun
+    - MagazinePistolSubMachineGun
+
+- type: startingGear
+  id: FishDmArenaSiar
+  equipment:
+    suitstorage: WeaponSIAR52
+  storage:
+    back:
+    - MagazinePistolSubMachineGunCaselessExtended
+    - MagazinePistolSubMachineGunCaselessExtended
+
+- type: startingGear
+  id: FishDmArenaM16
+  equipment:
+    suitstorage: WeaponRifleM16A4
+  storage:
+    back:
+    - MagazineRifleSP
+    - MagazineRifleSP
+
+- type: startingGear
+  id: FishDmArenaVestElite
+  equipment:
+    outerClothing: ClothingOuterVestWebElite
+
+- type: startingGear
+  id: FishDmArenaHelmAltyn
+  equipment:
+    head: FishClothingHeadHelmetPubgBlack
+
+- type: startingGear
+  id: FishDmArenaShieldBullet
+  inhand:
+  - RiotBulletShield
+
+- type: startingGear
+  id: FishDmArenaShieldLaser
+  inhand:
+  - RiotLaserShield
+
+- type: startingGear
+  id: FishDmArenaShieldEnergy
+  inhand:
+  - EnergyShield
+
+- type: startingGear
+  id: FishDmArenaDomeBelt
+  equipment:
+    belt: FishEnergyDomeGeneratorMicroreactor
+
+- type: startingGear
+  id: FishDmArenaAmBulldogSlug
+  storage:
+    back:
+    - MagazineShotgunSlug
+    - MagazineShotgunSlug
+
+- type: startingGear
+  id: FishDmArenaAmUzi
+  storage:
+    back:
+    - MagazinePistolSubMachineGun
+    - MagazinePistolSubMachineGun
+
+- type: startingGear
+  id: FishDmArenaAmSiar
+  storage:
+    back:
+    - MagazinePistolSubMachineGunCaselessExtended
+    - MagazinePistolSubMachineGunCaselessExtended
+
+- type: startingGear
+  id: FishDmArenaAmDeagle
+  storage:
+    back:
+    - MagazineMagnum
+    - MagazineMagnum
