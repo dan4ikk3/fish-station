@@ -9,8 +9,8 @@
     gloves: ClothingHandsGlovesFingerless
     shoes: ClothingShoesSwat
     back: ClothingBackpack
-    pocket1: WeaponPistolN1984
-    pocket2: MagazineMagnum
+    pocket1: FishWeaponPistolN1984
+    pocket2: MagazinePistol
   storage:
     back:
     - Brutepack
@@ -126,13 +126,13 @@
     - SpeedLoaderMagnumAP
 
 - type: startingGear
-  id: FishDmArenaN1984
+  id: FishDmArenaD1984
   equipment:
-    suitstorage: WeaponPistolN1984
+    suitstorage: WeaponPistolM1984
   storage:
     back:
-    - MagazineMagnum
-    - MagazineMagnum
+    - MagazinePistol40FMJ
+    - MagazinePistol40FMJ
 
 - type: startingGear
   id: FishDmArenaDoublebarrel
@@ -306,11 +306,11 @@
     - MagazinePistolCaselessRifle
 
 - type: startingGear
-  id: FishDmArenaAmN1984
+  id: FishDmArenaAmD1984
   storage:
     back:
-    - MagazineMagnum
-    - MagazineMagnum
+    - MagazinePistol40FMJ
+    - MagazinePistol40FMJ
 
 - type: startingGear
   id: FishDmArenaAmRevolver

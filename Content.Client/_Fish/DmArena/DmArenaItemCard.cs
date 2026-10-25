@@ -7,7 +7,6 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 using Robust.Shared.Maths;
-using Robust.Shared.Timing;
 using Robust.Shared.Prototypes;
 
 namespace Content.Client._Fish.DmArena;
@@ -25,8 +24,7 @@ public sealed class DmArenaItemCard : PanelContainer
     private bool _needsWeapon;
     private bool _hovered;
     private readonly StyleBoxTexture _styleBox;
-    private Color _current = DmArenaPalette.CardBg;
-    private Color _target = DmArenaPalette.CardBg;
+    private readonly PanelContainer _accent;
     private readonly Label _nameLabel;
     private readonly Label _costLabel;
     private readonly Label _countLabel;
@@ -56,6 +54,16 @@ public sealed class DmArenaItemCard : PanelContainer
             VerticalExpand = true,
             SeparationOverride = 6,
         };
+
+        _accent = new PanelContainer
+        {
+            MinWidth = 4,
+            MaxWidth = 4,
+            VerticalExpand = true,
+            Margin = new Thickness(0, 2),
+            PanelOverride = new StyleBoxFlat { BackgroundColor = DmArenaPalette.AccentDim },
+        };
+        hbox.AddChild(_accent);
 
         if (!string.IsNullOrEmpty(option.SpritePrototype))
         {
@@ -179,22 +187,19 @@ public sealed class DmArenaItemCard : PanelContainer
         UpdateVisual();
     }
 
-    protected override void FrameUpdate(FrameEventArgs args)
-    {
-        base.FrameUpdate(args);
-        _current = Color.InterpolateBetween(_current, _target, MathF.Min(1f, args.DeltaSeconds * 14f));
-        _styleBox.Modulate = _current;
-    }
-
     private void UpdateVisual()
     {
         var selected = _count > 0;
         var dim = _locked && !selected;
 
-        _target = selected
+        _styleBox.Modulate = selected
             ? DmArenaPalette.CardSelectedBg
             : dim ? DmArenaPalette.CardLockedBg
             : _hovered ? DmArenaPalette.CardHoverBg : DmArenaPalette.CardBg;
+
+        ((StyleBoxFlat) _accent.PanelOverride!).BackgroundColor = selected
+            ? DmArenaPalette.Accent
+            : dim ? DmArenaPalette.ButtonDisabledFg : DmArenaPalette.AccentDim;
 
         _nameLabel.FontColorOverride = dim ? DmArenaPalette.ButtonDisabledFg : DmArenaPalette.ButtonText;
         _costLabel.FontColorOverride = dim ? DmArenaPalette.ButtonDisabledFg : DmArenaPalette.Cost;

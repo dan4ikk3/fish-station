@@ -3,7 +3,6 @@ using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Input;
 using Robust.Shared.Maths;
-using Robust.Shared.Timing;
 
 namespace Content.Client._Fish.DmArena;
 
@@ -16,8 +15,6 @@ public sealed class DmArenaPillButton : PanelContainer
     private bool _disabled;
     private bool _selected;
     private bool _hovered;
-    private Color _current = DmArenaPalette.ButtonBg;
-    private Color _target = DmArenaPalette.ButtonBg;
 
     public bool Disabled
     {
@@ -89,23 +86,16 @@ public sealed class DmArenaPillButton : PanelContainer
         UpdateVisual();
     }
 
-    protected override void FrameUpdate(FrameEventArgs args)
-    {
-        base.FrameUpdate(args);
-        _current = Color.InterpolateBetween(_current, _target, MathF.Min(1f, args.DeltaSeconds * 14f));
-        _styleBox.Modulate = _current;
-    }
-
     private void UpdateVisual()
     {
         if (_disabled)
         {
-            _target = DmArenaPalette.ButtonDisabledBg;
+            _styleBox.Modulate = DmArenaPalette.ButtonDisabledBg;
             _label.FontColorOverride = DmArenaPalette.ButtonDisabledFg;
             return;
         }
 
-        _target = _selected
+        _styleBox.Modulate = _selected
             ? DmArenaPalette.ButtonSelectedBg
             : _hovered ? DmArenaPalette.ButtonHoverBg : DmArenaPalette.ButtonBg;
         _label.FontColorOverride = DmArenaPalette.ButtonText;

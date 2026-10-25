@@ -150,14 +150,14 @@
       sprite: WeaponRevolverPython
       cost: 41
       ammoType: revolver
-    - gear: FishDmArenaN1984
-      name: dm-arena-item-n1984
-      description: dm-arena-desc-n1984
+    - gear: FishDmArenaD1984
+      name: dm-arena-item-d1984
+      description: dm-arena-desc-d1984
       category: dm-arena-category-weapons
       group: dm-arena-group-pistols
-      sprite: WeaponPistolN1984
+      sprite: WeaponPistolM1984
       cost: 48
-      ammoType: n1984
+      ammoType: d1984
     - gear: FishDmArenaDoublebarrel
       name: dm-arena-item-doublebarrel
       description: dm-arena-desc-doublebarrel
@@ -354,15 +354,15 @@
       cost: 6
       maxCount: 3
       ammoFor: cobra
-    - gear: FishDmArenaAmN1984
-      name: dm-arena-item-am-n1984
-      description: dm-arena-desc-am-n1984
+    - gear: FishDmArenaAmD1984
+      name: dm-arena-item-am-d1984
+      description: dm-arena-desc-am-d1984
       category: dm-arena-category-gear
       group: dm-arena-group-ammo
-      sprite: MagazineMagnum
+      sprite: MagazinePistol40FMJ
       cost: 7
       maxCount: 3
-      ammoFor: n1984
+      ammoFor: d1984
     - gear: FishDmArenaAmRevolver
       name: dm-arena-item-am-revolver
       description: dm-arena-desc-am-revolver
@@ -785,3 +785,21 @@
   - type: Sprite
     sprite: Markers/jobs.rsi
     state: green
+
+- type: entity
+  id: FishWeaponPistolN1984
+  suffix: Fish
+  parent: WeaponPistolN1984
+  components:
+  - type: ItemSlots
+    slots:
+      gun_magazine:
+        startingItem: MagazinePistol
+        whitelist:
+          tags:
+          - MagazinePistol
+      gun_chamber:
+        startingItem: CartridgePistolSP
+        whitelist:
+          tags:
+          - CartridgePistol

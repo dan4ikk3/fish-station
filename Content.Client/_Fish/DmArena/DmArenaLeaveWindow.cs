@@ -1,4 +1,5 @@
 using System.Numerics;
+using Robust.Client.Graphics;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Utility;
 
@@ -16,12 +17,20 @@ public sealed class DmArenaLeaveWindow : DmArenaFrameWindow
 
         var message = new RichTextLabel
         {
-            HorizontalExpand = true,
-            Margin = new Thickness(14, 14),
+            HorizontalAlignment = HAlignment.Center,
+            MaxWidth = 420,
+            Margin = new Thickness(0, 18),
         };
         message.SetMessage(FormattedMessage.FromMarkupOrThrow(
             $"[color={DmArenaPalette.ButtonText.ToHex()}]{FormattedMessage.EscapeText(Loc.GetString("dm-arena-exit-offer"))}[/color]"));
         Contents.AddChild(message);
+        Contents.AddChild(new PanelContainer
+        {
+            MinHeight = 1,
+            Margin = new Thickness(14, 0),
+            PanelOverride = new StyleBoxFlat { BackgroundColor = DmArenaPalette.AccentDim },
+        });
+
 
         var buttons = new BoxContainer
         {

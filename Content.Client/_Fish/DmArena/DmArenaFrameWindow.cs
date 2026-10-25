@@ -6,7 +6,6 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
 using Robust.Shared.Input;
 using Robust.Shared.Maths;
-using Robust.Shared.Timing;
 
 namespace Content.Client._Fish.DmArena;
 
@@ -23,7 +22,6 @@ public class DmArenaFrameWindow : BaseWindow
     private readonly TextureButton _closeButton;
     private readonly PanelContainer _bodyPanel;
     private readonly BoxContainer _contentBox;
-    private float _fade;
 
     public string WindowTitle
     {
@@ -37,7 +35,6 @@ public class DmArenaFrameWindow : BaseWindow
     {
         MouseFilter = MouseFilterMode.Stop;
         Resizable = true;
-        Modulate = Color.White.WithAlpha(0f);
 
         _outerBorder = new PanelContainer
         {
@@ -55,6 +52,12 @@ public class DmArenaFrameWindow : BaseWindow
             Orientation = BoxContainer.LayoutOrientation.Vertical,
         };
         _outerBorder.AddChild(outerVBox);
+
+        outerVBox.AddChild(new PanelContainer
+        {
+            MinHeight = 3,
+            PanelOverride = new StyleBoxFlat { BackgroundColor = DmArenaPalette.Accent },
+        });
 
         _titleBar = new PanelContainer
         {
@@ -121,17 +124,6 @@ public class DmArenaFrameWindow : BaseWindow
         };
         _bodyPanel.AddChild(_contentBox);
         outerVBox.AddChild(_bodyPanel);
-    }
-
-    protected override void FrameUpdate(FrameEventArgs args)
-    {
-        base.FrameUpdate(args);
-
-        if (_fade >= 1f)
-            return;
-
-        _fade = MathF.Min(1f, _fade + args.DeltaSeconds * 6f);
-        Modulate = Color.White.WithAlpha(_fade);
     }
 
     protected override DragMode GetDragModeFor(Vector2 relativeMousePos)
