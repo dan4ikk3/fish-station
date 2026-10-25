@@ -24,4 +24,29 @@ public abstract partial class SharedGunSystem
         UpdateAmmoCount(entity.Owner);
         Dirty(entity);
     }
+
+    /// <summary>
+    /// Убирает отстрелянные гильзы и снова заряжает все камеры барабана.
+    /// </summary>
+    public void RefillRevolver(Entity<RevolverAmmoProviderComponent> entity)
+    {
+        var comp = entity.Comp;
+
+        for (var i = 0; i < comp.AmmoSlots.Count; i++)
+        {
+            if (comp.AmmoSlots[i] is { } spent)
+            {
+                Containers.Remove(spent, comp.AmmoContainer);
+                PredictedQueueDel(spent);
+                comp.AmmoSlots[i] = null;
+            }
+
+            if (i < comp.Chambers.Length)
+                comp.Chambers[i] = true;
+        }
+
+        UpdateRevolverAppearance(entity);
+        UpdateAmmoCount(entity, prediction: false);
+        Dirty(entity);
+    }
 }

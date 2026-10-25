@@ -1,48 +1,58 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System;
+using Content.Server.Administration.Logs;
+using Content.Server.Administration.Managers;
+using Content.Server.Administration;
 using Content.Server.EUI;
-using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
+using Content.Server.GameTicking;
 using Content.Server.Ghost;
 using Content.Server.Mind;
 using Content.Server.Popups;
 using Content.Server.Preferences.Managers;
 using Content.Server.Station.Systems;
 using Content.Server.Weapons.Ranged.Systems;
-using Content.Shared._Fish.DmArena;
+using Content.Shared.Administration;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
+using Content.Shared.Database;
 using Content.Shared.Dataset;
+using Content.Shared.Eui;
 using Content.Shared.Examine;
 using Content.Shared.Fluids.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost.Components;
 using Content.Shared.IdentityManagement;
-using Content.Shared.Inventory;
 using Content.Shared.Interaction.Events;
+using Content.Shared.Inventory;
 using Content.Shared.Item;
+using Content.Shared.Mind.Components;
 using Content.Shared.Mind;
-using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs;
 using Content.Shared.Popups;
 using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles;
 using Content.Shared.Tools.Components;
 using Content.Shared.Weapons.Ranged.Components;
-using Robust.Shared.Network;
+using Content.Shared._Fish.DmArena;
 using Robust.Server.Audio;
 using Robust.Server.Player;
 using Robust.Shared.Audio;
 using Robust.Shared.Configuration;
+using Robust.Shared.Console;
 using Robust.Shared.Containers;
 using Robust.Shared.Enums;
 using Robust.Shared.Map;
+using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Spawners;
 using Robust.Shared.Timing;
+using Robust.Shared.Utility;
 
 namespace Content.Server._Fish.DmArena;
 
@@ -66,7 +76,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototype = default!;
     [Dependency] private InventorySystem _inventory = default!;
 
-    private static readonly EntProtoId RulePrototype = "DmArenaRule";
+    private static readonly EntProtoId RulePrototype = "FishDmArenaRule";
     private static readonly ProtoId<LocalizedDatasetPrototype> DmArenaNameSuffixDataset = "NamesOperationPrefix";
     private static readonly SoundPathSpecifier LeaveSound = new("/Audio/Effects/pop_high.ogg");
     private EntityUid? _ruleEntity;
@@ -287,7 +297,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         TryOpenLoadout(args.SenderSession);
     }
 
-    private bool TryOpenLoadout(ICommonSession session)
+    public bool TryOpenLoadout(ICommonSession session)
     {
         if (!_enabled)
         {
@@ -305,7 +315,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         return true;
     }
 
-    private bool CanOpenLoadout(ICommonSession session, out EntityUid ruleUid)
+    public bool CanOpenLoadout(ICommonSession session, out EntityUid ruleUid)
     {
         ruleUid = default;
 
@@ -341,22 +351,31 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (!IsIdleGhost(session.AttachedEntity))
             return;
 
-        var ghost = session.AttachedEntity.Value;
         if (ev.Stay)
-        {
             TryOpenLoadout(session);
-            return;
-        }
+        else
+            TryLeaveToOriginalBody(session.AttachedEntity.Value);
+    }
 
-        if (!_mind.TryGetMind(ghost, out var mindId, out var mind)
-            || mind.OwnedEntity is not { Valid: true } body
-            || body == ghost
-            || !Exists(body))
-            return;
+    public bool TryLeaveToOriginalBody(EntityUid ghost)
+    {
+        if (!CanLeaveToOriginalBody(ghost, out var mindId, out var mind))
+            return false;
 
         _mind.UnVisit(mindId, mind);
+
         if (!TerminatingOrDeleted(ghost))
             QueueDel(ghost);
+
+        return true;
+    }
+
+    public bool CanLeaveToOriginalBody(EntityUid ghost, out EntityUid mindId, [NotNullWhen(true)] out MindComponent? mind)
+    {
+        return _mind.TryGetMind(ghost, out mindId, out mind)
+            && mind.OwnedEntity is { Valid: true } body
+            && body != ghost
+            && Exists(body);
     }
 
     private void OnLeaveRequest(DmArenaLeaveRequestEvent ev, EntitySessionEventArgs args)
@@ -396,6 +415,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             return false;
 
         var originalBody = mind.OwnedEntity != ghost ? mind.OwnedEntity : null;
+        var ownerId = mind.UserId;
         var mob = _stationSpawning.SpawnPlayerMob(spawnCoords, null, BuildArenaProfile(mind), null);
 
         // Выдача могла упасть: удаляем тело без владельца
@@ -407,17 +427,18 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
         EnsureComp<DmArenaFighterComponent>(mob).RuleEntity = ruleEntity;
 
-        if (originalBody is { Valid: true } body && !HasComp<DmArenaDormantBodyComponent>(body))
-        {
-            var marker = EnsureComp<DmArenaDormantBodyComponent>(body);
-            if (mind.UserId is { } ownerId)
-                marker.UserId = ownerId;
-        }
-
         if (!_mindSwap.TrySwapTempMind(session, mob))
         {
             QueueDel(mob);
             return false;
+        }
+
+        // Метку ставим только после успешной подмены, иначе она осталась бы на теле без бойца
+        if (originalBody is { Valid: true } body && !HasComp<DmArenaDormantBodyComponent>(body))
+        {
+            var marker = EnsureComp<DmArenaDormantBodyComponent>(body);
+            if (ownerId is { } userId)
+                marker.UserId = userId;
         }
 
         rule.Players.Add(GetNetEntity(mob));
@@ -599,7 +620,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             TryReturnToBody(current);
     }
 
-    private bool TryReturnToBody(EntityUid current)
+    public bool TryReturnToBody(EntityUid current)
     {
         if (!CanReturnToBody(current, out var fighter, out var originalBody))
             return false;
@@ -617,7 +638,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     }
 
     // Вернуться можно только в живое прежнее тело
-    private bool CanReturnToBody(EntityUid current, [NotNullWhen(true)] out DmArenaFighterComponent? fighter, out EntityUid originalBody)
+    public bool CanReturnToBody(EntityUid current, [NotNullWhen(true)] out DmArenaFighterComponent? fighter, out EntityUid originalBody)
     {
         originalBody = default;
 
@@ -698,8 +719,18 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private void OnDespawnPickedUp(Entity<TimedDespawnComponent> ent, ref EntGotInsertedIntoContainerMessage args)
     {
-        if (HasComp<DmArenaFighterComponent>(args.Container.Owner))
-            RemComp<TimedDespawnComponent>(ent);
+        // Рюкзак и другое хранилище бойца тоже считаются: поднятое в них не должно исчезнуть
+        EntityUid? owner = args.Container.Owner;
+        while (owner is { } current)
+        {
+            if (HasComp<DmArenaFighterComponent>(current))
+            {
+                RemComp<TimedDespawnComponent>(ent);
+                return;
+            }
+
+            owner = _container.TryGetContainingContainer((current, null, null), out var outer) ? outer.Owner : null;
+        }
     }
 
     private void MarkForDespawn(EntityUid uid, float lifetime, bool checkContainer = false)
@@ -727,6 +758,12 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     private void BroadcastPlayerCount(DmArenaRuleComponent? rule = null)
     {
         rule ??= CurrentRule;
+
+        foreach (var eui in _activeEuis.Values)
+        {
+            eui.StateDirty();
+        }
+
         RaiseNetworkEvent(new DmArenaPlayerCountEvent(rule?.Players.Count ?? 0, _enabled), Filter.Broadcast());
     }
 
@@ -880,7 +917,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             RefillBattery(uid);
 
         if (TryComp<RevolverAmmoProviderComponent>(uid, out var revolver))
-            RefillRevolver((uid, revolver));
+            _gun.RefillRevolver((uid, revolver));
     }
 
     private void RefillBattery(EntityUid uid)
@@ -895,24 +932,272 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         var change = new ChangeChargeEvent(missing);
         RaiseLocalEvent(uid, ref change);
     }
+}
 
-    private void RefillRevolver(Entity<RevolverAmmoProviderComponent> ent)
+public sealed class DmArenaKitEui : BaseEui
+{
+    private readonly DmArenaMatchSystem _arena;
+    private readonly EntityUid _ruleEntity;
+    private readonly ICommonSession _session;
+
+    public DmArenaKitEui(DmArenaMatchSystem arena, EntityUid ruleEntity, ICommonSession session)
     {
-        var comp = ent.Comp;
+        _arena = arena;
+        _ruleEntity = ruleEntity;
+        _session = session;
+    }
 
-        for (var i = 0; i < comp.AmmoSlots.Count; i++)
+    public override EuiStateBase GetNewState()
+    {
+        return _arena.GetLoadoutState(_ruleEntity, _session.UserId);
+    }
+
+    public override void HandleMessage(EuiMessageBase msg)
+    {
+        base.HandleMessage(msg);
+
+        switch (msg)
         {
-            if (comp.AmmoSlots[i] is { } spent)
-            {
-                _container.Remove(spent, comp.AmmoContainer);
-                QueueDel(spent);
-                comp.AmmoSlots[i] = null;
-            }
+            case DmArenaKitConfirmMessage selected:
+                if (_arena.SpawnPlayer(_session, _ruleEntity, selected.Items))
+                    Close();
+                else
+                    StateDirty();
+                break;
+            case DmArenaKitSaveMessage preset:
+                _arena.SavePreset(_ruleEntity, _session.UserId, preset.Items);
+                StateDirty();
+                break;
+        }
+    }
 
-            if (i < comp.Chambers.Length)
-                comp.Chambers[i] = true;
+    public override void Opened()
+    {
+        base.Opened();
+        StateDirty();
+    }
+
+    public override void Closed()
+    {
+        base.Closed();
+        _arena.OnEuiClosed(_session, this);
+    }
+}
+
+/// <summary>
+/// Временная подмена разума: настоящий разум игрока откладывается, а в тело арены идёт одноразовый.
+/// После выхода одноразовый разум удаляется, и игрок возвращается к своему прежнему разуму.
+/// </summary>
+public sealed partial class DmArenaMindSwapSystem : EntitySystem
+{
+    [Dependency] private MindSystem _mind = default!;
+    [Dependency] private GhostSystem _ghost = default!;
+    [Dependency] private MindExamineSystem _mindExamine = default!;
+    [Dependency] private MetaDataSystem _meta = default!;
+    [Dependency] private SharedTransformSystem _transform = default!;
+    [Dependency] private IPlayerManager _playerManager = default!;
+
+    public override void Initialize()
+    {
+        base.Initialize();
+
+        SubscribeLocalEvent<DmArenaMindSwapComponent, PlayerDetachedEvent>(OnPlayerDetached);
+    }
+
+    private void OnPlayerDetached(Entity<DmArenaMindSwapComponent> ent, ref PlayerDetachedEvent args)
+    {
+        if (args.Player.Status != SessionStatus.Disconnected)
+            return;
+
+        CleanupDisposableMind(ent, ent.Comp);
+        RemComp<DmArenaMindSwapComponent>(ent);
+    }
+
+    public bool TrySwapTempMind(ICommonSession session, EntityUid newBody)
+    {
+        if (session.AttachedEntity is not { Valid: true } currentEntity
+            || !_mind.TryGetMind(currentEntity, out var origMindId, out var origMind))
+            return false;
+
+        var userId = origMind.UserId;
+        _mind.UnVisit(origMindId, origMind);
+
+        // Освобождаем userId для одноразового разума
+        _mind.SetUserId(origMindId, null, origMind);
+
+        var newMind = _mind.CreateMind(userId, origMind.CharacterName);
+
+        try
+        {
+            _mind.TransferTo(newMind, newBody);
+            _playerManager.SetAttachedEntity(session, newBody);
+        }
+        catch (Exception e)
+        {
+            Log.Error($"Failed to swap mind of {session.Name} into {ToPrettyString(newBody)}: {e}");
+            QueueDel(newMind);
+            _mind.SetUserId(origMindId, userId, origMind);
+            return false;
         }
 
-        Dirty(ent);
+        var swap = EnsureComp<DmArenaMindSwapComponent>(newBody);
+        swap.OriginalMind = origMindId;
+        swap.DisposableMind = newMind;
+
+        return true;
+    }
+
+    public EntityUid? TryRestoreAsGhost(EntityUid temporaryBody)
+    {
+        if (!TryComp<DmArenaMindSwapComponent>(temporaryBody, out var temp)
+            || !TryComp<MindComponent>(temp.OriginalMind, out var origMind))
+            return null;
+
+        var coords = _transform.GetMapCoordinates(temporaryBody);
+
+        CleanupDisposableMind(temporaryBody, temp);
+
+        var ghost = Spawn("MobObserver", coords);
+        _mind.Visit(temp.OriginalMind, ghost, origMind);
+
+        if (TryComp<GhostComponent>(ghost, out var ghostComp))
+            _ghost.SetCanReturnToBody((ghost, ghostComp), origMind.OwnedEntity is { } owned && Exists(owned));
+
+        if (GetGhostName(origMind) is { } name)
+            _meta.SetEntityName(ghost, FormattedMessage.EscapeText(name));
+
+        RemComp<DmArenaMindSwapComponent>(temporaryBody);
+        return ghost;
+    }
+
+    private string? GetGhostName(MindComponent mind)
+    {
+        if (!string.IsNullOrWhiteSpace(mind.CharacterName))
+            return mind.CharacterName;
+
+        return mind.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session)
+            ? session.Name
+            : null;
+    }
+
+    public bool TryRestoreToOriginalBody(EntityUid temporaryBody)
+    {
+        if (!TryComp<DmArenaMindSwapComponent>(temporaryBody, out var temp)
+            || !TryComp<MindComponent>(temp.OriginalMind, out var origMind)
+            || origMind.OwnedEntity is not { } originalBody
+            || !Exists(originalBody))
+            return false;
+
+        CleanupDisposableMind(temporaryBody, temp);
+
+        if (origMind.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session))
+            _playerManager.SetAttachedEntity(session, originalBody);
+
+        RemComp<DmArenaMindSwapComponent>(temporaryBody);
+        return true;
+    }
+
+    private void CleanupDisposableMind(EntityUid temporaryBody, DmArenaMindSwapComponent temp)
+    {
+        if (TryComp<MindContainerComponent>(temporaryBody, out var tempContainer)
+            && tempContainer.LastMindStored == temp.DisposableMind)
+        {
+            tempContainer.LastMindStored = null;
+            Dirty(temporaryBody, tempContainer);
+        }
+
+        if (Exists(temp.DisposableMind))
+        {
+            _mind.WipeMind(temp.DisposableMind);
+            QueueDel(temp.DisposableMind);
+        }
+
+        if (!TryComp<MindComponent>(temp.OriginalMind, out var origMind)
+            || origMind.OriginalOwnerUserId is not { } userId)
+            return;
+
+        _mind.SetUserId(temp.OriginalMind, userId);
+
+        if (origMind.OwnedEntity is { } originalBody)
+            _mindExamine.RefreshMindStatus(originalBody);
+    }
+}
+
+/// <summary>
+/// Включает и выключает ДМ арену. Состояние хранится только на сервере, клиент его изменить не может.
+/// </summary>
+[AdminCommand(AdminFlags.Fun)]
+public sealed partial class DmArenaSwitchCommand : LocalizedCommands
+{
+    [Dependency] private IConfigurationManager _cfg = default!;
+    [Dependency] private IAdminManager _admin = default!;
+    [Dependency] private IAdminLogManager _adminLog = default!;
+
+    public override string Command => "dmarena";
+    public override string Description => LocalizationManager.GetString("cmd-dmarena-desc");
+    public override string Help => LocalizationManager.GetString("cmd-dmarena-help");
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (shell.Player is { } player && !_admin.HasAdminFlag(player, AdminFlags.Fun))
+        {
+            shell.WriteError(LocalizationManager.GetString("cmd-dmarena-no-access"));
+            return;
+        }
+
+        if (args.Length > 1)
+        {
+            shell.WriteError(LocalizationManager.GetString("shell-wrong-arguments-number"));
+            return;
+        }
+
+        var enabled = _cfg.GetCVar(DmArenaConfigVars.DmArenaEnabled);
+        var action = args.Length == 0 ? "status" : args[0].ToLowerInvariant();
+
+        switch (action)
+        {
+            case "status":
+                WriteStatus(shell, enabled);
+                break;
+            case "on" or "off":
+                SetEnabled(shell, enabled, action == "on");
+                break;
+            default:
+                shell.WriteError(LocalizationManager.GetString("cmd-dmarena-bad-argument"));
+                break;
+        }
+    }
+
+    private void WriteStatus(IConsoleShell shell, bool enabled)
+    {
+        shell.WriteLine(LocalizationManager.GetString(enabled ? "cmd-dmarena-status-on" : "cmd-dmarena-status-off"));
+    }
+
+    private void SetEnabled(IConsoleShell shell, bool current, bool value)
+    {
+        if (value == current)
+        {
+            WriteStatus(shell, current);
+            return;
+        }
+
+        _cfg.SetCVar(DmArenaConfigVars.DmArenaEnabled, value);
+
+        var who = shell.Player?.Name ?? "server";
+        _adminLog.Add(LogType.AdminCommands, LogImpact.High, $"{who} {(value ? "enabled" : "disabled")} the DM arena");
+
+        shell.WriteLine(LocalizationManager.GetString(value ? "cmd-dmarena-enabled" : "cmd-dmarena-disabled"));
+    }
+
+    public override CompletionResult GetCompletion(IConsoleShell shell, string[] args)
+    {
+        if (args.Length == 1)
+        {
+            return CompletionResult.FromHintOptions(
+                new[] { "on", "off", "status" },
+                LocalizationManager.GetString("cmd-dmarena-hint"));
+        }
+
+        return CompletionResult.Empty;
     }
 }

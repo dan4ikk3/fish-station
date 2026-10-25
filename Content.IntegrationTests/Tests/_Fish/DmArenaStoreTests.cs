@@ -16,7 +16,7 @@ namespace Content.IntegrationTests.Tests._Fish;
 [TestFixture]
 public sealed class DmArenaStoreTests : GameTest
 {
-    private const string RuleId = "DmArenaRule";
+    private const string RuleId = "FishDmArenaRule";
 
     [Test]
     public async Task StoreDataIsConsistent()

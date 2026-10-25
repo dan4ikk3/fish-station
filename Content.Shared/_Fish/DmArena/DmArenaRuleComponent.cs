@@ -76,7 +76,7 @@ public sealed partial class DmArenaRuleComponent : Component
     public TimeSpan NextCleanup;
 
     [DataField]
-    public ProtoId<StartingGearPrototype> Gear = "DmArenaBaseGear";
+    public ProtoId<StartingGearPrototype> Gear = "FishDmArenaBaseGear";
 
     [DataField]
     public List<DmArenaStoreItem> ShopItems = new();
