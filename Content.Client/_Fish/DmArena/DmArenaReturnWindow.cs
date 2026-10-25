@@ -1,5 +1,6 @@
 using System.Numerics;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Utility;
 
 namespace Content.Client._Fish.DmArena;
 
@@ -10,15 +11,16 @@ public sealed class DmArenaReturnWindow : DmArenaFrameWindow
     public DmArenaReturnWindow()
     {
         WindowTitle = Loc.GetString("dm-arena-revival-title");
-        SetSize = new Vector2(350, 160);
+        SetSize = new Vector2(380, 190);
         Resizable = false;
 
-        var message = new Label
+        var message = new RichTextLabel
         {
-            Text = Loc.GetString("dm-arena-revival-offer"),
-            HorizontalAlignment = HAlignment.Center,
-            Margin = new Thickness(8, 12),
+            HorizontalExpand = true,
+            Margin = new Thickness(14, 12),
         };
+        message.SetMessage(FormattedMessage.FromMarkupOrThrow(
+            $"[color={DmArenaPalette.ButtonText.ToHex()}]{FormattedMessage.EscapeText(Loc.GetString("dm-arena-revival-offer"))}[/color]"));
         Contents.AddChild(message);
 
         var buttons = new BoxContainer

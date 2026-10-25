@@ -1,5 +1,6 @@
 using System.Numerics;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Utility;
 
 namespace Content.Client._Fish.DmArena;
 
@@ -10,15 +11,17 @@ public sealed class DmArenaLeaveWindow : DmArenaFrameWindow
     public DmArenaLeaveWindow()
     {
         WindowTitle = Loc.GetString("dm-arena-exit-title");
-        SetSize = new Vector2(480, 170);
+        SetSize = new Vector2(480, 190);
         Resizable = false;
 
-        Contents.AddChild(new Label
+        var message = new RichTextLabel
         {
-            Text = Loc.GetString("dm-arena-exit-offer"),
-            HorizontalAlignment = HAlignment.Center,
-            Margin = new Thickness(8, 14),
-        });
+            HorizontalExpand = true,
+            Margin = new Thickness(14, 14),
+        };
+        message.SetMessage(FormattedMessage.FromMarkupOrThrow(
+            $"[color={DmArenaPalette.ButtonText.ToHex()}]{FormattedMessage.EscapeText(Loc.GetString("dm-arena-exit-offer"))}[/color]"));
+        Contents.AddChild(message);
 
         var buttons = new BoxContainer
         {

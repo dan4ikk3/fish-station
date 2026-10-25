@@ -189,7 +189,9 @@ dm-arena-desc-duck = Пищащее оружие массового отвлеч
 dm-arena-item-toysword = Игрушечный меч
 dm-arena-desc-toysword = Выглядит грозно, урона не наносит
 dm-arena-item-beer = Пивной запас
-dm-arena-desc-beer = Бутылка пива для праздника победы
+dm-arena-desc-beer =
+    Бутылка пива для праздника победы
+    Шипучка был бы доволен
 dm-arena-item-tophat = Цилиндр
 dm-arena-desc-tophat = Заменяет шлем. Джентльмен на арене
 dm-arena-item-fez = Феска
@@ -271,3 +273,4 @@ ent-FishDmArenaSpawnPoint = точка появления ДМ арены
 
 # Неразрушимые вещи
 dm-arena-indestructible = Это не разобрать.
+dm-arena-respawn-cooldown = Тело ещё не остыло. Подождите { $seconds } с.

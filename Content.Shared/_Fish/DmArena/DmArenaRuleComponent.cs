@@ -75,6 +75,8 @@ public sealed partial class DmArenaRuleComponent : Component
 
     public TimeSpan NextCleanup;
 
+    public Dictionary<NetUserId, TimeSpan> RespawnCooldowns = new();
+
     [DataField]
     public ProtoId<StartingGearPrototype> Gear = "FishDmArenaBaseGear";
 
@@ -92,4 +94,7 @@ public sealed partial class DmArenaRuleComponent : Component
 
     [DataField]
     public float SweepDespawnTime = 10f;
+
+    [DataField]
+    public TimeSpan RespawnCooldown = TimeSpan.FromSeconds(20);
 }

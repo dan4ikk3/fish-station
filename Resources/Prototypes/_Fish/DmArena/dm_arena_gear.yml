@@ -1,14 +1,16 @@
 - type: startingGear
   id: FishDmArenaBaseGear
   equipment:
-    jumpsuit: ClothingUniformJumpsuitOperative
+    jumpsuit: ClothingUniformJumpsuitTactical
     outerClothing: ClothingOuterArmorBasic
     head: ClothingHeadHelmetBasic
     mask: ClothingMaskGasSecurity
-    shoes: ClothingShoesBootsCombatFilled
+    eyes: ClothingEyesGlassesCheapSunglasses
+    gloves: ClothingHandsGlovesFingerless
+    shoes: ClothingShoesSwat
     back: ClothingBackpack
-    pocket1: WeaponPistolMk58
-    pocket2: MagazinePistol
+    pocket1: WeaponPistolN1984
+    pocket2: MagazineMagnum
   storage:
     back:
     - Brutepack

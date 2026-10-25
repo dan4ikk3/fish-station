@@ -28,6 +28,7 @@ using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Components;
+using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Power;
@@ -112,6 +113,8 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaShieldedComponent, ToolUseAttemptEvent>(OnArenaEntityToolUse);
         SubscribeLocalEvent<DmArenaFighterComponent, ToolUserAttemptUseEvent>(OnFighterToolUse);
         SubscribeLocalEvent<DmArenaMapItemComponent, GettingPickedUpAttemptEvent>(OnMapItemPickup);
+        SubscribeLocalEvent<DmArenaMapItemComponent, GettingInteractedWithAttemptEvent>(OnMapItemInteract);
+        SubscribeLocalEvent<DmArenaMapItemComponent, PullAttemptEvent>(OnMapItemPull);
         SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
@@ -295,6 +298,16 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         args.Cancel();
     }
 
+    private void OnMapItemInteract(Entity<DmArenaMapItemComponent> ent, ref GettingInteractedWithAttemptEvent args)
+    {
+        args.Cancelled = true;
+    }
+
+    private void OnMapItemPull(Entity<DmArenaMapItemComponent> ent, PullAttemptEvent args)
+    {
+        args.Cancelled = true;
+    }
+
     private void OnDamageableStartup(Entity<DamageableComponent> ent, ref ComponentStartup args)
     {
         if (CurrentRule?.ArenaMap is { } map && Transform(ent).MapID == map)
@@ -370,6 +383,15 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             return false;
         }
 
+        if (CurrentRule is { } current
+            && current.RespawnCooldowns.TryGetValue(session.UserId, out var until)
+            && until > _timing.CurTime)
+        {
+            var seconds = (int) Math.Ceiling((until - _timing.CurTime).TotalSeconds);
+            _popup.PopupEntity(Loc.GetString("dm-arena-respawn-cooldown", ("seconds", seconds)), session.AttachedEntity!.Value, session.AttachedEntity.Value);
+            return false;
+        }
+
         ruleUid = rule;
         return true;
     }
@@ -435,6 +457,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
                 ent.Comp.LastAttacker = attacker;
                 break;
             case MobState.Dead:
+                StartRespawnCooldown(ent, rule);
                 RewardKill(ent, args.Origin);
                 RemoveFromArena(ent, rule, playSound: false);
                 break;
@@ -578,6 +601,12 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         BroadcastPlayerCount();
     }
 
+    private void StartRespawnCooldown(Entity<DmArenaFighterComponent> ent, DmArenaRuleComponent rule)
+    {
+        if (CompOrNull<ActorComponent>(ent)?.PlayerSession is { } session)
+            rule.RespawnCooldowns[session.UserId] = _timing.CurTime + rule.RespawnCooldown;
+    }
+
     private void RemoveFromArena(Entity<DmArenaFighterComponent> ent, DmArenaRuleComponent rule, bool playSound = true)
     {
         var session = CompOrNull<ActorComponent>(ent)?.PlayerSession;
@@ -611,6 +640,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (args.Victim != ent.Owner || !TryGetFighterRule(ent, out var rule))
             return;
 
+        StartRespawnCooldown(ent, rule);
         RewardKill(ent);
         RemoveFromArena(ent, rule);
         args.Handled = true;

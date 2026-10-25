@@ -189,7 +189,9 @@ dm-arena-desc-duck = A squeaky weapon of mass distraction
 dm-arena-item-toysword = Toy sword
 dm-arena-desc-toysword = Looks scary, deals no damage
 dm-arena-item-beer = Beer stash
-dm-arena-desc-beer = A bottle of beer for the victory party
+dm-arena-desc-beer =
+    A bottle of beer for the victory party
+    Shipuchka would be pleased
 dm-arena-item-tophat = Top hat
 dm-arena-desc-tophat = Replaces your helmet. A gentleman on the arena
 dm-arena-item-fez = Fez
@@ -271,3 +273,4 @@ ent-FishDmArenaSpawnPoint = DM arena spawn point
 
 # Неразрушимые вещи
 dm-arena-indestructible = This is indestructible.
+dm-arena-respawn-cooldown = Your body is not cold yet. Wait { $seconds } s.
