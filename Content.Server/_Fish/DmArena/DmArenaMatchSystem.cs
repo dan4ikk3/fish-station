@@ -28,6 +28,7 @@ using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Components;
+using Content.Shared.Physics;
 using Content.Shared.Popups;
 using Content.Shared.Power;
 using Content.Shared.Preferences;
