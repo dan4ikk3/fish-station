@@ -150,14 +150,14 @@
       sprite: WeaponRevolverPython
       cost: 41
       ammoType: revolver
-    - gear: FishDmArenaD1984
-      name: dm-arena-item-d1984
-      description: dm-arena-desc-d1984
+    - gear: FishDmArenaN1984
+      name: dm-arena-item-n1984
+      description: dm-arena-desc-n1984
       category: dm-arena-category-weapons
       group: dm-arena-group-pistols
-      sprite: WeaponPistolM1984
+      sprite: FishWeaponPistolN1984
       cost: 48
-      ammoType: d1984
+      ammoType: n1984
     - gear: FishDmArenaDoublebarrel
       name: dm-arena-item-doublebarrel
       description: dm-arena-desc-doublebarrel
@@ -354,15 +354,15 @@
       cost: 6
       maxCount: 3
       ammoFor: cobra
-    - gear: FishDmArenaAmD1984
-      name: dm-arena-item-am-d1984
-      description: dm-arena-desc-am-d1984
+    - gear: FishDmArenaAmN1984
+      name: dm-arena-item-am-n1984
+      description: dm-arena-desc-am-n1984
       category: dm-arena-category-gear
       group: dm-arena-group-ammo
-      sprite: MagazinePistol40FMJ
+      sprite: MagazinePistol
       cost: 7
       maxCount: 3
-      ammoFor: d1984
+      ammoFor: n1984
     - gear: FishDmArenaAmRevolver
       name: dm-arena-item-am-revolver
       description: dm-arena-desc-am-revolver

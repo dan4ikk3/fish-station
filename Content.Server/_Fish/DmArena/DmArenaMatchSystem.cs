@@ -303,7 +303,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         args.Cancelled = true;
     }
 
-    private void OnMapItemPull(Entity<DmArenaMapItemComponent> ent, PullAttemptEvent args)
+    private void OnMapItemPull(Entity<DmArenaMapItemComponent> ent, ref PullAttemptEvent args)
     {
         args.Cancelled = true;
     }
