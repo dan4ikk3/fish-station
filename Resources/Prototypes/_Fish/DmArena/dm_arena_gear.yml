@@ -620,3 +620,15 @@
     back:
     - MagazineMagnum
     - MagazineMagnum
+
+- type: startingGear
+  id: FishDmArenaPenPyra
+  storage:
+    back:
+    - PyraAutoInjector
+
+- type: startingGear
+  id: FishDmArenaPenPunct
+  storage:
+    back:
+    - PunctAutoInjector
