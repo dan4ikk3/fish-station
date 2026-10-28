@@ -38,7 +38,6 @@ using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Maps;
 using Content.Shared.Mind.Components;
-using Content.Shared.Mindshield.Components;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Movement.Pulling.Components;
@@ -470,7 +469,8 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
 
                 var hasMind = _mindSystem.TryGetMind(victim.Value, out var mindId, out var mind);
 
-                var canConvert = !HasComp<MindShieldComponent>(victim.Value)
+                _mindShield.GetMindshieldStatus(victim.Value, out var mindshielded, out _);
+                var canConvert = !mindshielded
                                       && !HasComp<BibleUserComponent>(victim.Value);
 
                 if (hasMind && canConvert )
