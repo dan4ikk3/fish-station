@@ -57,7 +57,6 @@ public sealed partial class FishAiCameraHearingSystem : EntitySystem
                 held == ev.Source)
                 continue;
 
-            // Рядом с самим ИИ речь и так доходит обычным путём
             if (_xforms.InRange((held.Value, Transform(held.Value)), (ev.Source, sourceXform), directRange))
                 continue;
 
