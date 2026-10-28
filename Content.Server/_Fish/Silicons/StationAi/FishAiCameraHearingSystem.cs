@@ -61,7 +61,7 @@ public sealed partial class FishAiCameraHearingSystem : EntitySystem
             if (_xforms.InRange((held.Value, Transform(held.Value)), (ev.Source, sourceXform), directRange))
                 continue;
 
-            SendToAi(ev.Source, message, actor.PlayerSession);
+            SendToAi(ev.Source, message, whisper, actor.PlayerSession);
         }
     }
 
@@ -85,23 +85,33 @@ public sealed partial class FishAiCameraHearingSystem : EntitySystem
         return nearest;
     }
 
-    private void SendToAi(EntityUid source, string message, ICommonSession session)
+    private void SendToAi(EntityUid source, string message, bool whisper, ICommonSession session)
     {
         var nameEv = new TransformSpeakerNameEvent(source, MetaData(source).EntityName);
         RaiseLocalEvent(source, nameEv);
 
-        var speech = nameEv.SpeechVerb != null && ProtoMan.Resolve(nameEv.SpeechVerb, out var verbProto)
-            ? verbProto
-            : _chat.GetSpeechVerb(source, message);
+        var name = FormattedMessage.EscapeText(nameEv.VoiceName);
+        var content = FormattedMessage.EscapeText(message);
+        string wrapped;
 
-        var wrapped = Loc.GetString(speech.Bold ? "chat-telephone-message-wrap-bold" : "chat-telephone-message-wrap",
-            ("color", Color.White),
-            ("fontType", speech.FontId),
-            ("fontSize", speech.FontSize),
-            ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
-            ("name", FormattedMessage.EscapeText(nameEv.VoiceName)),
-            ("message", FormattedMessage.EscapeText(message)));
+        if (whisper)
+        {
+            wrapped = Loc.GetString("chat-manager-entity-whisper-wrap-message", ("entityName", name), ("message", content));
+        }
+        else
+        {
+            var speech = nameEv.SpeechVerb != null && ProtoMan.Resolve(nameEv.SpeechVerb, out var verbProto)
+                ? verbProto
+                : _chat.GetSpeechVerb(source, message);
 
-        _chatManager.ChatMessageToOne(ChatChannel.Local, message, wrapped, source, false, session.Channel);
+            wrapped = Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
+                ("entityName", name),
+                ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
+                ("fontType", speech.FontId),
+                ("fontSize", speech.FontSize),
+                ("message", content));
+        }
+
+        _chatManager.ChatMessageToOne(whisper ? ChatChannel.Whisper : ChatChannel.Local, message, wrapped, source, false, session.Channel);
     }
 }

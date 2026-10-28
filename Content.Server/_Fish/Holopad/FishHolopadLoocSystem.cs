@@ -4,7 +4,6 @@ using Content.Shared.Holopad;
 using Content.Shared.Speech.Components;
 using Content.Shared.Telephone;
 using Robust.Server.Player;
-using Robust.Shared.Player;
 
 namespace Content.Server._Fish.Holopad;
 
@@ -42,14 +41,14 @@ public sealed partial class FishHolopadLoocSystem : EntitySystem
 
     private void OnExpandRecipients(ExpandICChatRecipientsEvent ev)
     {
-        if (!_loocSources.Remove(ev.Source) || !TryComp<HolopadUserComponent>(ev.Source, out var user))
+        if (!_loocSources.Remove(ev.Source))
             return;
 
-        foreach (var holopad in user.LinkedHolopads)
+        var sourceXform = Transform(ev.Source);
+        var query = EntityQueryEnumerator<HolopadComponent, TelephoneComponent, ActiveListenerComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out _, out var telephone, out var listener, out var xform))
         {
-            if (!HasComp<ActiveListenerComponent>(holopad) ||
-                !TryComp<TelephoneComponent>(holopad, out var telephone) ||
-                telephone.Muted)
+            if (telephone.Muted || !_xforms.InRange((ev.Source, sourceXform), (uid, xform), listener.Range))
                 continue;
 
             foreach (var linked in telephone.LinkedTelephones)
