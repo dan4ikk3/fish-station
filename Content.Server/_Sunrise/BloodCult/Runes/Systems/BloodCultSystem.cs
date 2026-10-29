@@ -31,6 +31,7 @@ using Content.Shared.Damage.Systems;
 using Content.Shared.Gibbing;
 using Content.Shared.Inventory;
 using Content.Shared.Maps;
+using Content.Shared.Mindshield;
 using Content.Shared.Movement.Pulling.Systems;
 using Content.Shared.Roles;
 using Content.Shared.Speech.EntitySystems;
@@ -90,6 +91,7 @@ namespace Content.Server._Sunrise.BloodCult.Runes.Systems
         [Dependency] private SharedTransformSystem _xform = default!;
         [Dependency] private SharedAppearanceSystem _appearanceSystem = default!;
         [Dependency] private NavMapSystem _navMap = default!;
+        [Dependency] private MindShieldSystem _mindShield = default!;
         [Dependency] private PullingSystem _pulling = default!;
         [Dependency] private KillCultistTargetsConditionSystem _cultistTargetsConditionSystem = default!;
         [Dependency] private EntityQuery<TransformComponent> _xformQuery = default!;
