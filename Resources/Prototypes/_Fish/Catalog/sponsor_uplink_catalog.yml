@@ -203,7 +203,7 @@
   id: UplinkFishPlushieLusain
   productEntity: PlushieLusain
   cost:
-    Suntick: 4
+    Suntick: 8
   categories:
   - SpecialThings
   conditions:
