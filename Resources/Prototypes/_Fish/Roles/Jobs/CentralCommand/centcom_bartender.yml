@@ -5,7 +5,7 @@
   playTimeTracker: JobCentcommBartender
   requirements:
     - !type:OverallPlaytimeRequirement
-      time: 920000
+      time: 920000 # 255 hrs
     - !type:DepartmentTimeRequirement
       department: Civilian
       time: 72000 #20 hrs # Sunrise-RoleTime
@@ -24,6 +24,13 @@
   special:
    - !type:AddImplantSpecial
      implants: [ MindShieldImplant ]
+  speciesBlacklist:
+  - Vox
+  - Felinid
+  - Vulpkanin
+  - Swine
+  - Dwarf
+  - HumanoidXeno
 
 - type: startingGear
   id: CentcommBartenderGear

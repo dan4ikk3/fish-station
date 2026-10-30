@@ -5,7 +5,7 @@
   playTimeTracker: JobCentcommMedicalDoctor
   requirements:
     - !type:OverallPlaytimeRequirement
-      time: 920000
+      time: 920000 # 255 hrs
     - !type:DepartmentTimeRequirement
       department: Medical
       time: 72000 #20 hrs # Sunrise-RoleTime
@@ -25,3 +25,10 @@
     prototype: WehMedipen
   - !type:AddImplantSpecial
     implants: [ MindShieldImplant ]
+  speciesBlacklist:
+  - Vox
+  - Felinid
+  - Vulpkanin
+  - Swine
+  - Dwarf
+  - HumanoidXeno

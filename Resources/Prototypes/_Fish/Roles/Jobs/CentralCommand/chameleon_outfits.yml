@@ -37,3 +37,7 @@
 - type: chameleonOutfit
   id: ChameleonOutfitRepresentativeBlueShield
   job: RepresentativeBlueShield
+
+- type: chameleonOutfit
+  id: CentCommMaidChameleonOutfit
+  job: CentCommMaid
