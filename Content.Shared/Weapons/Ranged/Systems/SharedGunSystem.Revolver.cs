@@ -92,6 +92,11 @@ public partial class SharedGunSystem
         {
             UpdateAmmoCount(ent, prediction: false);
         }
+
+        // Fish-start
+        if (oldIndex == state.CurrentIndex)
+            UpdateAmmoCount(ent, prediction: false);
+        // Fish-end
     }
 
     public bool TryRevolverInsert(Entity<RevolverAmmoProviderComponent> ent, EntityUid insertEnt, EntityUid? user)

@@ -115,7 +115,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaMapItemComponent, GettingPickedUpAttemptEvent>(OnMapItemPickup);
         SubscribeLocalEvent<DmArenaMapItemComponent, GettingInteractedWithAttemptEvent>(OnMapItemInteract);
         SubscribeLocalEvent<DmArenaMapItemComponent, PullAttemptEvent>(OnMapItemPull);
-        SubscribeLocalEvent<TimedDespawnComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
+        SubscribeLocalEvent<DmArenaSweptComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
 
@@ -653,6 +653,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             || !TryGetFighterRule((entity, fighter), out var rule))
             return;
 
+        StartRespawnCooldown((entity, fighter), rule);
         RewardKill((entity, fighter));
         RemoveFromArena((entity, fighter), rule);
         args.Handled = true;
@@ -784,7 +785,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             RemComp<DmArenaDormantBodyComponent>(originalBody);
     }
 
-    private void OnDespawnPickedUp(Entity<TimedDespawnComponent> ent, ref EntGotInsertedIntoContainerMessage args)
+    private void OnDespawnPickedUp(Entity<DmArenaSweptComponent> ent, ref EntGotInsertedIntoContainerMessage args)
     {
         // Рюкзак и другое хранилище бойца тоже считаются: поднятое в них не должно исчезнуть
         EntityUid? owner = args.Container.Owner;
@@ -792,11 +793,31 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         {
             if (HasComp<DmArenaFighterComponent>(current))
             {
-                RemComp<TimedDespawnComponent>(ent);
+                CancelDespawn(ent);
                 return;
             }
 
             owner = _container.TryGetContainingContainer((current, null, null), out var outer) ? outer.Owner : null;
+        }
+    }
+
+    private void CancelDespawn(EntityUid uid)
+    {
+        if (HasComp<DmArenaSweptComponent>(uid))
+        {
+            RemComp<DmArenaSweptComponent>(uid);
+            RemComp<TimedDespawnComponent>(uid);
+        }
+
+        if (!TryComp<ContainerManagerComponent>(uid, out var manager))
+            return;
+
+        foreach (var container in _container.GetAllContainers(uid, manager))
+        {
+            foreach (var contained in container.ContainedEntities.ToList())
+            {
+                CancelDespawn(contained);
+            }
         }
     }
 
@@ -805,6 +826,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (HasComp<TimedDespawnComponent>(uid) || checkContainer && _container.IsEntityInContainer(uid))
             return;
 
+        EnsureComp<DmArenaSweptComponent>(uid);
         EnsureComp<TimedDespawnComponent>(uid).Lifetime = lifetime;
     }
 

@@ -54,29 +54,42 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
             return false;
 
         var userId = origMind.UserId;
-        _mind.UnVisit(origMindId, origMind);
-
-        // Освобождаем userId для одноразового разума
-        _mind.SetUserId(origMindId, null, origMind);
-
-        var newMind = _mind.CreateMind(userId, origMind.CharacterName);
+        Entity<MindComponent>? newMind = null;
 
         try
         {
-            _mind.TransferTo(newMind, newBody);
+            _mind.UnVisit(origMindId, origMind);
+
+            // Освобождаем userId для одноразового разума
+            _mind.SetUserId(origMindId, null, origMind);
+
+            newMind = _mind.CreateMind(userId, origMind.CharacterName);
+            _mind.TransferTo(newMind.Value, newBody);
             _playerManager.SetAttachedEntity(session, newBody);
         }
         catch (Exception e)
         {
             Log.Error($"Failed to swap mind of {session.Name} into {ToPrettyString(newBody)}: {e}");
-            QueueDel(newMind);
+
+            if (newMind is { } failed)
+                QueueDel(failed);
+
             _mind.SetUserId(origMindId, userId, origMind);
+
+            if (!TerminatingOrDeleted(currentEntity))
+            {
+                if (origMind.OwnedEntity != currentEntity)
+                    _mind.Visit(origMindId, currentEntity, origMind);
+
+                _playerManager.SetAttachedEntity(session, currentEntity);
+            }
+
             return false;
         }
 
         var swap = EnsureComp<DmArenaMindSwapComponent>(newBody);
         swap.OriginalMind = origMindId;
-        swap.DisposableMind = newMind;
+        swap.DisposableMind = newMind.Value;
 
         return true;
     }
