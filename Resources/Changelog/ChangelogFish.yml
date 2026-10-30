@@ -1182,3 +1182,47 @@
     message: Все роли синего щита получили новый комплект имплантов как и у Офицера.
   id: 120
   url: https://github.com/makura-games/fish-station/pull/572
+- author: KrytoiChuvaaak
+  time: '2026-10-30T15:25:56.0000000+00:00'
+  changes:
+  - type: Tweak
+    message: Зимняя куртка капитана больше не даёт защиты от урона и от стамины.
+  id: 121
+  url: https://github.com/makura-games/fish-station/pull/528
+- author: KrytoiChuvaaak
+  time: '2026-10-30T15:28:08.0000000+00:00'
+  changes:
+  - type: Add
+    message: У админ-призрака появилась кнопка самозапрета на взаимодействие с миром.
+  - type: Add
+    message: Имя админ-призрака теперь подписывается должностью администратора, в том числе в LOOC.
+  id: 122
+  url: https://github.com/makura-games/fish-station/pull/537
+- author: dan4ikk3
+  time: '2026-10-30T15:33:48.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлена ДМ арена.
+  - type: Add
+    message: Добавлена уникальная карта ДМ арены.
+  - type: Add
+    message: Добавлены готовые наборы снаряжения для ДМ арены.
+  - type: Add
+    message: Добавлена команда dmarena, которой администраторы включают и выключают ДМ арену.
+  id: 123
+  url: https://github.com/makura-games/fish-station/pull/522
+  media:
+  - url: https://github.com/user-attachments/assets/020667d1-e462-4fdd-95c5-1d404f78979f
+    description: изображение
+  - url: https://github.com/user-attachments/assets/99f1040e-d1bb-4a88-85c4-b9badab9dd8b
+    description: изображение
+- author: dan4ikk3
+  time: '2026-10-30T15:35:38.0000000+00:00'
+  changes:
+  - type: Add
+    message: Добавлена плюшка Андре Люсайн
+  id: 124
+  url: https://github.com/makura-games/fish-station/pull/569
+  media:
+  - url: https://github.com/user-attachments/assets/8d72711a-0607-4d97-97c5-bcf36c3fd13f
+    description: изображение
