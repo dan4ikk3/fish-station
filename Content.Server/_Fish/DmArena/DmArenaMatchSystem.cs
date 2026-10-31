@@ -3,6 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server.Administration;
 using Content.Server.Administration.Logs;
+using Content.Server.EnergyDome;
 using Content.Server.EUI;
 using Content.Server.GameTicking;
 using Content.Server.GameTicking.Rules;
@@ -128,6 +129,8 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
         SubscribeLocalEvent<DmArenaFighterComponent, EntityTerminatingEvent>(OnFighterTerminating);
         SubscribeLocalEvent<DmArenaFighterComponent, DamageDealtEvent>(OnFighterDamaged);
+        SubscribeLocalEvent<EnergyDomeComponent, DamageDealtEvent>(OnDomeDamaged);
+        SubscribeLocalEvent<DmArenaFighterComponent, IsUnequippingTargetAttemptEvent>(OnFighterUnequip);
 
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
     }
@@ -485,14 +488,37 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private void OnFighterDamaged(Entity<DmArenaFighterComponent> ent, ref DamageDealtEvent args)
     {
-        if (args.Origin is not { } attacker || attacker == ent.Owner || !TryComp<DmArenaFighterComponent>(attacker, out var other))
+        MarkCombat(ent, args.Origin);
+    }
+
+    private void OnDomeDamaged(Entity<EnergyDomeComponent> ent, ref DamageDealtEvent args)
+    {
+        if (ent.Comp.Generator is { } generator
+            && TryComp<EnergyDomeGeneratorComponent>(generator, out var generatorComp)
+            && generatorComp.DomeParentEntity is { } wearer
+            && TryComp<DmArenaFighterComponent>(wearer, out var fighter))
+            MarkCombat((wearer, fighter), args.Origin);
+    }
+
+    private void MarkCombat(Entity<DmArenaFighterComponent> victim, EntityUid? origin)
+    {
+        if (origin is not { } attacker || attacker == victim.Owner || !TryComp<DmArenaFighterComponent>(attacker, out var other))
             return;
 
-        if (!_mobState.IsCritical(ent))
-            ent.Comp.LastCombat = _timing.CurTime;
+        if (!_mobState.IsCritical(victim))
+            victim.Comp.LastCombat = _timing.CurTime;
 
         if (!_mobState.IsCritical(attacker))
             other.LastCombat = _timing.CurTime;
+    }
+
+    private void OnFighterUnequip(EntityUid uid, DmArenaFighterComponent component, IsUnequippingTargetAttemptEvent args)
+    {
+        if (args.User == uid || !TryGetFighterRule((uid, component), out var rule) || (args.SlotFlags & rule.LockedSlots) == 0)
+            return;
+
+        args.Reason = "dm-arena-strip-locked";
+        args.Cancel();
     }
 
     private bool IsInCombat(Entity<DmArenaFighterComponent> ent)
