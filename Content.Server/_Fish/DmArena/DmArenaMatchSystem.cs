@@ -753,11 +753,8 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (args.SenderSession.AttachedEntity is not { Valid: true } current)
             return;
 
-        if (IsIdleGhost(current))
-        {
-            TryLeaveToOriginalBody(current);
+        if (TryComp<DmArenaFighterComponent>(current, out var fighter) && IsInCombat((current, fighter)))
             return;
-        }
 
         if (!TryReturnToBody(current))
             Log.Warning($"DM arena return to body rejected for {args.SenderSession.Name}: {ToPrettyString(current)}");
