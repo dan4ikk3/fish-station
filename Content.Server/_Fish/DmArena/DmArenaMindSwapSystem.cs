@@ -65,7 +65,6 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
 
             newMind = _mind.CreateMind(userId, origMind.CharacterName);
 
-            // Одноразовый разум не должен порождать призрака при удалении тела
             if (TryComp<MindContainerComponent>(newBody, out var bodyContainer))
                 bodyContainer.GhostOnShutdown = false;
 
@@ -96,7 +95,6 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
         swap.OriginalMind = origMindId;
         swap.DisposableMind = newMind.Value;
 
-        // Старый призрак теперь без разума: удаляем, иначе они копятся над ареной
         if (!TerminatingOrDeleted(currentEntity))
         {
             if (TryComp<MindContainerComponent>(currentEntity, out var ghostContainer))
@@ -120,7 +118,6 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
 
         var ghost = Spawn("MobObserver", coords);
 
-        // Прежний призрак удалён вместе с телом-владельцем: разум нужно вернуть напрямую
         var hasBody = origMind.OwnedEntity is { } owner && Exists(owner);
         if (hasBody)
             _mind.Visit(temp.OriginalMind, ghost, origMind);

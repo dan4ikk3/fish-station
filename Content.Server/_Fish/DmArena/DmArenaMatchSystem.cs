@@ -161,7 +161,6 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SweepLooseItems(rule);
     }
 
-    // Арена закрыта первые минуты раунда, если админ не открыл её вручную
     private bool IsOpen => _enabled
         && (_openedManually || _ticker.RunLevel == GameRunLevel.InRound && _ticker.RoundDuration() >= _openAfter);
 
@@ -350,7 +349,6 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private void ShieldEntity(EntityUid uid)
     {
-        // Купол должен получать урон, иначе поясной генератор никогда не разряжается
         if (!HasComp<MobStateComponent>(uid) && !HasComp<EnergyDomeComponent>(uid))
             EnsureComp<DmArenaShieldedComponent>(uid);
     }
@@ -388,7 +386,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     {
         if (!IsOpen)
         {
-            // Клиент мог не знать, что арена закрыта
+            // Клиент мог не знать, что арена выключена
             RaiseNetworkEvent(new DmArenaPlayerCountEvent(0, false), session.Channel);
             return false;
         }
@@ -766,7 +764,6 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         var items = EntityQueryEnumerator<ItemComponent, TransformComponent>();
         while (items.MoveNext(out var uid, out _, out var xform))
         {
-            // Некоторые расы подбираемые (Item), бойцов чистить нельзя
             if (xform.MapID == map && !HasComp<DmArenaMapItemComponent>(uid) && !HasComp<MobStateComponent>(uid))
                 MarkForDespawn(uid, rule.SweepDespawnTime, checkContainer: true);
         }
@@ -813,7 +810,6 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         BroadcastPlayerCount(rule);
     }
 
-    // Боец мог исчезнуть мимо обычного выхода (удаление, чистка): счётчик и игрок не должны зависнуть
     private void OnFighterTerminating(Entity<DmArenaFighterComponent> ent, ref EntityTerminatingEvent args)
     {
         if (!TryGetFighterRule(ent, out var rule) || !rule.Players.Remove(GetNetEntity(ent)))
