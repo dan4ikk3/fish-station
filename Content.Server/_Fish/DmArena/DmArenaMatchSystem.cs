@@ -488,13 +488,18 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (args.Origin is not { } attacker || attacker == ent.Owner || !TryComp<DmArenaFighterComponent>(attacker, out var other))
             return;
 
-        ent.Comp.LastCombat = _timing.CurTime;
-        other.LastCombat = _timing.CurTime;
+        if (!_mobState.IsCritical(ent))
+            ent.Comp.LastCombat = _timing.CurTime;
+
+        if (!_mobState.IsCritical(attacker))
+            other.LastCombat = _timing.CurTime;
     }
 
     private bool IsInCombat(Entity<DmArenaFighterComponent> ent)
     {
-        if (!TryGetFighterRule(ent, out var rule) || _timing.CurTime >= ent.Comp.LastCombat + rule.CombatLock)
+        if (!TryGetFighterRule(ent, out var rule)
+            || _mobState.IsCritical(ent)
+            || _timing.CurTime >= ent.Comp.LastCombat + rule.CombatLock)
             return false;
 
         _popup.PopupEntity(Loc.GetString("dm-arena-in-combat"), ent.Owner, ent.Owner);
@@ -505,6 +510,9 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     {
         if (!TryGetFighterRule(ent, out var rule))
             return;
+
+        if (args.NewMobState == MobState.Critical)
+            ent.Comp.LastCombat = TimeSpan.Zero;
 
         switch (args.NewMobState)
         {
@@ -714,9 +722,8 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             || !TryGetFighterRule((entity, fighter), out var rule))
             return;
 
-        if (!_mobState.IsCritical(entity))
+        if (IsInCombat((entity, fighter)))
         {
-            _popup.PopupEntity(Loc.GetString("dm-arena-ghost-alive"), entity, entity);
             args.Handled = true;
             return;
         }
