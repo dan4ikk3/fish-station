@@ -28,6 +28,7 @@ using Content.Shared.Item;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
+using Content.Shared.Mobs.Systems;
 using Content.Shared.Movement.Components;
 using Content.Shared.Movement.Pulling.Events;
 using Content.Shared.Physics;
@@ -67,6 +68,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     [Dependency] private IServerPreferencesManager _prefs = default!;
     [Dependency] private EuiManager _euiManager = default!;
     [Dependency] private GameTicker _ticker = default!;
+    [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private MindSystem _mind = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private SharedContainerSystem _container = default!;
@@ -712,8 +714,9 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             || !TryGetFighterRule((entity, fighter), out var rule))
             return;
 
-        if (IsInCombat((entity, fighter)))
+        if (!_mobState.IsCritical(entity))
         {
+            _popup.PopupEntity(Loc.GetString("dm-arena-ghost-alive"), entity, entity);
             args.Handled = true;
             return;
         }
