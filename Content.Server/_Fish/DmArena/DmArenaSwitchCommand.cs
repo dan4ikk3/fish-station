@@ -65,18 +65,22 @@ public sealed partial class DmArenaSwitchCommand : LocalizedCommands
 
     private void SetEnabled(IConsoleShell shell, bool current, bool value)
     {
+        var who = shell.Player?.Name ?? "server";
+
         if (value)
             _systems.GetEntitySystem<DmArenaMatchSystem>().OpenManually();
 
         if (value == current)
         {
+            if (value)
+                _adminLog.Add(LogType.AdminCommands, LogImpact.High, $"{who} opened the DM arena manually");
+
             WriteStatus(shell, current);
             return;
         }
 
         _cfg.SetCVar(DmArenaConfigVars.DmArenaEnabled, value);
 
-        var who = shell.Player?.Name ?? "server";
         _adminLog.Add(LogType.AdminCommands, LogImpact.High, $"{who} {(value ? "enabled" : "disabled")} the DM arena");
 
         shell.WriteLine(LocalizationManager.GetString(value ? "cmd-dmarena-enabled" : "cmd-dmarena-disabled"));
