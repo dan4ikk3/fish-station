@@ -64,6 +64,11 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
             _mind.SetUserId(origMindId, null, origMind);
 
             newMind = _mind.CreateMind(userId, origMind.CharacterName);
+
+            // Одноразовый разум не должен порождать призрака при удалении тела
+            if (TryComp<MindContainerComponent>(newBody, out var bodyContainer))
+                bodyContainer.GhostOnShutdown = false;
+
             _mind.TransferTo(newMind.Value, newBody);
             _playerManager.SetAttachedEntity(session, newBody);
         }
@@ -91,6 +96,15 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
         swap.OriginalMind = origMindId;
         swap.DisposableMind = newMind.Value;
 
+        // Старый призрак теперь без разума: удаляем, иначе они копятся над ареной
+        if (!TerminatingOrDeleted(currentEntity))
+        {
+            if (TryComp<MindContainerComponent>(currentEntity, out var ghostContainer))
+                ghostContainer.GhostOnShutdown = false;
+
+            QueueDel(currentEntity);
+        }
+
         return true;
     }
 
@@ -105,10 +119,16 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
         CleanupDisposableMind(temporaryBody, temp);
 
         var ghost = Spawn("MobObserver", coords);
-        _mind.Visit(temp.OriginalMind, ghost, origMind);
+
+        // Прежний призрак удалён вместе с телом-владельцем: разум нужно вернуть напрямую
+        var hasBody = origMind.OwnedEntity is { } owner && Exists(owner);
+        if (hasBody)
+            _mind.Visit(temp.OriginalMind, ghost, origMind);
+        else
+            _mind.TransferTo(temp.OriginalMind, ghost, mind: origMind);
 
         if (TryComp<GhostComponent>(ghost, out var ghostComp))
-            _ghost.SetCanReturnToBody((ghost, ghostComp), origMind.OwnedEntity is { } owned && Exists(owned));
+            _ghost.SetCanReturnToBody((ghost, ghostComp), hasBody);
 
         if (GetGhostName(origMind) is { } name)
             _meta.SetEntityName(ghost, FormattedMessage.EscapeText(name));

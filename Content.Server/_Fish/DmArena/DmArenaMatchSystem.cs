@@ -16,6 +16,7 @@ using Content.Shared.Administration;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Dataset;
+using Content.Shared.EnergyDome;
 using Content.Shared.Examine;
 using Content.Shared.Fluids.Components;
 using Content.Shared.GameTicking;
@@ -86,6 +87,10 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     private static readonly SoundPathSpecifier LeaveSound = new("/Audio/Effects/pop_high.ogg");
     private EntityUid? _ruleEntity;
     private bool _enabled = true;
+    private bool _openedManually;
+    private bool _wasOpen;
+    private TimeSpan _openAfter;
+    private TimeSpan _nextOpenCheck;
 
     private bool _refillOnKill;
 
@@ -97,6 +102,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
         Subs.CVar(_cfg, DmArenaConfigVars.DmArenaRefill, value => _refillOnKill = value, true);
         Subs.CVar(_cfg, DmArenaConfigVars.DmArenaEnabled, OnEnabledChanged, true);
+        Subs.CVar(_cfg, DmArenaConfigVars.DmArenaOpenDelay, value => _openAfter = TimeSpan.FromMinutes(value), true);
 
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundEnding);
         SubscribeLocalEvent<DmArenaRuleComponent, RuleLoadedGridsEvent>(OnGridsLoaded);
@@ -118,6 +124,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaSweptComponent, EntGotInsertedIntoContainerMessage>(OnDespawnPickedUp);
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
+        SubscribeLocalEvent<DmArenaFighterComponent, EntityTerminatingEvent>(OnFighterTerminating);
 
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
     }
@@ -134,18 +141,44 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (args.NewStatus != SessionStatus.InGame)
             return;
 
-        RaiseNetworkEvent(new DmArenaPlayerCountEvent(CurrentRule?.Players.Count ?? 0, _enabled), args.Session.Channel);
+        RaiseNetworkEvent(new DmArenaPlayerCountEvent(CurrentRule?.Players.Count ?? 0, IsOpen), args.Session.Channel);
     }
 
     public override void Update(float frameTime)
     {
         base.Update(frameTime);
 
+        if (_timing.CurTime >= _nextOpenCheck)
+        {
+            _nextOpenCheck = _timing.CurTime + TimeSpan.FromSeconds(1);
+            RefreshOpenState();
+        }
+
         if (CurrentRule is not { Active: true } rule || _timing.CurTime < rule.NextCleanup)
             return;
 
         rule.NextCleanup = _timing.CurTime + rule.CleanupInterval;
         SweepLooseItems(rule);
+    }
+
+    // Арена закрыта первые минуты раунда, если админ не открыл её вручную
+    private bool IsOpen => _enabled
+        && (_openedManually || _ticker.RunLevel == GameRunLevel.InRound && _ticker.RoundDuration() >= _openAfter);
+
+    public void OpenManually()
+    {
+        _openedManually = true;
+        RefreshOpenState();
+    }
+
+    private void RefreshOpenState()
+    {
+        var open = IsOpen;
+        if (open == _wasOpen)
+            return;
+
+        _wasOpen = open;
+        BroadcastPlayerCount();
     }
 
     private DmArenaRuleComponent? CurrentRule =>
@@ -193,6 +226,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     private void OnRoundEnding(RoundRestartCleanupEvent ev)
     {
         CloseEuis();
+        _openedManually = false;
 
         if (CurrentRule is { } rule)
         {
@@ -316,7 +350,8 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private void ShieldEntity(EntityUid uid)
     {
-        if (!HasComp<MobStateComponent>(uid))
+        // Купол должен получать урон, иначе поясной генератор никогда не разряжается
+        if (!HasComp<MobStateComponent>(uid) && !HasComp<EnergyDomeComponent>(uid))
             EnsureComp<DmArenaShieldedComponent>(uid);
     }
 
@@ -351,9 +386,9 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     public bool TryOpenLoadout(ICommonSession session)
     {
-        if (!_enabled)
+        if (!IsOpen)
         {
-            // Клиент мог не знать, что арена выключена
+            // Клиент мог не знать, что арена закрыта
             RaiseNetworkEvent(new DmArenaPlayerCountEvent(0, false), session.Channel);
             return false;
         }
@@ -466,7 +501,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     public bool SpawnPlayer(ICommonSession session, EntityUid ruleEntity, List<int> items)
     {
-        if (!_enabled
+        if (!IsOpen
             || !TryComp<DmArenaRuleComponent>(ruleEntity, out var rule)
             || !rule.Active
             || session.AttachedEntity is not { Valid: true } ghost
@@ -731,7 +766,8 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         var items = EntityQueryEnumerator<ItemComponent, TransformComponent>();
         while (items.MoveNext(out var uid, out _, out var xform))
         {
-            if (xform.MapID == map && !HasComp<DmArenaMapItemComponent>(uid))
+            // Некоторые расы подбираемые (Item), бойцов чистить нельзя
+            if (xform.MapID == map && !HasComp<DmArenaMapItemComponent>(uid) && !HasComp<MobStateComponent>(uid))
                 MarkForDespawn(uid, rule.SweepDespawnTime, checkContainer: true);
         }
 
@@ -774,6 +810,17 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
         rule.Players.Remove(GetNetEntity(ent));
         QueueDel(ent);
+        BroadcastPlayerCount(rule);
+    }
+
+    // Боец мог исчезнуть мимо обычного выхода (удаление, чистка): счётчик и игрок не должны зависнуть
+    private void OnFighterTerminating(Entity<DmArenaFighterComponent> ent, ref EntityTerminatingEvent args)
+    {
+        if (!TryGetFighterRule(ent, out var rule) || !rule.Players.Remove(GetNetEntity(ent)))
+            return;
+
+        ClearOriginalBodyMarker(ent);
+        _mindSwap.TryRestoreAsGhost(ent);
         BroadcastPlayerCount(rule);
     }
 
@@ -853,7 +900,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             eui.StateDirty();
         }
 
-        RaiseNetworkEvent(new DmArenaPlayerCountEvent(rule?.Players.Count ?? 0, _enabled), Filter.Broadcast());
+        RaiseNetworkEvent(new DmArenaPlayerCountEvent(rule?.Players.Count ?? 0, IsOpen), Filter.Broadcast());
     }
 
     public DmArenaKitEuiState GetLoadoutState(EntityUid ruleEntity, NetUserId userId)
