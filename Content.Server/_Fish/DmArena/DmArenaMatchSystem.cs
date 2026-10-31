@@ -750,7 +750,16 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
 
     private void OnRevivalAccept(DmArenaRevivalAcceptEvent ev, EntitySessionEventArgs args)
     {
-        if (args.SenderSession.AttachedEntity is { Valid: true } current && !TryReturnToBody(current))
+        if (args.SenderSession.AttachedEntity is not { Valid: true } current)
+            return;
+
+        if (IsIdleGhost(current))
+        {
+            TryLeaveToOriginalBody(current);
+            return;
+        }
+
+        if (!TryReturnToBody(current))
             Log.Warning($"DM arena return to body rejected for {args.SenderSession.Name}: {ToPrettyString(current)}");
     }
 
