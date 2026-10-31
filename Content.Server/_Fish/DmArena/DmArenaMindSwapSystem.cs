@@ -64,10 +64,6 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
             _mind.SetUserId(origMindId, null, origMind);
 
             newMind = _mind.CreateMind(userId, origMind.CharacterName);
-
-            if (TryComp<MindContainerComponent>(newBody, out var bodyContainer))
-                bodyContainer.GhostOnShutdown = false;
-
             _mind.TransferTo(newMind.Value, newBody);
             _playerManager.SetAttachedEntity(session, newBody);
         }
@@ -97,8 +93,8 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
 
         if (!TerminatingOrDeleted(currentEntity))
         {
-            if (TryComp<MindContainerComponent>(currentEntity, out var ghostContainer))
-                ghostContainer.GhostOnShutdown = false;
+            if (origMind.OwnedEntity == currentEntity)
+                _mind.TransferTo(origMindId, null, createGhost: false, mind: origMind);
 
             QueueDel(currentEntity);
         }
@@ -172,6 +168,12 @@ public sealed partial class DmArenaMindSwapSystem : EntitySystem
 
         if (Exists(temp.DisposableMind))
         {
+            if (TryComp<MindComponent>(temp.DisposableMind, out var disposable)
+                && disposable.OwnedEntity is { } stray
+                && stray != temporaryBody
+                && HasComp<GhostComponent>(stray))
+                QueueDel(stray);
+
             _mind.WipeMind(temp.DisposableMind);
             QueueDel(temp.DisposableMind);
         }
