@@ -272,6 +272,7 @@ ent-FishWeaponPistolN1984 = { ent-WeaponPistolN1984 }
 # Неразрушимые вещи
 dm-arena-indestructible = This is indestructible.
 dm-arena-respawn-cooldown = Your body is not cold yet. Wait { $seconds } s.
+dm-arena-in-combat = You are in combat, you cannot leave right now.
 
 dm-arena-item-deagle = Deagle pistol
 dm-arena-desc-deagle = A powerful magnum pistol, two spare magazines

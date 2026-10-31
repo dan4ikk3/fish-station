@@ -97,4 +97,7 @@ public sealed partial class DmArenaRuleComponent : Component
 
     [DataField]
     public TimeSpan RespawnCooldown = TimeSpan.FromSeconds(20);
+
+    [DataField]
+    public TimeSpan CombatLock = TimeSpan.FromSeconds(10);
 }

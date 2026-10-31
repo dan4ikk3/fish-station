@@ -272,6 +272,7 @@ ent-FishWeaponPistolN1984 = { ent-WeaponPistolN1984 }
 # Неразрушимые вещи
 dm-arena-indestructible = Это не разобрать.
 dm-arena-respawn-cooldown = Тело ещё не остыло. Подождите { $seconds } с.
+dm-arena-in-combat = Вы в бою, уйти сейчас нельзя.
 
 dm-arena-item-deagle = Пистолет «Дигл»
 dm-arena-desc-deagle = Мощный пистолет под магнум, два запасных магазина

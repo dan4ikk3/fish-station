@@ -125,6 +125,7 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         SubscribeLocalEvent<DmArenaDormantBodyComponent, ExaminedEvent>(OnOriginalBodyExamined);
         SubscribeLocalEvent<DmArenaFighterComponent, PlayerDetachedEvent>(OnPlayerDetached);
         SubscribeLocalEvent<DmArenaFighterComponent, EntityTerminatingEvent>(OnFighterTerminating);
+        SubscribeLocalEvent<DmArenaFighterComponent, DamageDealtEvent>(OnFighterDamaged);
 
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
     }
@@ -475,8 +476,27 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
     private void OnLeaveRequest(DmArenaLeaveRequestEvent ev, EntitySessionEventArgs args)
     {
         if (args.SenderSession.AttachedEntity is { Valid: true } entity
-            && TryComp<DmArenaFighterComponent>(entity, out var fighter))
+            && TryComp<DmArenaFighterComponent>(entity, out var fighter)
+            && !IsInCombat((entity, fighter)))
             LeaveDmArena((entity, fighter));
+    }
+
+    private void OnFighterDamaged(Entity<DmArenaFighterComponent> ent, ref DamageDealtEvent args)
+    {
+        if (args.Origin is not { } attacker || attacker == ent.Owner || !TryComp<DmArenaFighterComponent>(attacker, out var other))
+            return;
+
+        ent.Comp.LastCombat = _timing.CurTime;
+        other.LastCombat = _timing.CurTime;
+    }
+
+    private bool IsInCombat(Entity<DmArenaFighterComponent> ent)
+    {
+        if (!TryGetFighterRule(ent, out var rule) || _timing.CurTime >= ent.Comp.LastCombat + rule.CombatLock)
+            return false;
+
+        _popup.PopupEntity(Loc.GetString("dm-arena-in-combat"), ent.Owner, ent.Owner);
+        return true;
     }
 
     private void OnMobStateChanged(Entity<DmArenaFighterComponent> ent, ref MobStateChangedEvent args)
@@ -673,6 +693,12 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
         if (args.Victim != ent.Owner || !TryGetFighterRule(ent, out var rule))
             return;
 
+        if (IsInCombat(ent))
+        {
+            args.Handled = true;
+            return;
+        }
+
         StartRespawnCooldown(ent, rule);
         RewardKill(ent);
         RemoveFromArena(ent, rule);
@@ -685,6 +711,12 @@ public sealed partial class DmArenaMatchSystem : EntitySystem
             || !TryComp<DmArenaFighterComponent>(entity, out var fighter)
             || !TryGetFighterRule((entity, fighter), out var rule))
             return;
+
+        if (IsInCombat((entity, fighter)))
+        {
+            args.Handled = true;
+            return;
+        }
 
         StartRespawnCooldown((entity, fighter), rule);
         RewardKill((entity, fighter));
