@@ -36,10 +36,10 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<EntitySpokeEvent>(OnSpoke);
-        SubscribeLocalEvent<BorgChassisComponent, MapInitEvent>(OnBorgMapInit);
+        SubscribeLocalEvent<BorgChassisComponent, ComponentInit>(OnBorgInit);
     }
 
-    private void OnBorgMapInit(Entity<BorgChassisComponent> ent, ref MapInitEvent args)
+    private void OnBorgInit(Entity<BorgChassisComponent> ent, ref ComponentInit args)
     {
         EnsureComp<FishCameraHearingComponent>(ent);
     }
