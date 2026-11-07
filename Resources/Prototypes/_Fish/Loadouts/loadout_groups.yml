@@ -134,4 +134,35 @@
   - FishSpecOpsWeaponPistolDeagle
   - FishSpecOpsWeaponPistolDeagleGolden
 
+- type: loadoutGroup
+  id: FishCentCommOfficerJumpsuit
+  name: loadout-group-centcomm-operator-jumpsuit
+  loadouts:
+  - CentCommOfficerJumpsuit
+  - CentCommOfficerJumpskirt
+  - CentCommOfficialJumpsuit
+  - CentCommOfficialJumpskirt
+  - CentCommOfficialJumpsuitFish
+  - CentCommOfficialJumpskirtFish
+  - CentCommAssistantJumpsuitFish
+  - FishCentCommFormalJumpsuit
+  - FishCentCommFormalDress
 
+- type: loadoutGroup
+  id: FishCentCommOfficerOuter
+  name: loadout-group-centcomm-outer
+  minLimit: 0
+  loadouts:
+  - CentcommArmor
+  - CentCommArmorSlim
+  - CentcommCoatFish
+  - CentcommArmorFish
+  - FishCentCommCarapace
+
+- type: loadoutGroup
+  id: FishCentCommOfficerTrinkets
+  name: loadout-group-trinkets
+  minLimit: 0
+  maxLimit: 1
+  loadouts:
+  - FishCentCommFlippo

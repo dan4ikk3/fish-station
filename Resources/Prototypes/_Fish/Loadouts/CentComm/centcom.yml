@@ -219,3 +219,26 @@
   id: CentCommAdminGlasses
   equipment:
     eyes: ClothingEyesGlassesCommand
+
+# --- Officer / Trainee extras ---
+
+- type: loadout
+  id: FishCentCommFormalJumpsuit
+  equipment:
+    jumpsuit: ClothingUniformJumpsuitCentcomFormal
+
+- type: loadout
+  id: FishCentCommFormalDress
+  equipment:
+    jumpsuit: ClothingUniformJumpskirtCentcomFormalDress
+
+- type: loadout
+  id: FishCentCommCarapace
+  equipment:
+    outerClothing: ClothingOuterArmorCentcommCarapace
+
+- type: loadout
+  id: FishCentCommFlippo
+  storage:
+    back:
+    - CentCommFlippo
