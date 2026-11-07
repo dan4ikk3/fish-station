@@ -1,8 +1,7 @@
 using System.Numerics;
-using Content.Server.Chat.Managers;
+using Content.Server.Chat.Systems;
 using Content.Shared._Fish.CameraHearing;
 using Content.Shared.Chat;
-using Content.Shared.Examine;
 using Content.Shared.Mind.Components;
 using Content.Shared.Power.EntitySystems;
 using Content.Shared.Silicons.Borgs.Components;
@@ -11,8 +10,6 @@ using Content.Shared.SurveillanceCamera.Components;
 using Content.Shared.Wall;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
-using Robust.Shared.Random;
-using Robust.Shared.Utility;
 
 namespace Content.Server._Fish.CameraHearing;
 
@@ -21,21 +18,16 @@ namespace Content.Server._Fish.CameraHearing;
 /// </summary>
 public sealed partial class FishCameraHearingSystem : EntitySystem
 {
-    [Dependency] private IChatManager _chatManager = default!;
-    [Dependency] private IRobustRandom _random = default!;
-    [Dependency] private SharedChatSystem _chat = default!;
     [Dependency] private SharedStationAiSystem _stationAi = default!;
     [Dependency] private SharedPowerReceiverSystem _powerReceiver = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private ExamineSystemShared _examine = default!;
 
-    private readonly HashSet<EntityUid> _listeners = new();
-
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<EntitySpokeEvent>(OnSpoke);
+        SubscribeLocalEvent<ExpandICChatRecipientsEvent>(OnExpandRecipients);
         SubscribeLocalEvent<BorgChassisComponent, ComponentInit>(OnBorgInit);
     }
 
@@ -44,18 +36,17 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
         EnsureComp<FishCameraHearingComponent>(ent);
     }
 
-    private void OnSpoke(EntitySpokeEvent ev)
+    private void OnExpandRecipients(ExpandICChatRecipientsEvent ev)
     {
         if (!HasComp<MindContainerComponent>(ev.Source))
             return;
 
-        var whisper = ev.ObfuscatedMessage != null;
+        var whisper = ev.VoiceRange <= SharedChatSystem.WhisperMuffledRange;
         var sourceXform = Transform(ev.Source);
         var sourcePos = _transform.GetWorldPosition(sourceXform);
         var sourceCoords = _transform.GetMapCoordinates(sourceXform);
-        var heard = false;
-
-        _listeners.Clear();
+        var viewers = new List<(EntityUid Viewer, float Range)>();
+        float? nearest = null;
 
         var query = EntityQueryEnumerator<FishCameraHearingComponent, TransformComponent>();
         while (query.MoveNext(out var uid, out var hearing, out var xform))
@@ -63,38 +54,40 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
             if (xform.MapID != sourceXform.MapID || !IsWorking(uid))
                 continue;
 
-            var range = whisper ? hearing.WhisperRange : hearing.Range;
+            var distance = (_transform.GetWorldPosition(xform) - sourcePos).Length();
 
-            if ((_transform.GetWorldPosition(xform) - sourcePos).Length() > range ||
+            if (distance > (whisper ? hearing.WhisperRange : hearing.Range) ||
                 IsBlockedByWall(uid, xform, sourceCoords, hearing.WallMountFrontOffset))
                 continue;
 
-            heard = true;
+            nearest = nearest == null ? distance : Math.Min(nearest.Value, distance);
 
-            if (TryComp<SurveillanceCameraComponent>(uid, out var camera))
-                _listeners.UnionWith(camera.ActivePvsViewers);
+            if (!TryComp<SurveillanceCameraComponent>(uid, out var camera))
+                continue;
+
+            foreach (var viewer in camera.ActivePvsViewers)
+            {
+                viewers.Add((viewer, distance));
+            }
         }
 
-        if (!heard)
+        if (nearest == null)
             return;
 
         var cores = EntityQueryEnumerator<StationAiCoreComponent>();
         while (cores.MoveNext(out var core, out var coreComp))
         {
-            if (coreComp.Remote && _stationAi.TryGetHeld((core, coreComp), out var held))
-                _listeners.Add(held.Value);
+            if (coreComp.Remote &&
+                _stationAi.TryGetHeld((core, coreComp), out var held) &&
+                TryComp<ActorComponent>(held, out var actor))
+                ev.Recipients.TryAdd(actor.PlayerSession, new ChatSystem.ICChatRecipientData(nearest.Value, false));
         }
 
-        var directRange = whisper ? SharedChatSystem.WhisperMuffledRange : SharedChatSystem.VoiceRange;
-
-        foreach (var listener in _listeners)
+        // Зрители камеры видят речь только облачком, без записи в чат.
+        foreach (var (viewer, range) in viewers)
         {
-            if (listener == ev.Source ||
-                !TryComp<ActorComponent>(listener, out var actor) ||
-                _transform.InRange((listener, Transform(listener)), (ev.Source, sourceXform), directRange))
-                continue;
-
-            Send(ev.Source, ev.Message, whisper, actor.PlayerSession);
+            if (TryComp<ActorComponent>(viewer, out var actor))
+                ev.Recipients.TryAdd(actor.PlayerSession, new ChatSystem.ICChatRecipientData(range, false, true));
         }
     }
 
@@ -118,35 +111,5 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
         }
 
         return !_examine.InRangeUnOccluded(origin, source, 0f, null);
-    }
-
-    private void Send(EntityUid source, string message, bool whisper, ICommonSession session)
-    {
-        var nameEv = new TransformSpeakerNameEvent(source, MetaData(source).EntityName);
-        RaiseLocalEvent(source, nameEv);
-
-        var name = FormattedMessage.EscapeText(nameEv.VoiceName);
-        var content = FormattedMessage.EscapeText(message);
-        string wrapped;
-
-        if (whisper)
-        {
-            wrapped = Loc.GetString("chat-manager-entity-whisper-wrap-message", ("entityName", name), ("message", content));
-        }
-        else
-        {
-            var speech = nameEv.SpeechVerb != null && ProtoMan.Resolve(nameEv.SpeechVerb, out var verbProto)
-                ? verbProto
-                : _chat.GetSpeechVerb(source, message);
-
-            wrapped = Loc.GetString(speech.Bold ? "chat-manager-entity-say-bold-wrap-message" : "chat-manager-entity-say-wrap-message",
-                ("entityName", name),
-                ("verb", Loc.GetString(_random.Pick(speech.SpeechVerbStrings))),
-                ("fontType", speech.FontId),
-                ("fontSize", speech.FontSize),
-                ("message", content));
-        }
-
-        _chatManager.ChatMessageToOne(whisper ? ChatChannel.Whisper : ChatChannel.Local, message, wrapped, source, false, session.Channel);
     }
 }

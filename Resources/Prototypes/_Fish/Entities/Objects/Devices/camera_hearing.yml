@@ -11,10 +11,3 @@
   - type: Item
     size: Small
   - type: FishCameraUpgrade
-
-- type: entity
-  parent: MasterHandheldCamera
-  id: FishMasterHandheldCamera
-  suffix: Fish, Hearing
-  components:
-  - type: FishCameraHearing

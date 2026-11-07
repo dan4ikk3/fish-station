@@ -9,7 +9,7 @@
 
 - type: latheRecipe
   id: FishMasterHandheldCameraRecipe
-  result: FishMasterHandheldCamera
+  result: MasterHandheldCamera
   completetime: 8
   materials:
     Steel: 500
