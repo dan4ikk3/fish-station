@@ -8,7 +8,6 @@ using Content.Shared.Power.EntitySystems;
 using Content.Shared.Silicons.Borgs.Components;
 using Content.Shared.Silicons.StationAi;
 using Content.Shared.SurveillanceCamera.Components;
-using Content.Shared.Wall;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 
@@ -58,7 +57,7 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
             var distance = (_transform.GetWorldPosition(xform) - sourcePos).Length();
 
             if (distance > (whisper ? hearing.WhisperRange : hearing.Range) ||
-                IsBlockedByWall(uid, xform, sourceCoords, hearing.WallMountFrontOffset))
+                IsBlockedByWall(xform, sourceCoords, hearing.FrontOffset))
                 continue;
 
             nearest = nearest == null ? distance : Math.Min(nearest.Value, distance);
@@ -72,23 +71,32 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
             }
         }
 
-        if (nearest == null)
-            return;
-
         var cores = EntityQueryEnumerator<StationAiCoreComponent>();
         while (cores.MoveNext(out var core, out var coreComp))
         {
-            if (coreComp.Remote &&
-                _stationAi.TryGetHeld((core, coreComp), out var held) &&
-                TryComp<ActorComponent>(held, out var actor))
-                ev.Recipients.TryAdd(actor.PlayerSession, new ChatSystem.ICChatRecipientData(nearest.Value, false));
+            if (!coreComp.Remote ||
+                !_stationAi.TryGetHeld((core, coreComp), out var held) ||
+                !TryComp<ActorComponent>(held, out var actor) ||
+                held == ev.Source)
+                continue;
+
+            var session = actor.PlayerSession;
+
+            // Глаз ИИ слышит речь в радиусе, но не сквозь стены.
+            if (session.AttachedEntity is { } eye &&
+                ev.Recipients.ContainsKey(session) &&
+                !_examine.InRangeUnOccluded(eye, sourceCoords, 0f))
+                ev.Recipients.Remove(session);
+
+            // Через камеру ИИ видит речь только облачком, шёпот приходит в чат.
+            if (nearest != null)
+                ev.Recipients.TryAdd(session, new ChatSystem.ICChatRecipientData(nearest.Value, false, !whisper));
         }
 
-        // Зрители камеры видят речь только облачком, без записи в чат.
         foreach (var (viewer, range) in viewers)
         {
             if (TryComp<ActorComponent>(viewer, out var actor))
-                ev.Recipients.TryAdd(actor.PlayerSession, new ChatSystem.ICChatRecipientData(range, false, true));
+                ev.Recipients.TryAdd(actor.PlayerSession, new ChatSystem.ICChatRecipientData(range, false));
         }
     }
 
@@ -101,13 +109,14 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
                camera.Active && _powerReceiver.IsPowered(uid);
     }
 
-    private bool IsBlockedByWall(EntityUid uid, TransformComponent xform, MapCoordinates source, float frontOffset)
+    private bool IsBlockedByWall(TransformComponent xform, MapCoordinates source, float frontOffset)
     {
         var origin = _transform.GetMapCoordinates(xform);
 
-        if (TryComp<WallMountComponent>(uid, out var mount))
+        // Настенная камера стоит внутри стены, поэтому слух считается от точки перед ней.
+        if (xform.Anchored)
         {
-            var front = (_transform.GetWorldRotation(xform) + mount.Direction).RotateVec(new Vector2(0f, -1f));
+            var front = _transform.GetWorldRotation(xform).RotateVec(new Vector2(0f, -1f));
             origin = origin.Offset(front * frontOffset);
         }
 

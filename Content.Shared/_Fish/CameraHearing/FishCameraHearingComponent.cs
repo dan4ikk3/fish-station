@@ -13,8 +13,8 @@ public sealed partial class FishCameraHearingComponent : Component
     public float WhisperRange = 2f;
 
     /// <summary>
-    /// Насколько вперёд от настенной камеры считается точкой слуха, чтобы стена не глушила звук.
+    /// Насколько вперёд от закреплённой камеры считается точкой слуха, чтобы стена не глушила звук.
     /// </summary>
     [DataField]
-    public float WallMountFrontOffset = 0.75f;
+    public float FrontOffset = 0.75f;
 }

@@ -6,8 +6,8 @@
   suffix: Fish
   components:
   - type: Sprite
-    sprite: _Fish/Objects/Devices/camera_upgrade.rsi
-    state: icon
+    sprite: Objects/Storage/boxes.rsi
+    state: box
   - type: Item
     size: Small
   - type: FishCameraUpgrade

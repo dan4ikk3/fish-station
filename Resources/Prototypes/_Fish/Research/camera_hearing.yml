@@ -3,8 +3,8 @@
   id: FishCameraHearing
   name: research-technology-fish-camera-hearing
   icon:
-    sprite: _Fish/Objects/Devices/camera_upgrade.rsi
-    state: icon
+    sprite: Objects/Storage/boxes.rsi
+    state: box
   discipline: Arsenal
   tier: 3
   cost: 10000
