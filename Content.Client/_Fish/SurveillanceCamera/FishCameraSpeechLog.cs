@@ -1,3 +1,6 @@
+using System.Numerics;
+using Content.Client.Viewport;
+using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Timing;
@@ -6,47 +9,93 @@ using Robust.Shared.Utility;
 namespace Content.Client.SurveillanceCamera.UI;
 
 /// <summary>
-/// Строки речи поверх вида камеры в мониторе, исчезают через несколько секунд.
+/// Облачки речи над говорящими поверх вида камеры в мониторе.
 /// </summary>
-public sealed class FishCameraSpeechLog : RichTextLabel
+public sealed class FishCameraSpeechLog : Control
 {
+    [Dependency] private IEntityManager _entMan = default!;
     [Dependency] private IGameTiming _timing = default!;
 
-    private static readonly TimeSpan LineLifetime = TimeSpan.FromSeconds(8);
+    private static readonly TimeSpan BubbleLifetime = TimeSpan.FromSeconds(6);
+    private const float BubbleMaxWidth = 200f;
+    private const float HeadOffset = 24f;
 
-    private readonly List<(string Text, TimeSpan Expire)> _lines = new();
+    private readonly List<(EntityUid Speaker, Control Bubble, TimeSpan Expire)> _bubbles = new();
+    private ScalingViewport? _viewport;
 
     public FishCameraSpeechLog()
     {
         IoCManager.InjectDependencies(this);
+        MouseFilter = MouseFilterMode.Ignore;
     }
 
-    public void AddLine(string speaker, string message)
+    public void AddLine(ScalingViewport viewport, NetEntity speaker, string message)
     {
-        _lines.Add(($"{FormattedMessage.EscapeText(speaker)}: {FormattedMessage.EscapeText(message)}", _timing.RealTime + LineLifetime));
-        Refresh();
+        if (!_entMan.TryGetEntity(speaker, out var uid))
+            return;
+
+        _viewport = viewport;
+        Remove(uid.Value);
+
+        var label = new RichTextLabel { MaxWidth = BubbleMaxWidth, Margin = new Thickness(4) };
+        label.SetMessage(FormattedMessage.FromUnformatted(message));
+
+        var bubble = new PanelContainer
+        {
+            PanelOverride = new StyleBoxFlat { BackgroundColor = Color.Black.WithAlpha(0.7f) },
+            MouseFilter = MouseFilterMode.Ignore,
+        };
+        bubble.AddChild(label);
+        AddChild(bubble);
+        _bubbles.Add((uid.Value, bubble, _timing.RealTime + BubbleLifetime));
+    }
+
+    private void Remove(EntityUid speaker)
+    {
+        for (var i = _bubbles.Count - 1; i >= 0; i--)
+        {
+            if (_bubbles[i].Speaker != speaker)
+                continue;
+
+            RemoveChild(_bubbles[i].Bubble);
+            _bubbles.RemoveAt(i);
+        }
     }
 
     protected override void FrameUpdate(FrameEventArgs args)
     {
         base.FrameUpdate(args);
 
-        if (_lines.RemoveAll(line => line.Expire <= _timing.RealTime) > 0)
-            Refresh();
-    }
-
-    private void Refresh()
-    {
-        var message = new FormattedMessage();
-
-        for (var i = 0; i < _lines.Count; i++)
+        for (var i = _bubbles.Count - 1; i >= 0; i--)
         {
-            if (i > 0)
-                message.PushNewline();
+            if (_bubbles[i].Expire > _timing.RealTime && !_entMan.Deleted(_bubbles[i].Speaker))
+                continue;
 
-            message.AddMarkupPermissive(_lines[i].Text);
+            RemoveChild(_bubbles[i].Bubble);
+            _bubbles.RemoveAt(i);
         }
 
-        SetMessage(message);
+        InvalidateArrange();
+    }
+
+    protected override Vector2 ArrangeOverride(Vector2 finalSize)
+    {
+        if (_viewport == null)
+            return finalSize;
+
+        var transform = _entMan.System<SharedTransformSystem>();
+
+        foreach (var (speaker, bubble, _) in _bubbles)
+        {
+            bubble.Measure(Vector2.Max(finalSize, new Vector2(BubbleMaxWidth, BubbleMaxWidth)));
+
+            var screen = _viewport.WorldToScreen(transform.GetWorldPosition(speaker));
+            var local = (screen - GlobalPixelPosition) / UIScale;
+            var size = bubble.DesiredSize;
+
+            bubble.Arrange(UIBox2.FromDimensions(local - new Vector2(size.X / 2f, size.Y + HeadOffset), size));
+        }
+
+        return finalSize;
     }
 }

@@ -3,11 +3,11 @@ using Robust.Shared.Serialization;
 namespace Content.Shared._Fish.CameraHearing;
 
 /// <summary>
-/// Речь, услышанная камерой, для показа на экране монитора камер.
+/// Речь, услышанная камерой, для показа облачком над говорящим на экране монитора камер.
 /// </summary>
 [Serializable, NetSerializable]
-public sealed class FishCameraSpeechMessage(string speaker, string message) : BoundUserInterfaceMessage
+public sealed class FishCameraSpeechMessage(NetEntity speaker, string message) : BoundUserInterfaceMessage
 {
-    public string Speaker { get; } = speaker;
+    public NetEntity Speaker { get; } = speaker;
     public string Message { get; } = message;
 }

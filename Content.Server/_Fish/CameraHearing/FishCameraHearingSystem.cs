@@ -13,7 +13,7 @@ using Robust.Shared.Player;
 namespace Content.Server._Fish.CameraHearing;
 
 /// <summary>
-/// Речь рядом с улучшенной камерой или активным боргом слышит ИИ, а мониторы камер показывают её текстом. Стены глушат звук.
+/// Речь рядом с улучшенной камерой или активным боргом слышит ИИ, а мониторы камер показывают её облачком над говорящим. Стены глушат звук.
 /// </summary>
 public sealed partial class FishCameraHearingSystem : EntitySystem
 {
@@ -45,9 +45,7 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
             Hear(ev.Source, ev.ObfuscatedMessage != null) == null)
             return;
 
-        var nameEv = new TransformSpeakerNameEvent(ev.Source, MetaData(ev.Source).EntityName);
-        RaiseLocalEvent(ev.Source, nameEv);
-        var message = new FishCameraSpeechMessage(nameEv.VoiceName, ev.Message);
+        var message = new FishCameraSpeechMessage(GetNetEntity(ev.Source), ev.Message);
 
         foreach (var camera in _heardBy)
         {
