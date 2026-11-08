@@ -81,8 +81,9 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
 
             var session = actor.PlayerSession;
 
-            // Глаз ИИ слышит речь в радиусе, но не сквозь стены.
+            // Летающий глаз ИИ слышит речь в радиусе, но не сквозь стены. Слух у ядра и в голопаде не трогаем.
             if (session.AttachedEntity is { } eye &&
+                eye == coreComp.RemoteEntity &&
                 ev.Recipients.ContainsKey(session) &&
                 !_examine.InRangeUnOccluded(eye, sourceCoords, 0f))
                 ev.Recipients.Remove(session);
