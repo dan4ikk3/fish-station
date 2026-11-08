@@ -45,7 +45,9 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
             Hear(ev.Source, ev.ObfuscatedMessage != null) == null)
             return;
 
-        var message = new FishCameraSpeechMessage(GetNetEntity(ev.Source), ev.Message);
+        var nameEv = new TransformSpeakerNameEvent(ev.Source, MetaData(ev.Source).EntityName);
+        RaiseLocalEvent(ev.Source, nameEv);
+        var message = new FishCameraSpeechMessage(GetNetEntity(ev.Source), nameEv.VoiceName, ev.Message);
 
         foreach (var camera in _heardBy)
         {

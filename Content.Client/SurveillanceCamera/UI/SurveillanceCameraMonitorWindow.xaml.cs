@@ -198,9 +198,9 @@ public sealed partial class SurveillanceCameraMonitorWindow : DefaultWindow
     }
 
     // Fish-start
-    public void AddSpeech(NetEntity speaker, string message)
+    public void AddSpeech(NetEntity speaker, string name, string message)
     {
-        SpeechLog.AddLine(CameraView, speaker, message);
+        SpeechLog.AddLine(CameraView, speaker, name, message);
     }
     // Fish-end
 
