@@ -197,6 +197,13 @@ public sealed partial class SurveillanceCameraMonitorWindow : DefaultWindow
         CameraSelected!((string)SubnetList[args.ItemIndex].Metadata!, null);
     }
 
+    // Fish-start
+    public void AddSpeech(string speaker, string message)
+    {
+        SpeechLog.AddLine(speaker, message);
+    }
+    // Fish-end
+
     public void SetMap(EntityUid mapUid)
     {
         CameraMap.MapUid = _mapUid = mapUid;
