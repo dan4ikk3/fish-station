@@ -1,17 +1,16 @@
 - type: roleLoadout
   id: JobCentCommTrainee
   groups:
-  - FishCentCommOfficerJumpsuit
+  - CentCommOperatorJumpsuitFish
   - CentCommOperatorHatsFish
   - CentCommOperatorShoesFish
   - CentCommOperatorGlovesFish
-  - FishCentCommOfficerOuter
+  - CentCommOperatorOuterFish
   - CentCommOperatorNeckFish
   - CentCommOperatorEyesFish
   - CentCommOperatorBackFish
   - CentCommOperatorWeaponsFish
-  - Trinkets
-  - FishCentCommOfficerTrinkets
+  - CentCommOperatorTrinketsFish
   - Survival
   - GroupSpeciesBreathTool
   - Bra
@@ -21,17 +20,16 @@
 - type: roleLoadout
   id: JobCentCommOfficer
   groups:
-  - FishCentCommOfficerJumpsuit
+  - CentCommOperatorJumpsuitFish
   - CentCommOperatorHatsFish
   - CentCommOperatorShoesFish
   - CentCommOperatorGlovesFish
-  - FishCentCommOfficerOuter
+  - CentCommOperatorOuterFish
   - CentCommOperatorNeckFish
   - CentCommOperatorEyesFish
   - CentCommOperatorBackFish
   - CentCommOperatorWeaponsFish
-  - Trinkets
-  - FishCentCommOfficerTrinkets
+  - CentCommOperatorTrinketsFish
   - Survival
   - GroupSpeciesBreathTool
   - Bra

@@ -223,22 +223,22 @@
 # --- Officer / Trainee extras ---
 
 - type: loadout
-  id: FishCentCommFormalJumpsuit
+  id: CentCommFormalJumpsuitFish
   equipment:
     jumpsuit: ClothingUniformJumpsuitCentcomFormal
 
 - type: loadout
-  id: FishCentCommFormalDress
+  id: CentCommFormalDressFish
   equipment:
     jumpsuit: ClothingUniformJumpskirtCentcomFormalDress
 
 - type: loadout
-  id: FishCentCommCarapace
+  id: CentCommCarapaceFish
   equipment:
     outerClothing: ClothingOuterArmorCentcommCarapace
 
 - type: loadout
-  id: FishCentCommFlippo
+  id: CentCommFlippoFish
   storage:
     back:
     - CentCommFlippo
