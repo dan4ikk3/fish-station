@@ -1,6 +1,5 @@
 using System.Numerics;
 using Content.Client.Chat.Managers;
-using Content.Client.Viewport; // Fish-edit
 using Content.Shared.CCVar;
 using Content.Shared.Chat;
 using Content.Shared.Speech;
@@ -61,18 +60,6 @@ namespace Content.Client.Chat.UI
         private float _verticalOffsetAchieved;
 
         public Vector2 ContentSize { get; private set; }
-
-        // Fish-start
-        public ScalingViewport? FishViewport { get; set; }
-
-        private Vector2 FishWorldToScreen(Vector2 worldPos)
-        {
-            if (FishViewport == null)
-                return _eyeManager.WorldToScreen(worldPos);
-
-            return FishViewport.WorldToScreen(worldPos) - (Parent?.GlobalPixelPosition ?? Vector2.Zero);
-        }
-        // Fish-end
 
         // man down
         public event Action<EntityUid, SpeechBubble>? OnDied;
@@ -143,9 +130,7 @@ namespace Content.Client.Chat.UI
                 _verticalOffsetAchieved = MathHelper.Lerp(_verticalOffsetAchieved, VerticalOffset, 10 * args.DeltaSeconds);
             }
 
-            var eye = FishViewport?.Eye ?? _eyeManager.CurrentEye; // Fish-edit
-
-            if (!_entityManager.TryGetComponent<TransformComponent>(_senderEntity, out var xform) || xform.MapID != eye.Position.MapId) // Fish-edit
+            if (!_entityManager.TryGetComponent<TransformComponent>(_senderEntity, out var xform) || xform.MapID != _eyeManager.CurrentEye.Position.MapId)
             {
                 Modulate = Color.White.WithAlpha(0);
                 return;
@@ -167,10 +152,10 @@ namespace Content.Client.Chat.UI
             if (_entityManager.TryGetComponent<SpeechComponent>(_senderEntity, out var speech))
                 baseOffset = speech.SpeechBubbleOffset;
 
-            var offset = (-eye.Rotation).ToWorldVec() * -(EntityVerticalOffset + baseOffset); // Fish-edit
+            var offset = (-_eyeManager.CurrentEye.Rotation).ToWorldVec() * -(EntityVerticalOffset + baseOffset);
             var worldPos = _transformSystem.GetWorldPosition(xform) + offset;
 
-            var lowerCenter = FishWorldToScreen(worldPos) / UIScale; // Fish-edit
+            var lowerCenter = _eyeManager.WorldToScreen(worldPos) / UIScale;
             var screenPos = lowerCenter - new Vector2(ContentSize.X / 2, ContentSize.Y + _verticalOffsetAchieved);
             // Round to nearest 0.5
             screenPos = (screenPos * 2).Rounded() / 2;

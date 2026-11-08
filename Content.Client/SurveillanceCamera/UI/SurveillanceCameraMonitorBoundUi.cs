@@ -78,7 +78,7 @@ public sealed class SurveillanceCameraMonitorBoundUserInterface : BoundUserInter
     protected override void ReceiveMessage(BoundUserInterfaceMessage message)
     {
         if (message is FishCameraSpeechMessage speech)
-            _window?.AddSpeech(speech.Speaker, speech.Name, speech.Message);
+            _window?.AddSpeech(speech.Speaker, speech.Name, speech.Message, speech.Whisper);
     }
     // Fish-end
 

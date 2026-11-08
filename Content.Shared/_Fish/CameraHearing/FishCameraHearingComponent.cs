@@ -7,7 +7,7 @@ namespace Content.Shared._Fish.CameraHearing;
 public sealed partial class FishCameraHearingComponent : Component
 {
     [DataField]
-    public float Range = 5f;
+    public float Range = 4f;
 
     [DataField]
     public float WhisperRange = 2f;

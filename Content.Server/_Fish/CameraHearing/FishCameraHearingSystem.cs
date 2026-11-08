@@ -41,13 +41,14 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
 
     private void OnSpoke(EntitySpokeEvent ev)
     {
-        if (!HasComp<MindContainerComponent>(ev.Source) ||
-            Hear(ev.Source, ev.ObfuscatedMessage != null) == null)
+        var whisper = ev.ObfuscatedMessage != null;
+
+        if (!HasComp<MindContainerComponent>(ev.Source) || Hear(ev.Source, whisper) == null)
             return;
 
         var nameEv = new TransformSpeakerNameEvent(ev.Source, MetaData(ev.Source).EntityName);
         RaiseLocalEvent(ev.Source, nameEv);
-        var message = new FishCameraSpeechMessage(GetNetEntity(ev.Source), nameEv.VoiceName, ev.Message);
+        var message = new FishCameraSpeechMessage(GetNetEntity(ev.Source), nameEv.VoiceName, ev.Message, whisper);
 
         foreach (var camera in _heardBy)
         {
