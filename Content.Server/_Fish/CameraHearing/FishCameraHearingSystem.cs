@@ -2,6 +2,7 @@ using System.Numerics;
 using Content.Server.Chat.Systems;
 using Content.Shared._Fish.CameraHearing;
 using Content.Shared.Chat;
+using Content.Shared.Examine;
 using Content.Shared.Mind.Components;
 using Content.Shared.Power.EntitySystems;
 using Content.Shared.Silicons.Borgs.Components;
