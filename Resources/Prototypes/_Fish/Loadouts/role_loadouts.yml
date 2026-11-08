@@ -10,7 +10,8 @@
   - CentCommOperatorEyesFish
   - CentCommOperatorBackFish
   - CentCommOperatorWeaponsFish
-  - CentCommOperatorTrinketsFish
+  - Trinkets
+  - CentCommJobTrinkets
   - Survival
   - GroupSpeciesBreathTool
   - Bra
@@ -29,7 +30,8 @@
   - CentCommOperatorEyesFish
   - CentCommOperatorBackFish
   - CentCommOperatorWeaponsFish
-  - CentCommOperatorTrinketsFish
+  - Trinkets
+  - CentCommJobTrinkets
   - Survival
   - GroupSpeciesBreathTool
   - Bra
