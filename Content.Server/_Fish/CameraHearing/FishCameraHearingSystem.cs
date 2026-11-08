@@ -1,4 +1,3 @@
-using System.Numerics;
 using Content.Server.Chat.Systems;
 using Content.Shared._Fish.CameraHearing;
 using Content.Shared.Chat;
@@ -7,14 +6,14 @@ using Content.Shared.Mind.Components;
 using Content.Shared.Power.EntitySystems;
 using Content.Shared.Silicons.Borgs.Components;
 using Content.Shared.Silicons.StationAi;
+using Content.Shared.SurveillanceCamera;
 using Content.Shared.SurveillanceCamera.Components;
-using Robust.Shared.Map;
 using Robust.Shared.Player;
 
 namespace Content.Server._Fish.CameraHearing;
 
 /// <summary>
-/// Речь рядом с улучшенной камерой или активным боргом слышат ИИ и зрители камеры, если между ними нет стены.
+/// Речь рядом с улучшенной камерой или активным боргом слышит ИИ, а мониторы камер показывают её текстом. Стены глушат звук.
 /// </summary>
 public sealed partial class FishCameraHearingSystem : EntitySystem
 {
@@ -22,11 +21,15 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
     [Dependency] private SharedPowerReceiverSystem _powerReceiver = default!;
     [Dependency] private SharedTransformSystem _transform = default!;
     [Dependency] private ExamineSystemShared _examine = default!;
+    [Dependency] private SharedUserInterfaceSystem _ui = default!;
+
+    private readonly List<EntityUid> _heardBy = new();
 
     public override void Initialize()
     {
         base.Initialize();
 
+        SubscribeLocalEvent<EntitySpokeEvent>(OnSpoke);
         SubscribeLocalEvent<ExpandICChatRecipientsEvent>(OnExpandRecipients);
         SubscribeLocalEvent<BorgChassisComponent, ComponentInit>(OnBorgInit);
     }
@@ -36,40 +39,36 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
         EnsureComp<FishCameraHearingComponent>(ent);
     }
 
+    private void OnSpoke(EntitySpokeEvent ev)
+    {
+        if (!HasComp<MindContainerComponent>(ev.Source) ||
+            Hear(ev.Source, ev.ObfuscatedMessage != null) == null)
+            return;
+
+        var nameEv = new TransformSpeakerNameEvent(ev.Source, MetaData(ev.Source).EntityName);
+        RaiseLocalEvent(ev.Source, nameEv);
+        var message = new FishCameraSpeechMessage(nameEv.VoiceName, ev.Message);
+
+        foreach (var camera in _heardBy)
+        {
+            if (!TryComp<SurveillanceCameraComponent>(camera, out var comp))
+                continue;
+
+            foreach (var monitor in comp.ActiveMonitors)
+            {
+                _ui.ServerSendUiMessage(monitor, SurveillanceCameraMonitorUiKey.Key, message);
+            }
+        }
+    }
+
     private void OnExpandRecipients(ExpandICChatRecipientsEvent ev)
     {
         if (!HasComp<MindContainerComponent>(ev.Source))
             return;
 
         var whisper = ev.VoiceRange <= SharedChatSystem.WhisperMuffledRange;
-        var sourceXform = Transform(ev.Source);
-        var sourcePos = _transform.GetWorldPosition(sourceXform);
-        var sourceCoords = _transform.GetMapCoordinates(sourceXform);
-        var viewers = new List<(EntityUid Viewer, float Range)>();
-        float? nearest = null;
-
-        var query = EntityQueryEnumerator<FishCameraHearingComponent, TransformComponent>();
-        while (query.MoveNext(out var uid, out var hearing, out var xform))
-        {
-            if (xform.MapID != sourceXform.MapID || !IsWorking(uid))
-                continue;
-
-            var distance = (_transform.GetWorldPosition(xform) - sourcePos).Length();
-
-            if (distance > (whisper ? hearing.WhisperRange : hearing.Range) ||
-                IsBlockedByWall(xform, sourceCoords, hearing.FrontOffset))
-                continue;
-
-            nearest = nearest == null ? distance : Math.Min(nearest.Value, distance);
-
-            if (!TryComp<SurveillanceCameraComponent>(uid, out var camera))
-                continue;
-
-            foreach (var viewer in camera.ActivePvsViewers)
-            {
-                viewers.Add((viewer, distance));
-            }
-        }
+        var nearest = Hear(ev.Source, whisper);
+        var sourceCoords = _transform.GetMapCoordinates(ev.Source);
 
         var cores = EntityQueryEnumerator<StationAiCoreComponent>();
         while (cores.MoveNext(out var core, out var coreComp))
@@ -92,12 +91,37 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
             if (nearest != null)
                 ev.Recipients.TryAdd(session, new ChatSystem.ICChatRecipientData(nearest.Value, false, !whisper));
         }
+    }
 
-        foreach (var (viewer, range) in viewers)
+    /// <summary>
+    /// Находит работающие источники слуха, которые слышат говорящего. Возвращает расстояние до ближайшего.
+    /// </summary>
+    private float? Hear(EntityUid source, bool whisper)
+    {
+        var sourceXform = Transform(source);
+        var sourcePos = _transform.GetWorldPosition(sourceXform);
+        var sourceCoords = _transform.GetMapCoordinates(sourceXform);
+        float? nearest = null;
+
+        _heardBy.Clear();
+
+        var query = EntityQueryEnumerator<FishCameraHearingComponent, TransformComponent>();
+        while (query.MoveNext(out var uid, out var hearing, out var xform))
         {
-            if (TryComp<ActorComponent>(viewer, out var actor))
-                ev.Recipients.TryAdd(actor.PlayerSession, new ChatSystem.ICChatRecipientData(range, false));
+            if (xform.MapID != sourceXform.MapID || !IsWorking(uid))
+                continue;
+
+            var distance = (_transform.GetWorldPosition(xform) - sourcePos).Length();
+
+            if (distance > (whisper ? hearing.WhisperRange : hearing.Range) ||
+                !_examine.InRangeUnOccluded(_transform.GetMapCoordinates(xform), sourceCoords, 0f, null))
+                continue;
+
+            _heardBy.Add(uid);
+            nearest = nearest == null ? distance : Math.Min(nearest.Value, distance);
         }
+
+        return nearest;
     }
 
     private bool IsWorking(EntityUid uid)
@@ -107,19 +131,5 @@ public sealed partial class FishCameraHearingSystem : EntitySystem
 
         return !TryComp<SurveillanceCameraComponent>(uid, out var camera) ||
                camera.Active && _powerReceiver.IsPowered(uid);
-    }
-
-    private bool IsBlockedByWall(TransformComponent xform, MapCoordinates source, float frontOffset)
-    {
-        var origin = _transform.GetMapCoordinates(xform);
-
-        // Настенная камера стоит внутри стены, поэтому слух считается от точки перед ней.
-        if (xform.Anchored)
-        {
-            var front = _transform.GetWorldRotation(xform).RotateVec(new Vector2(0f, -1f));
-            origin = origin.Offset(front * frontOffset);
-        }
-
-        return !_examine.InRangeUnOccluded(origin, source, 0f, null);
     }
 }
