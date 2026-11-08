@@ -1,24 +1,27 @@
 using System.Numerics;
+using Content.Client.Chat.UI;
 using Content.Client.Viewport;
+using Content.Shared.CCVar;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Configuration;
 using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 
 namespace Content.Client.SurveillanceCamera.UI;
 
 /// <summary>
-/// Облачки речи над говорящими поверх вида камеры в мониторе.
+/// Облачки речи над говорящими поверх вида камеры в мониторе, в том же стиле, что и обычные.
 /// </summary>
 public sealed class FishCameraSpeechLog : Control
 {
     [Dependency] private IEntityManager _entMan = default!;
     [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private IConfigurationManager _cfg = default!;
 
-    private static readonly TimeSpan BubbleLifetime = TimeSpan.FromSeconds(6);
-    private const float BubbleMaxWidth = 200f;
-    private const float HeadOffset = 24f;
+    private static readonly TimeSpan BubbleLifetime = TimeSpan.FromSeconds(4);
+    private const float HeadOffset = 0.5f;
 
     private readonly List<(EntityUid Speaker, Control Bubble, TimeSpan Expire)> _bubbles = new();
     private ScalingViewport? _viewport;
@@ -37,15 +40,20 @@ public sealed class FishCameraSpeechLog : Control
         _viewport = viewport;
         Remove(uid.Value);
 
-        var label = new RichTextLabel { MaxWidth = BubbleMaxWidth, Margin = new Thickness(4) };
+        var label = new RichTextLabel
+        {
+            MaxWidth = SpeechBubble.SpeechMaxWidth,
+            OutlineColorOverride = TextOutline.Default.Color,
+        };
         label.SetMessage(FormattedMessage.FromUnformatted(message));
 
         var bubble = new PanelContainer
         {
-            PanelOverride = new StyleBoxFlat { BackgroundColor = Color.Black.WithAlpha(0.7f) },
+            StyleClasses = { "speechBox", "sayBox" },
+            Children = { label },
+            ModulateSelfOverride = Color.White.WithAlpha(_cfg.GetCVar(CCVars.SpeechBubbleBackgroundOpacity)),
             MouseFilter = MouseFilterMode.Ignore,
         };
-        bubble.AddChild(label);
         AddChild(bubble);
         _bubbles.Add((uid.Value, bubble, _timing.RealTime + BubbleLifetime));
     }
@@ -87,13 +95,14 @@ public sealed class FishCameraSpeechLog : Control
 
         foreach (var (speaker, bubble, _) in _bubbles)
         {
-            bubble.Measure(Vector2.Max(finalSize, new Vector2(BubbleMaxWidth, BubbleMaxWidth)));
+            bubble.Measure(Vector2Helpers.Infinity);
 
-            var screen = _viewport.WorldToScreen(transform.GetWorldPosition(speaker));
+            var offset = (-_viewport.Eye!.Rotation).ToWorldVec() * -HeadOffset;
+            var screen = _viewport.WorldToScreen(transform.GetWorldPosition(speaker) + offset);
             var local = (screen - GlobalPixelPosition) / UIScale;
             var size = bubble.DesiredSize;
 
-            bubble.Arrange(UIBox2.FromDimensions(local - new Vector2(size.X / 2f, size.Y + HeadOffset), size));
+            bubble.Arrange(UIBox2.FromDimensions(local - new Vector2(size.X / 2f, size.Y), size));
         }
 
         return finalSize;
